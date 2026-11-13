@@ -87,10 +87,13 @@ async def convert_webm_to_mp4(
         }
 
     except Exception as e:
+        import traceback
+        tb = traceback.format_exc()
+        print(f"[CONVERTER ERROR] {tb}", flush=True)
         export_tasks[export_id] = {
             "status": "failed",
             "mp4_url": None,
-            "error": str(e)
+            "error": f"{type(e).__name__}: {str(e)} | {tb}"
         }
     finally:
         # Clean up temporary uploaded WebM file
