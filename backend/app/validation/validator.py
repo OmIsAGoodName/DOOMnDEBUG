@@ -52,19 +52,38 @@ class PlanValidator:
 
             # Clamp initial character placements
             for char in scene.characters:
-                orig_pos = char.position
-                char.position = (clamp_x(char.position[0]), clamp_y(char.position[1]))
-                if char.position != orig_pos:
-                    repairs.append(f"Clamped character {char.character_id} pos {orig_pos} -> {char.position}")
+                orig_pos = char.position if hasattr(char, "position") else (char.get("position") if isinstance(char, dict) else (0.5, 0.76))
+                clamped = (clamp_x(orig_pos[0]), clamp_y(orig_pos[1]))
+                if hasattr(char, "position"):
+                    char.position = clamped
+                    cid = getattr(char, "character_id", "unknown")
+                elif isinstance(char, dict):
+                    char["position"] = clamped
+                    cid = char.get("character_id", "unknown")
+                else:
+                    cid = "unknown"
+                if clamped != orig_pos:
+                    repairs.append(f"Clamped character {cid} pos {orig_pos} -> {clamped}")
 
             # Clamp initial props
             for prop in scene.props:
-                orig_pos = prop.position
-                prop.position = (clamp_x(prop.position[0]), clamp_y(prop.position[1]))
-                resolved_prop, rep = self.resolver.resolve_prop(prop.prop_id)
+                orig_pos = prop.position if hasattr(prop, "position") else (prop.get("position") if isinstance(prop, dict) else (0.5, 0.76))
+                clamped = (clamp_x(orig_pos[0]), clamp_y(orig_pos[1]))
+                if hasattr(prop, "position"):
+                    prop.position = clamped
+                    pid = getattr(prop, "prop_id", "prop")
+                elif isinstance(prop, dict):
+                    prop["position"] = clamped
+                    pid = prop.get("prop_id", "prop")
+                else:
+                    pid = "prop"
+                resolved_prop, rep = self.resolver.resolve_prop(pid)
                 if rep:
                     repairs.append(rep)
-                    prop.prop_id = resolved_prop
+                    if hasattr(prop, "prop_id"):
+                        prop.prop_id = resolved_prop
+                    elif isinstance(prop, dict):
+                        prop["prop_id"] = resolved_prop
 
             # Ensure choice beat is last beat
             choice_beat_idx = -1

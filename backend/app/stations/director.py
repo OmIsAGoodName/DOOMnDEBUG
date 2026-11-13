@@ -4,7 +4,7 @@ import uuid
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from ..models.story_draft import StoryDraft, DraftScene
-from ..models.episode_plan import EpisodePlan, Scene, CastMember, Palette, VoiceConfig
+from ..models.episode_plan import EpisodePlan, Scene, CastMember, Palette, VoiceConfig, PlacedCharacter, PlacedProp
 from ..stations.writer import load_metadata
 from ..llm.adapter import generate_json
 
@@ -242,13 +242,13 @@ async def direct_scene(
         for m_idx, m_cid in enumerate(missing_cids):
             slot = len(existing_cids) + m_idx
             x_pos = round(0.18 + (slot / max(1, total_chars - 1)) * 0.64, 2)
-            scene.characters.append({
-                "character_id": m_cid,
-                "position": (min(0.88, x_pos), 0.76),
-                "facing": "left" if x_pos > 0.50 else "right",
-                "expression": "happy",
-                "animation": "idle"
-            })
+            scene.characters.append(PlacedCharacter(
+                character_id=m_cid,
+                position=(min(0.88, x_pos), 0.76),
+                facing="left" if x_pos > 0.50 else "right",
+                expression="happy",
+                animation="idle"
+            ))
 
     # Ensure beats have healthy duration breathing room
     for beat in scene.beats:

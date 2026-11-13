@@ -9,7 +9,15 @@
 
 ## ⚡ Recent Updates (Physical Narrative Actions & Studio Asset Library)
 
-1. **Rich Narrative Action Parsing & Execution (Zero LLM Tokens)**:
+1. **Fixed Pipeline PlacedCharacter Dict Validation & Groq Rate Limit Resilience**:
+   - Resolved `AttributeError: 'dict' object has no attribute 'position'`:
+     - In [`backend/app/stations/director.py`](file:///d:/VoxFable/backend/app/stations/director.py), instantiated missing cast additions as `PlacedCharacter` models rather than raw dicts.
+     - In [`backend/app/validation/validator.py`](file:///d:/VoxFable/backend/app/validation/validator.py), made character & prop position clampers defensive against both Pydantic models and dictionary structures.
+   - Enhanced LLM provider fallback in [`backend/app/llm/providers.py`](file:///d:/VoxFable/backend/app/llm/providers.py):
+     - Added `llama-3.3-70b-versatile` and `llama-3.1-8b-instant` to candidate model list.
+     - Constrained `max_tokens: 1500` on Groq completion requests to avoid OTPM token estimation rejections.
+
+2. **Rich Narrative Action Parsing & Execution (Zero LLM Tokens)**:
    - **Cinematic Flight Exit**:
      - Extended `ActionRemoveCharacter.exit` in [`backend/app/models/episode_plan.py`](file:///d:/VoxFable/backend/app/models/episode_plan.py) to support `"fly_away"`.
      - In [`frontend/src/engine/resolveTimeline.ts`](file:///d:/VoxFable/frontend/src/engine/resolveTimeline.ts), implemented smooth upward ascent into the sky with flapping wings, easing, and natural alpha fade.

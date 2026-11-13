@@ -88,7 +88,7 @@ class GroqProvider(BaseProvider):
         models_to_try = []
         if self.model and "120b" not in self.model:
             models_to_try.append(self.model)
-        for candidate in ["openai/gpt-oss-20b", "qwen/qwen3.8-27b"]:
+        for candidate in ["openai/gpt-oss-20b", "llama-3.3-70b-versatile", "llama-3.1-8b-instant", "qwen/qwen3.8-27b"]:
             if candidate not in models_to_try:
                 models_to_try.append(candidate)
 
@@ -99,7 +99,8 @@ class GroqProvider(BaseProvider):
                     "model": model_name,
                     "messages": messages,
                     "response_format": {"type": "json_object"},
-                    "temperature": temperature
+                    "temperature": temperature,
+                    "max_tokens": 1500
                 }
                 try:
                     resp = await client.post(url, headers=headers, json=payload)
