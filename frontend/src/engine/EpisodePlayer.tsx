@@ -219,7 +219,7 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
     );
 
     // Play
-    const play = useCallback(() => {
+    const play = useCallback(async () => {
       if (timeRef.current >= timeline.totalDuration) {
         timeRef.current = 0;
       }
@@ -228,11 +228,11 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
       setIsChoiceActive(false);
       lastTimestampRef.current = null;
 
-      const ctx = audioEngineRef.current?.initContext();
-      if (ctx && ctx.state === 'suspended') {
-        ctx.resume().catch(() => {});
+      const engine = audioEngineRef.current;
+      if (engine) {
+        await engine.ensureContextResumed();
+        engine.syncPlayback(timeline, timeRef.current, true);
       }
-      audioEngineRef.current?.syncPlayback(timeline, timeRef.current, true);
 
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
       animFrameRef.current = requestAnimationFrame(tick);
@@ -248,17 +248,19 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
 
     // Seek
     const seek = useCallback(
-      (t: number) => {
+      async (t: number) => {
         const clampedT = Math.max(0, Math.min(t, timeline.totalDuration));
         timeRef.current = clampedT;
         lastTimestampRef.current = null;
 
         drawCurrentFrame(clampedT);
 
-        if (isPlayingRef.current) {
-          audioEngineRef.current?.syncPlayback(timeline, clampedT, true);
+        const engine = audioEngineRef.current;
+        if (isPlayingRef.current && engine) {
+          await engine.ensureContextResumed();
+          engine.syncPlayback(timeline, clampedT, true);
         } else {
-          audioEngineRef.current?.stopAll();
+          engine?.stopAll();
         }
       },
       [timeline, drawCurrentFrame]
