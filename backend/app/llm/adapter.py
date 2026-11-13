@@ -40,7 +40,7 @@ class LLMAdapter:
         user: str,
         schema: Union[Dict[str, Any], Type[BaseModel]],
         temperature: float = 0.7,
-        max_retries: int = 5,
+        max_retries: int = 2,
         bypass_cache: bool = False
     ) -> Dict[str, Any]:
         schema_name = schema.__name__ if isinstance(schema, type) else "json_schema"
@@ -105,7 +105,7 @@ async def generate_json(
     user: str,
     schema: Union[Dict[str, Any], Type[BaseModel]],
     temperature: float = 0.7,
-    max_retries: int = 5,
+    max_retries: int = 2,
     bypass_cache: bool = False
 ) -> Dict[str, Any]:
     return await llm_adapter.generate_json(
