@@ -1,8 +1,8 @@
 # Om's Status & Milestone Log
 
-**Current Milestone**: Part 3 (Integration, Demo Net & Pre-flight) Complete  
+**Current Milestone**: Lead Coordinator - Continuous Multi-Workstation Integration Active  
 **Date**: 2026-11-13  
-**Active Branch**: `om/supabase-backend` (synced with `main` at `e8b16f8`)
+**Active Branch**: `main` (synced at `65080ad`)
 
 ---
 
@@ -18,23 +18,29 @@
   - `docs/TASKS.md`: Complete automated integration runner docs + manual demo checklist.
   - `scripts/integration_check.py`: End-to-end integration test runner.
   - `scripts/bake_demo_episode.py`: Offline fallback baker for Quick, Live, and Studio episodes.
-  - Baked 3 offline demo episodes under `frontend/public/demo/episodes/` with synthesized edge-tts audio and `index.json` manifest (total size: ~0.84 MB, well below the 30 MB budget).
+  - Baked 3 offline demo episodes under `frontend/public/demo/episodes/` with synthesized edge-tts audio and `index.json` manifest.
   - `frontend/src/lib/api.ts`: Static fallback detection so the frontend can play and download demo episodes even with backend stopped / offline.
   - `scripts/preflight.py`: Pre-flight audit checking Python, Node, FFmpeg, ports 5173/8000, environment keys, baked episodes, disk space.
   - `docs/PREFLIGHT.md`: Demo-day hardware, audio, presentation script, and speaker allocation.
   - `scripts/run_demo.bat` & `scripts/run_demo.sh`: One-click simultaneous launcher for FastAPI and Vite.
+- [x] **Continuous Integration & Team Verification**:
+  - Merged & verified Maegan Part 1 (`dd3c201`): Timeline resolver, 720p canvas renderer, master clock, Web Audio engine, RMS lipsync, dev harness.
+  - Merged & verified Nigel Part 1 (`9ecede7`): Drawing kit primitives, `pip_owl` (8 poses, 6 expressions, 6 accessories), `forest_day`, `/dev/art` gallery.
+  - Merged & verified Maegan Parts 2-5 (`0264161` & `65080ad`): Zoom/pan camera, mood tinting, speech bubbles, dynamic branch re-resolution, interactive Live mode (`LiveController`, `matchChoice`, `useLiveChoices`), in-browser WebM recording & export pipeline (`recorder.ts`, `exportFlow.ts`).
+  - Merged & verified Nigel Part 2 (`fced67d`): Full art suite for `rusty_fox`, `mia_kid`, remaining backgrounds (`forest_night`, `meadow_day`, `treehouse_interior`, `village_street`), 12 canvas props, and licensed audio assets (`assets/LICENSES.md`).
+  - Full suite verification: 38/38 frontend tests pass, 43/43 backend tests pass, 0 TypeScript errors, 4/4 fixtures valid, preflight [READY].
 
 ## 2. In progress
-- Teammate support: Standing by for Maegan (Engine / Live Player) and Nigel (Art & UI) contract updates or requests.
+- Monitoring remote repository for Nigel's Part 3 (UI foundation, Auth pages, Quick Story `/quick`, Library & Episode view).
 
 ## 3. Next
-- Teammate contract proposals / review (Part 4.1).
-- Assist teammates on integrating real SVG character/background assets and canvas animation sync.
-- Verification of live WebM recording $\rightarrow$ MP4 export in browser once engine recording button is wired up.
+- Merge and verify Nigel's Part 3 as soon as pushed.
+- Monitor and verify Nigel's Part 4 (Studio mode, Series & Character builder) and Part 5 (Pitch deck & demo documentation).
+- Final end-to-end rehearsal with `run_demo.bat`.
 
 ## 4. Blockers
 - None.
 
 ## 5. Requests / Notes for Team
-- Teammates can run `git pull --rebase origin main` to pull all backend stations, offline demo episodes, launchers, and updated contracts.
-- To run the full stack locally: double-click `scripts\run_demo.bat` (Windows) or execute `./scripts/run_demo.sh`.
+- Main is completely clean, fully typed, and green on all unit and integration tests.
+- Nigel: After completing Part 3 (`/quick`, `/library`, `/login`, etc.), run `git fetch origin && git rebase origin/main && git push origin HEAD:main`.
