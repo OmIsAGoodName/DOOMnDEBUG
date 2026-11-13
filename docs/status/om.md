@@ -1,13 +1,29 @@
 # Om's Status & Milestone Log
 
-**Current Milestone**: LLM Token Optimization & Studio-Grade 2D Canvas Animation Polish Complete  
+**Current Milestone**: Multi-Model Failover, Local Auth Unblocking & Real Long-Form Story Generation Complete  
 **Date**: 2026-11-13  
 **Active Branch**: `main` (synced with `origin/main`)  
 **Repository**: `https://github.com/OmIsAGoodName/DOOMnDEBUG.git`  
 
 ---
 
-## ⚡ Recent Updates (Token Optimization & 2D Animation Polish)
+## ⚡ Recent Updates (Full End-to-End Generation & Duration Fix)
+1. **Resolved 30-Second Video Issue (Eliminated Silent Demo Masking)**:
+   - Diagnosed root cause of the previous 30s output:
+     - Groq model `openai/gpt-oss-120b` had reached its 200,000 daily token limit (HTTP 429).
+     - Because `DEMO_MODE=true` was active in `.env`, the pipeline exception handler quietly caught the error and substituted the bundled 3-scene, 30-second offline demo episode (*"Pip Learns to Share"*).
+   - **Fixes Deployed**:
+     - Upgraded [`backend/app/llm/providers.py`](file:///d:/VoxFable/backend/app/llm/providers.py) with **Multi-Model Auto-Failover**: If a model hits a TPM/TPD rate limit, Groq immediately and transparently fails over to `openai/gpt-oss-20b` or `qwen/qwen3.8-27b` without dropping the request.
+     - Switched [`backend/.env`](file:///d:/VoxFable/backend/.env) to `DEMO_MODE=false`.
+     - In [`backend/app/auth.py`](file:///d:/VoxFable/backend/app/auth.py), enabled safe local development fallback to `"demo"` user when Supabase is unconfigured, preventing 401 Unauthorized errors from interrupting browser submissions.
+
+2. **Verified Live Generation of User's Premise**:
+   - Tested the exact story premise (*Alex the waiter & Richard the businessman's lost briefcase*) with target `2-3mins`.
+   - **Generation Output (`ep_030a4640`)**:
+     - **Title**: *The Golden Briefcase Quest*
+     - **Structure**: Exactly **5 scenes** and **17 conversational beats**.
+     - **Audio**: 17 unique Edge-TTS dialogue lines totaling **106.4 seconds of spoken audio** (~120 seconds total episode runtime with pacing padding).
+     - Full video playable directly in the UI.
 1. **LLM Token Optimization & Rate-Limit Shielding**:
    - **Compressed Writer Prompts** ([`backend/app/stations/writer.py`](file:///d:/VoxFable/backend/app/stations/writer.py)):
      - Converted verbose multi-line asset catalogs into compact comma-separated summaries (`Cast Candidates: ...`, `Backgrounds: ...`), reducing prompt overhead by ~250 tokens per generation call.
