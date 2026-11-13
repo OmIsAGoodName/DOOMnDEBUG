@@ -8,14 +8,21 @@
 - Part 0.6: Frontend scaffold (Vite + React + TS + Tailwind + Vitest + routes + stubs in all folders)
 - Part 0.7: Push #1 (Initial scaffold published to GitHub)
 - Part 0.8: Supabase schema migration (0001_init.sql with RLS & trigger), SUPABASE.md, test_rls.py
-- Part 0.9: Backend skeleton (FastAPI, auth dependency, health check, repositories), frontend shared libraries (config, supabase, AuthProvider, DataRepo, typed API client, useGeneration hook) - Ready for Push #2
+- Part 0.9: Backend skeleton (FastAPI, auth dependency, health check, repositories), frontend shared libraries (Push #2)
+- Part 1.1: LLM provider adapter (Gemini, Groq, Ollama) with retry, exponential backoff, rate limiter, and disk cache
+- Part 1.2: Story Writer station (narrative arc, 3-6 scenes, <25 words speech, Golden tests)
+- Part 1.3: Animation Director station (parallel scene direction, camera shots, coordinate constraints)
+- Part 1.4: Validator and Asset Resolver (fallback ladder, repair logs, 26 unit tests)
+- Part 1.5: Edge-TTS synthesis and audio manifest generator (word boundary events, real demo audio in frontend/public/demo)
+- Part 1.6: Generation pipeline and async Quick Story API endpoints (progress stages: understanding, writing, planning, preparing, checking, narration, ready)
 
 ## In progress
-- Part 1: LLM adapter and story generation pipeline
+- Integration 1: Quick Story end-to-end integration
 
 ## Next
-- Part 1.1: LLM provider adapter (Gemini, Groq, Ollama)
-- Part 1.2: Story Writer station
+- Part 2.1: Safety Gate (keyword blocklist, reading-level check, LLM judge)
+- Part 2.2: Continuity Supervisor
+- Part 2.3: Studio Mode batch generation
 
 ## Blockers
 - None

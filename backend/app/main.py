@@ -1,5 +1,6 @@
 import os
 import shutil
+import asyncio
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from fastapi import FastAPI, Depends, HTTPException, Request, status
@@ -11,6 +12,7 @@ from pydantic import BaseModel
 from .config import settings
 from .auth import get_current_user
 from .repositories import get_repository, Repository
+from .pipeline import run_quick_story_pipeline, generation_tasks
 
 app = FastAPI(title="VoxFable API", version="0.1.0")
 
@@ -55,7 +57,6 @@ async def health():
     supabase_configured = bool(settings.SUPABASE_URL and settings.SUPABASE_SECRET_KEY)
     mode = "demo" if settings.DEMO_MODE else "online"
 
-    # LLM identifier
     llm_info = settings.LLM_PROVIDER_ORDER.split(",")[0]
     if llm_info == "gemini":
         llm_desc = f"gemini/{settings.GEMINI_MODEL}"
@@ -99,7 +100,22 @@ async def create_generation(
         "episode_ids": []
     }
     created = await repo.create_generation(user["user_id"], gen_data)
-    return {"generation_id": created["id"], "status": created["status"]}
+    gen_id = created["id"]
+
+    # Launch background task
+    asyncio.create_task(run_quick_story_pipeline(
+        generation_id=gen_id,
+        owner_id=user["user_id"],
+        prompt=req.prompt or "A charming friendship adventure",
+        age_band=req.age_band or "4-6",
+        language=req.language or "en",
+        interactive=req.interactive or False,
+        series=req.series,
+        characters=req.characters,
+        repo=repo
+    ))
+
+    return {"generation_id": gen_id, "status": "queued"}
 
 @app.get("/api/generations/{generation_id}")
 async def get_generation(
@@ -107,6 +123,19 @@ async def get_generation(
     user: Dict[str, Any] = Depends(get_current_user),
     repo: Repository = Depends(get_repository)
 ):
+    # Check in-memory task cache first
+    cached = generation_tasks.get(generation_id)
+    if cached:
+        return {
+            "id": cached["id"],
+            "kind": "quick",
+            "status": cached.get("status", "running"),
+            "stage": cached.get("stage", "understanding"),
+            "progress": cached.get("progress"),
+            "episode_ids": cached.get("episode_ids", []),
+            "error": cached.get("error")
+        }
+
     gen = await repo.get_generation(user["user_id"], generation_id)
     if not gen:
         raise HTTPException(
