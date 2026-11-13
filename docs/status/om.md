@@ -1,13 +1,33 @@
 # Om's Status & Milestone Log
 
-**Current Milestone**: Polish, Dark Theme & LLM Fallback Robustness Complete  
+**Current Milestone**: Studio Story Quality, Multi-Beat Dialogue & Strict Duration Enforcement Complete  
 **Date**: 2026-11-13  
 **Active Branch**: `main` (synced with `origin/main`)  
 **Repository**: `https://github.com/OmIsAGoodName/DOOMnDEBUG.git`  
 
 ---
 
-## ⚡ Recent Updates (Animation Polish, Story Options, Dark Mode & Provider Robustness)
+## ⚡ Recent Updates (Studio Story Depth, Dialogue Flow & Duration Calibration)
+1. **Multi-Beat Narrative & Character Dialogue Architecture**:
+   - Upgraded [`backend/app/prompts/writer.md`](file:///d:/VoxFable/backend/app/prompts/writer.md) and [`backend/app/stations/writer.py`](file:///d:/VoxFable/backend/app/stations/writer.py):
+     - Eliminated single-beat monologues; each scene now mandates **2 to 4 beats** with genuine back-and-forth conversational dialogue between cast members (`type: "SPEAK"`).
+     - Characters exhibit distinct personalities, question each other, react with emotion, and cooperate to solve gentle everyday curiosities.
+     - Narrator (`type: "NARRATE"`) is reserved for atmospheric scene-setting and cozy bedtime sign-offs.
+2. **Strict Story Duration Enforcement**:
+   - Calibrated exact scene and beat targets to faithfully hit the user's chosen duration:
+     - **`< 1 min`**: Exactly 3 scenes, 2 beats each (6 beats total) &bull; ~50–65 seconds.
+     - **`1 - 2 mins`**: Exactly 4 to 5 scenes, 2 to 3 beats each (10 to 14 beats total) &bull; ~85–115 seconds (verified 84.2s runtime in live integration test).
+     - **`2 - 3 mins`**: Exactly 5 to 6 scenes, 3 to 4 beats each (16 to 22 beats total) &bull; ~135–170 seconds.
+3. **Pacing, Breathing Room & Director Polish**:
+   - In [`backend/app/stations/director.py`](file:///d:/VoxFable/backend/app/stations/director.py) and [`frontend/src/engine/resolveTimeline.ts`](file:///d:/VoxFable/frontend/src/engine/resolveTimeline.ts):
+     - Added natural post-speech padding (`speechDuration + 0.8s` with `min_duration >= max(5.0, speech + 1.2s)`).
+     - Dialogue no longer clips or rushes immediately into the next beat; characters finish gesturing, emoting, and sound effects play out naturally.
+4. **Resilience & Rate Limit Guarding**:
+   - Space scene directing calls by 1.0s and increased LLM adapter retries to 5 with dynamic retry-after parsing so complex multi-scene stories generate without hitting token-per-minute spikes.
+5. **Quality Verification**:
+   - All 43 pytest unit tests passing.
+   - All 38 frontend vitest tests passing.
+   - Backend live on `http://localhost:8000`, frontend live on `http://localhost:5173`.
 1. **Resolved LLM Provider Failure & Safe Fallback**:
    - Diagnosed root cause of `"All LLM providers failed. Last error: All connection attempts failed"`:
      - Groq encountered a temporary connection timeout/rate limit.
