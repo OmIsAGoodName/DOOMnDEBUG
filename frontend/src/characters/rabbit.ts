@@ -52,10 +52,7 @@ export function drawRabbit(ctx: CanvasRenderingContext2D, state: CharacterDrawSt
   const strokeW = 4;
   setupOutline(ctx, strokeW, palette.outline);
 
-  // 1. Soft ground shadow
-  shadow(ctx, 0, 0, 130, 32, 0.28);
-
-  // 2. Pose dynamics
+  // 1. Pose dynamics
   let bodyYOffset = 0;
   let bodyRotation = 0;
   let earSway = Math.sin(time * 3.5) * 0.08;
@@ -120,6 +117,18 @@ export function drawRabbit(ctx: CanvasRenderingContext2D, state: CharacterDrawSt
     }
   }
 
+  // Dynamic squash & stretch based on vertical velocity and bounce
+  const hopHeight = Math.max(0, -bodyYOffset);
+  let stretchX = 1.0;
+  let stretchY = 1.0;
+  if (hopHeight > 1) {
+    stretchY = 1.0 + Math.min(0.18, (hopHeight / 100) * 0.4);
+    stretchX = 1.0 - Math.min(0.12, (hopHeight / 100) * 0.25);
+  }
+
+  // Soft ground shadow (reactive to hop height)
+  shadow(ctx, 0, 0, 130, 32, 0.28, hopHeight);
+
   // 3. Fluffy Cotton Tail (back)
   ctx.save();
   ctx.translate(-55, -75 + bodyYOffset);
@@ -157,6 +166,7 @@ export function drawRabbit(ctx: CanvasRenderingContext2D, state: CharacterDrawSt
   ctx.save();
   ctx.translate(0, bodyYOffset);
   ctx.rotate(bodyRotation);
+  ctx.scale(stretchX, stretchY);
 
   ctx.fillStyle = palette.primary;
   ctx.strokeStyle = palette.outline;

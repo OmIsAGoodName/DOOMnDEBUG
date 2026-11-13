@@ -219,12 +219,15 @@ export function renderAt(
     let mouth: 'closed' | 'half' | 'wide' = 'closed';
     if (opts?.mouthOverride) {
       mouth = opts.mouthOverride;
-    } else if (state.animation === 'talk' && currentBeat?.speech && currentBeat.speech.character_id === charId) {
-      const lineId = currentBeat.lineId;
-      if (lineId && !currentBeat.estimatedSpeech) {
-        mouth = mouthAt(lineId, t - currentBeat.startTime);
-      } else {
-        mouth = fallbackMouthCycle(t, currentBeat.speech.text.length, true);
+    } else if (currentBeat?.speech && currentBeat.speech.character_id === charId) {
+      const isSpeakingWindow = t >= currentBeat.startTime && t <= currentBeat.startTime + currentBeat.speechDuration;
+      if (isSpeakingWindow) {
+        const lineId = currentBeat.lineId;
+        if (lineId && !currentBeat.estimatedSpeech) {
+          mouth = mouthAt(lineId, t - currentBeat.startTime);
+        } else {
+          mouth = fallbackMouthCycle(t, currentBeat.speech.text?.length || 10, true);
+        }
       }
     }
 
