@@ -54,10 +54,7 @@ export function drawOwl(ctx: CanvasRenderingContext2D, state: CharacterDrawState
   const strokeW = 4;
   setupOutline(ctx, strokeW, palette.outline);
 
-  // 1. Soft ground shadow under feet
-  shadow(ctx, 0, 0, 140, 36, 0.28);
-
-  // 2. Pose calculations (all deterministic from time and poseT)
+  // 1. Pose calculations (all deterministic from time and poseT)
   let bodyBounceY = 0;
   let bodyRot = 0;
   let headTilt = 0;
@@ -90,8 +87,8 @@ export function drawOwl(ctx: CanvasRenderingContext2D, state: CharacterDrawState
     case 'talk': {
       bodyBounceY = Math.sin(time * 4) * 2;
       headTilt = Math.sin(time * 6) * 0.08;
-      leftWingAngle = Math.sin(time * 5) * 0.12;
-      rightWingAngle = Math.sin(time * 6) * 0.2;
+      leftWingAngle = Math.sin(time * 5) * 0.12 - Math.sin(time * 12) * 0.08;
+      rightWingAngle = Math.sin(time * 6) * 0.2 + Math.sin(time * 12) * 0.08;
       break;
     }
     case 'wave': {
@@ -149,6 +146,18 @@ export function drawOwl(ctx: CanvasRenderingContext2D, state: CharacterDrawState
     blink = Math.max(blink, 0.7);
   }
 
+  // Dynamic squash & stretch based on hop/bounce
+  const hopHeight = Math.max(0, -bodyBounceY);
+  let stretchX = 1.0;
+  let stretchY = 1.0;
+  if (hopHeight > 1) {
+    stretchY = 1.0 + Math.min(0.18, (hopHeight / 100) * 0.4);
+    stretchX = 1.0 - Math.min(0.12, (hopHeight / 100) * 0.25);
+  }
+
+  // 2. Soft ground shadow under feet (reactive to hop height)
+  shadow(ctx, 0, 0, 140, 36, 0.28, hopHeight);
+
   // --- ACCESSORY LAYER 0: Cape (behind back) ---
   if (accessories.includes('cape')) {
     drawCape(ctx, bodyBounceY, time, palette);
@@ -169,6 +178,7 @@ export function drawOwl(ctx: CanvasRenderingContext2D, state: CharacterDrawState
   ctx.save();
   ctx.translate(0, bodyBounceY);
   ctx.rotate(bodyRot);
+  ctx.scale(stretchX, stretchY);
 
   // Body egg/oval
   ctx.fillStyle = palette.primary;
