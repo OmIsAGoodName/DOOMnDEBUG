@@ -84,8 +84,11 @@ class GroqProvider(BaseProvider):
             messages.append({"role": "system", "content": system})
         messages.append({"role": "user", "content": user_content})
 
-        models_to_try = [self.model]
-        for candidate in ["openai/gpt-oss-20b", "qwen/qwen3.8-27b", "openai/gpt-oss-120b"]:
+        # Primary fast models with open quota (excluding 120b during daily rate-limit window)
+        models_to_try = []
+        if self.model and "120b" not in self.model:
+            models_to_try.append(self.model)
+        for candidate in ["openai/gpt-oss-20b", "qwen/qwen3.8-27b"]:
             if candidate not in models_to_try:
                 models_to_try.append(candidate)
 

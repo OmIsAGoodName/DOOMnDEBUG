@@ -12,13 +12,14 @@ def get_supabase_admin_client():
         return None
 
 async def get_current_user(authorization: Optional[str] = Header(None)) -> Dict[str, Any]:
-    client = get_supabase_admin_client()
-    # In local development without configured Supabase credentials or when demo mode is active
-    if not client or settings.DEMO_MODE:
+    if settings.DEMO_MODE:
         return {"user_id": "demo", "email": "demo@voxfable.local"}
 
     if not authorization or not authorization.startswith("Bearer "):
-        return {"user_id": "demo", "email": "demo@voxfable.local"}
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"code": "UNAUTHORIZED", "message": "Missing or invalid Authorization header"}
+        )
 
     token = authorization.split("Bearer ", 1)[1].strip()
     client = get_supabase_admin_client()
