@@ -89,6 +89,10 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
       playerRef.current.pause();
       setIsPlaying(false);
     } else {
+      if (duration > 0 && currentTime >= duration) {
+        playerRef.current.seek(0);
+        setCurrentTime(0);
+      }
       playerRef.current.play();
       setIsPlaying(true);
       setHasStarted(true);
@@ -261,7 +265,6 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
               muted={isMuted}
               onEnd={() => {
                 setIsPlaying(false);
-                setHasStarted(false);
               }}
             />
 
