@@ -395,7 +395,13 @@ export function evaluateCharacterState(
       } else if (a.type === 'MOVE_TO' && a.character_id === charId) {
         const moveTo = a as ActionMoveTo;
         if (t >= act.startTime && t < act.endTime) {
-          const progress = act.duration > 0 ? (t - act.startTime) / act.duration : 1;
+          const rawProgress = act.duration > 0 ? (t - act.startTime) / act.duration : 1;
+          const clamped = Math.min(1, Math.max(0, rawProgress));
+          // Organic Cubic Ease-In-Out for natural acceleration & deceleration
+          const progress = clamped < 0.5
+            ? 4 * clamped * clamped * clamped
+            : 1 - Math.pow(-2 * clamped + 2, 3) / 2;
+
           const startX = x;
           const startY = y;
           const targetX = moveTo.to[0];

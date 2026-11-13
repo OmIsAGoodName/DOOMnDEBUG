@@ -20,6 +20,11 @@ export function easeInOutQuad(t: number): number {
   return c < 0.5 ? 2 * c * c : 1 - Math.pow(-2 * c + 2, 2) / 2;
 }
 
+export function easeInOutCubic(t: number): number {
+  const c = clamp(t, 0, 1);
+  return c < 0.5 ? 4 * c * c * c : 1 - Math.pow(-2 * c + 2, 3) / 2;
+}
+
 export function easeInOutSine(t: number): number {
   const c = clamp(t, 0, 1);
   return -(Math.cos(Math.PI * c) - 1) / 2;
@@ -30,6 +35,20 @@ export function easeOutBack(t: number): number {
   const c1 = 1.70158;
   const c3 = c1 + 1;
   return 1 + c3 * Math.pow(c - 1, 3) + c1 * Math.pow(c - 1, 2);
+}
+
+/**
+ * Breathing expansion factor for organic living character idle.
+ * Oscillates gently at ~0.4Hz expanding torso width and height ±1.5%.
+ */
+export function computeBreathing(time: number, speed = 1.0): { scaleX: number; scaleY: number; offsetY: number } {
+  if (time <= 0) return { scaleX: 1.0, scaleY: 1.0, offsetY: 0 };
+  const breath = Math.sin(time * speed * Math.PI);
+  return {
+    scaleX: 1.0 - breath * 0.015,
+    scaleY: 1.0 + breath * 0.02,
+    offsetY: breath * 2.0,
+  };
 }
 
 /**

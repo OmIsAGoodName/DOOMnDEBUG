@@ -60,11 +60,15 @@ export function shadow(
   y: number,
   w: number,
   h: number = w * 0.28,
-  alpha = 0.25
+  alpha = 0.25,
+  hopHeight = 0
 ): void {
   ctx.save();
-  ctx.fillStyle = `rgba(30, 41, 59, ${clamp(alpha, 0, 1)})`;
-  ellipse(ctx, x, y, w / 2, h / 2);
+  // Dynamic scale & soften as character jumps or hops
+  const scaleMod = Math.max(0.5, 1.0 - (hopHeight / 120) * 0.4);
+  const alphaMod = Math.max(0.08, alpha * (1.0 - (hopHeight / 120) * 0.5));
+  ctx.fillStyle = `rgba(30, 41, 59, ${clamp(alphaMod, 0, 1)})`;
+  ellipse(ctx, x, y, (w / 2) * scaleMod, (h / 2) * scaleMod);
   ctx.fill();
   ctx.restore();
 }
