@@ -193,7 +193,7 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
             setIsExporting(false);
             if (capturedBlob) {
               triggerFileDownload(capturedBlob, `${plan.title || episode.title || 'episode'}.webm`);
-              alert('MP4 conversion timed out. Direct WebM video downloaded instead!');
+              alert(`MP4 conversion issue: ${status.error || 'Conversion timed out'}. Direct WebM downloaded instead!`);
             } else {
               alert('Export failed during MP4 conversion.');
             }

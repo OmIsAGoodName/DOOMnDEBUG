@@ -290,18 +290,22 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
 
       const stream = canvas.captureStream(30);
 
-      const audioCtx = audioEngineRef.current?.initContext();
-      if (audioCtx) {
+      const engine = audioEngineRef.current;
+      if (engine) {
+        const audioCtx = engine.initContext();
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume().catch(() => {});
+        }
         const audioDest = audioCtx.createMediaStreamDestination();
-        audioEngineRef.current?.setRecordingDestination(audioDest);
+        engine.setRecordingDestination(audioDest);
         const audioTracks = audioDest.stream.getAudioTracks();
         if (audioTracks.length > 0) {
           stream.addTrack(audioTracks[0]);
         }
-      }
 
-      if (opts?.muteLocal) {
-        audioEngineRef.current?.setMuted(true);
+        if (opts?.muteLocal) {
+          engine.setLocalMuted(true);
+        }
       }
 
       const mimeTypes = [
@@ -331,6 +335,7 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
         };
 
         recorder.onstop = () => {
+          audioEngineRef.current?.setLocalMuted(false);
           const blob = new Blob(recordedChunksRef.current, { type: selectedMime });
           if (stopRecordingResolverRef.current) {
             stopRecordingResolverRef.current(blob);
@@ -347,6 +352,7 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
 
     // Recording: stopRecording
     const stopRecording = useCallback((): Promise<Blob> => {
+      audioEngineRef.current?.setLocalMuted(false);
       return new Promise<Blob>((resolve) => {
         if (!recorderRef.current || recorderRef.current.state === 'inactive') {
           resolve(new Blob([], { type: 'video/webm' }));
