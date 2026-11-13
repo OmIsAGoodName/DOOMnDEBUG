@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import type { EpisodeRecord, EpisodePlayerHandle, EpisodePlan, AudioManifest, ChoiceInfo } from '@contracts';
 import { EpisodePlayer } from '../engine';
 import { exportEpisode } from '../engine/exportFlow';
@@ -523,6 +524,12 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
           <Button variant="secondary" size="md" onClick={handleReplay}>
             ↺ Replay Story
           </Button>
+
+          <Link to="/library">
+            <Button variant="ghost" size="md">
+              📚 Library
+            </Button>
+          </Link>
         </div>
 
         <div className="flex items-center gap-2">

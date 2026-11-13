@@ -1,15 +1,31 @@
 # Om's Status & Milestone Log
 
-**Current Milestone**: Multi-Choice Interactive Playback Polish & Ping-Pong Loop Fix  
+**Current Milestone**: Episode Library Auto-Save, Reverse Chronological Ordering & Real-Time Sync  
 **Date**: 2026-11-14  
 **Active Branch**: `main` (synced with `origin/main`)  
 **Repository**: `https://github.com/OmIsAGoodName/DOOMnDEBUG.git`  
 
 ---
 
-## ⚡ Recent Updates (Multi-Choice Ping-Pong Loop Fix & Branch Playback Polish)
+## ⚡ Recent Updates (Library Auto-Save, Real-Time Sync & Reverse Chronological Ordering)
 
-1. **Eliminated Interactive Choice Ping-Pong Loop in EpisodePlayer**:
+1. **Episode Library Auto-Save & Chronological Sorting**:
+   - Diagnosed why recent generations seemed missing from `/library`:
+     - Episodes were previously saved without an ISO `created_at` timestamp in `backend/app/pipeline.py` and `backend/app/repositories.py`.
+     - `LocalFileRepository.list_episodes` returned records in insertion order (oldest first), placing newly generated episodes 30+ cards down at the very bottom of the page.
+     - `/api/episodes` omitted `plan` and `safety` objects, leaving `isInteractive` undefined on all user cards.
+   - **Fixes**:
+     - Added automatic ISO timestamping (`datetime.now(timezone.utc).isoformat()`) in `backend/app/pipeline.py` and `backend/app/repositories.py`.
+     - Reversed episode list in `LocalFileRepository.list_episodes` so the newest generated story is always **#1 at the top of the Library**.
+     - Backfilled timestamps for all existing records in `media/data/episodes.json`.
+     - Returned `plan`, `safety`, `continuity`, and `video_url` in `GET /api/episodes` ([`backend/app/main.py`](file:///d:/VoxFable/backend/app/main.py)).
+   - **UI Improvements**:
+     - Upgraded [`frontend/src/pages/Library.tsx`](file:///d:/VoxFable/frontend/src/pages/Library.tsx) with real-time title/character search filter (`Search stories by title or character...`).
+     - Added relative creation badges (`Just now`, `5m ago`, `2h ago`), `🎙 Interactive Tree` tag, and `✨ Latest Story` highlight.
+     - Added a direct **"🎉 Story Generated & Auto-Saved to Your Library!"** notification banner in [`frontend/src/pages/Quick.tsx`](file:///d:/VoxFable/frontend/src/pages/Quick.tsx) with a 1-click **"📚 View in Library"** button.
+     - Added a **"📚 Library"** button to the bottom action bar in [`frontend/src/ui/EpisodeView.tsx`](file:///d:/VoxFable/frontend/src/ui/EpisodeView.tsx).
+
+2. **Eliminated Interactive Choice Ping-Pong Loop in EpisodePlayer**:
    - Diagnosed root cause: `activeChoicePointRef` was storing a single active choice beat ID (`string | null`).
      - When the player traversed from Choice 1 (e.g., at 8.5s) to Choice 2 (at 16.5s), resolving Choice 2 updated `activeChoicePointRef` to Choice 2's beat ID.
      - On subsequent clock ticks, `timeline.choicePoints.find()` matched Choice 1 again because its timestamp was in the past (`nextTime >= 8.5s`) and its ID differed from Choice 2 (`activeChoicePointRef !== cp.choiceBeatId`).

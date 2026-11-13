@@ -12,9 +12,27 @@ interface AssetCatalog {
   sfx: any[];
 }
 
+function formatEpisodeDate(dateStr?: string) {
+  if (!dateStr) return null;
+  try {
+    const d = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    if (diffMins < 5) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  } catch {
+    return null;
+  }
+}
+
 export default function Library() {
   const [activeTab, setActiveTab] = useState<'stories' | 'characters' | 'backgrounds' | 'props'>('stories');
   const [episodes, setEpisodes] = useState<EpisodeRecord[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [assets, setAssets] = useState<AssetCatalog>({
     characters: [],
     backgrounds: [],
@@ -252,71 +270,126 @@ export default function Library() {
 
       {/* TAB 1: Stories */}
       {activeTab === 'stories' && (
-        episodes.length === 0 ? (
-          <EmptyState
-            icon="🎬"
-            title="No stories created yet"
-            description="Create your first animated bedtime story with our Quick Story generator!"
-            action={
-              <Link to="/quick">
-                <Button variant="primary" size="md">
-                  Create a Story
-                </Button>
-              </Link>
-            }
-          />
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {episodes.map((ep) => {
-              const isDemo = ep.id.startsWith('demo_');
-              const isInteractive = ep.plan?.interactive;
+        <div className="space-y-6">
+          {/* Stories Controls Bar */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="w-full sm:max-w-xs relative">
+              <input
+                type="text"
+                placeholder="Search stories by title or character..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-2 pl-9 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+              <span className="absolute left-3 top-2.5 text-slate-400 text-xs">🔍</span>
+            </div>
 
-              return (
-                <Link key={ep.id} to={`/episode/${ep.id}`} className="group block">
-                  <Card
-                    hoverEffect
-                    className="h-full flex flex-col justify-between overflow-hidden border-slate-200 dark:border-slate-800 group-hover:border-indigo-400 group-hover:-translate-y-1 transition-all"
-                    padding="none"
-                  >
-                    <div className="aspect-video bg-gradient-to-br from-indigo-900 to-slate-900 relative flex items-center justify-center overflow-hidden">
-                      <span className="text-4xl select-none group-hover:scale-110 transition-transform">
-                        🎬
-                      </span>
-                      {isInteractive && (
-                        <span className="absolute top-3 left-3 bg-amber-400 text-amber-950 text-[10px] font-black uppercase px-2 py-0.5 rounded-full shadow">
-                          🎙 Interactive
-                        </span>
-                      )}
-                      {isDemo && (
-                        <span className="absolute top-3 right-3 bg-emerald-500 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded-full shadow">
-                          Offline Ready
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
-                      <div>
-                        <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">
-                          {ep.title}
-                        </h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                          Age: {ep.plan?.age_band || '4-6'} &bull; Status: {ep.status}
-                        </p>
-                      </div>
-
-                      <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
-                        <SafetyBadge status={ep.safety?.verdict || 'pass'} />
-                        <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                          Play &rarr;
-                        </span>
-                      </div>
-                    </div>
-                  </Card>
-                </Link>
-              );
-            })}
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400">
+              <span>Showing {episodes.filter((ep) => {
+                if (!searchQuery.trim()) return true;
+                const q = searchQuery.toLowerCase();
+                return ep.title.toLowerCase().includes(q) || ep.plan?.cast?.some((c) => c.name.toLowerCase().includes(q));
+              }).length} of {episodes.length} stories</span>
+              <span className="text-slate-300 dark:text-slate-700">&bull;</span>
+              <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Newest First
+              </span>
+            </div>
           </div>
-        )
+
+          {episodes.length === 0 ? (
+            <EmptyState
+              icon="🎬"
+              title="No stories created yet"
+              description="Create your first animated bedtime story with our Quick Story generator!"
+              action={
+                <Link to="/quick">
+                  <Button variant="primary" size="md">
+                    Create a Story
+                  </Button>
+                </Link>
+              }
+            />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {episodes
+                .filter((ep) => {
+                  if (!searchQuery.trim()) return true;
+                  const q = searchQuery.toLowerCase();
+                  return ep.title.toLowerCase().includes(q) || ep.plan?.cast?.some((c) => c.name.toLowerCase().includes(q));
+                })
+                .map((ep, idx) => {
+                  const isDemo = ep.id.startsWith('demo_');
+                  const isInteractive = ep.plan?.interactive;
+                  const timeLabel = formatEpisodeDate(ep.created_at);
+                  const isNewest = idx === 0 && !isDemo;
+
+                  return (
+                    <Link key={ep.id} to={`/episode/${ep.id}`} className="group block">
+                      <Card
+                        hoverEffect
+                        className="h-full flex flex-col justify-between overflow-hidden border-slate-200 dark:border-slate-800 group-hover:border-indigo-400 group-hover:-translate-y-1 transition-all"
+                        padding="none"
+                      >
+                        <div className="aspect-video bg-gradient-to-br from-indigo-900 to-slate-900 relative flex items-center justify-center overflow-hidden">
+                          <span className="text-4xl select-none group-hover:scale-110 transition-transform">
+                            🎬
+                          </span>
+
+                          {/* Left Badges */}
+                          <div className="absolute top-3 left-3 flex flex-col gap-1.5 items-start">
+                            {isInteractive && (
+                              <span className="bg-amber-400 text-amber-950 text-[10px] font-black uppercase px-2 py-0.5 rounded-full shadow">
+                                🎙 Interactive Tree
+                              </span>
+                            )}
+                            {isNewest && (
+                              <span className="bg-indigo-500 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-full shadow animate-pulse">
+                                ✨ Latest Story
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Right Badges */}
+                          <div className="absolute top-3 right-3 flex items-center gap-1.5">
+                            {isDemo ? (
+                              <span className="bg-emerald-500 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded-full shadow">
+                                Offline Ready
+                              </span>
+                            ) : timeLabel ? (
+                              <span className="bg-slate-900/80 backdrop-blur-sm text-slate-300 text-[10px] font-bold px-2 py-0.5 rounded-full shadow border border-slate-700">
+                                {timeLabel}
+                              </span>
+                            ) : null}
+                          </div>
+                        </div>
+
+                        <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
+                          <div>
+                            <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">
+                              {ep.title}
+                            </h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                              Age: {ep.plan?.age_band || '4-6'} &bull;{' '}
+                              {ep.plan?.scenes?.length ? `${ep.plan.scenes.length} Scenes` : 'Full Animated Tale'}
+                            </p>
+                          </div>
+
+                          <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
+                            <SafetyBadge status={ep.safety?.verdict || 'pass'} />
+                            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                              Play &rarr;
+                            </span>
+                          </div>
+                        </div>
+                      </Card>
+                    </Link>
+                  );
+                })}
+            </div>
+          )}
+        </div>
       )}
 
       {/* TAB 2: Characters */}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import type { EpisodeRecord } from '@contracts';
 import { api, useGeneration } from '../lib/api';
 import {
@@ -119,7 +120,32 @@ export default function Quick() {
   // 1. Episode Ready State: Render Episode View
   if (episode) {
     return (
-      <div className="py-8 px-4">
+      <div className="py-8 px-4 max-w-4xl mx-auto space-y-4">
+        {/* Saved to Library Notice Banner */}
+        <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm animate-fadeIn">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl select-none">🎉</span>
+            <div>
+              <h3 className="text-sm font-black text-emerald-900 dark:text-emerald-200">
+                Story Generated & Auto-Saved to Your Library!
+              </h3>
+              <p className="text-xs text-emerald-700 dark:text-emerald-400">
+                You can re-watch, explore branches, or export this episode anytime from the Library tab.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link to="/library">
+              <Button variant="secondary" size="sm">
+                📚 View in Library
+              </Button>
+            </Link>
+            <Button variant="ghost" size="sm" onClick={handleReset}>
+              + New Story
+            </Button>
+          </div>
+        </div>
+
         <EpisodeView episode={episode} onReset={handleReset} />
       </div>
     );

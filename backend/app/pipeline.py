@@ -2,6 +2,7 @@ import os
 import time
 import asyncio
 import uuid
+from datetime import datetime, timezone
 from typing import Dict, Any, Optional, List
 from .models.episode_plan import EpisodePlan
 from .stations.writer import write_story
@@ -100,6 +101,7 @@ async def run_quick_story_pipeline(
 
         # 7. Ready
         t0 = time.perf_counter()
+        now_iso = datetime.now(timezone.utc).isoformat()
         episode_record = {
             "id": episode_id,
             "title": repaired_plan.title,
@@ -107,7 +109,8 @@ async def run_quick_story_pipeline(
             "audio_manifest": manifest.model_dump(),
             "safety": {"verdict": "pass", "age_fit": 1.0, "scary": 0.0, "notes": "Approved"},
             "continuity": {"violations": []},
-            "status": "ready"
+            "status": "ready",
+            "created_at": now_iso
         }
         await repo.create_episode(owner_id, episode_record)
 
@@ -158,7 +161,8 @@ async def run_quick_story_pipeline(
                     "audio_manifest": fallback_manifest_dict,
                     "safety": {"verdict": "pass", "age_fit": 1.0, "scary": 0.0, "notes": "Approved (Demo Net)"},
                     "continuity": {"violations": []},
-                    "status": "ready"
+                    "status": "ready",
+                    "created_at": datetime.now(timezone.utc).isoformat()
                 }
                 await repo.create_episode(owner_id, episode_record)
                 await repo.update_generation(owner_id, generation_id, {

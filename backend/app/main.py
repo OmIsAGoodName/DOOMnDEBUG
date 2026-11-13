@@ -411,8 +411,11 @@ async def list_episodes(
             "id": ep["id"],
             "title": ep.get("title", "Untitled"),
             "status": ep.get("status", "draft"),
-            "video_url": ep.get("video_path"),
-            "created_at": ep.get("created_at")
+            "video_url": ep.get("video_path") or ep.get("video_url"),
+            "created_at": ep.get("created_at"),
+            "plan": ep.get("plan"),
+            "safety": ep.get("safety"),
+            "continuity": ep.get("continuity"),
         }
         for ep in episodes
     ]

@@ -1,5 +1,6 @@
 import json
 import uuid
+from datetime import datetime, timezone
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import List, Optional, Dict, Any
@@ -63,7 +64,8 @@ class LocalFileRepository(Repository):
     async def create_episode(self, owner_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         records = self._read_data(self.episodes_file)
         ep_id = data.get("id") or str(uuid.uuid4())
-        record = {**data, "id": ep_id, "owner_id": owner_id}
+        created_at = data.get("created_at") or datetime.now(timezone.utc).isoformat()
+        record = {**data, "id": ep_id, "owner_id": owner_id, "created_at": created_at}
         records[ep_id] = record
         self._write_data(self.episodes_file, records)
         return record
@@ -77,7 +79,9 @@ class LocalFileRepository(Repository):
 
     async def list_episodes(self, owner_id: str) -> List[Dict[str, Any]]:
         records = self._read_data(self.episodes_file)
-        return [r for r in records.values() if r.get("owner_id") == owner_id or owner_id == "demo"]
+        matching = [r for r in records.values() if r.get("owner_id") == owner_id or owner_id == "demo"]
+        # Return newest first (reverse chronological order)
+        return list(reversed(matching))
 
     async def update_episode(self, owner_id: str, episode_id: str, data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         records = self._read_data(self.episodes_file)
