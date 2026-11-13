@@ -53,10 +53,7 @@ export function drawFox(ctx: CanvasRenderingContext2D, state: CharacterDrawState
   const strokeW = 4;
   setupOutline(ctx, strokeW, palette.outline);
 
-  // 1. Soft ground shadow
-  shadow(ctx, 0, 0, 140, 36, 0.28);
-
-  // 2. Pose calculations
+  // 1. Pose calculations
   let bodyBounceY = 0;
   let bodyRot = 0;
   let headTilt = 0;
@@ -78,7 +75,7 @@ export function drawFox(ctx: CanvasRenderingContext2D, state: CharacterDrawState
       bodyBounceY = -Math.abs(Math.sin(cycle)) * 8;
       bodyRot = Math.sin(cycle) * 0.04;
       headTilt = Math.sin(cycle) * 0.05;
-      tailAngle = Math.sin(cycle) * 0.25;
+      tailAngle = Math.sin(cycle - 0.5) * 0.28;
       leftLegAngle = Math.sin(cycle) * 0.45;
       rightLegAngle = -Math.sin(cycle) * 0.45;
       leftArmAngle = -Math.sin(cycle) * 0.4;
@@ -90,7 +87,7 @@ export function drawFox(ctx: CanvasRenderingContext2D, state: CharacterDrawState
     case 'talk': {
       bodyBounceY = Math.sin(time * 4) * 2.5;
       headTilt = Math.sin(time * 6) * 0.08;
-      tailAngle = Math.sin(time * 4) * 0.2;
+      tailAngle = Math.sin(time * 4 - 0.3) * 0.22;
       rightArmAngle = -0.3 + Math.sin(time * 6) * 0.2;
       leftArmAngle = 0.1;
       break;
@@ -152,6 +149,18 @@ export function drawFox(ctx: CanvasRenderingContext2D, state: CharacterDrawState
     blink = Math.max(blink, 0.7);
   }
 
+  // Dynamic squash & stretch based on bounce/hop
+  const hopHeight = Math.max(0, -bodyBounceY);
+  let stretchX = 1.0;
+  let stretchY = 1.0;
+  if (hopHeight > 1) {
+    stretchY = 1.0 + Math.min(0.18, (hopHeight / 100) * 0.4);
+    stretchX = 1.0 - Math.min(0.12, (hopHeight / 100) * 0.25);
+  }
+
+  // 2. Soft ground shadow (reactive to hop height)
+  shadow(ctx, 0, 0, 140, 36, 0.28, hopHeight);
+
   // --- ACCESSORY LAYER: Cape (rear) ---
   if (accessories.includes('cape')) {
     drawFoxCape(ctx, bodyBounceY, time, palette);
@@ -175,6 +184,7 @@ export function drawFox(ctx: CanvasRenderingContext2D, state: CharacterDrawState
   ctx.save();
   ctx.translate(0, bodyBounceY);
   ctx.rotate(bodyRot);
+  ctx.scale(stretchX, stretchY);
 
   // Body torso
   ctx.fillStyle = palette.primary;

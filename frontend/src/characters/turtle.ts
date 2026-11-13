@@ -52,10 +52,7 @@ export function drawTurtle(ctx: CanvasRenderingContext2D, state: CharacterDrawSt
   const strokeW = 4;
   setupOutline(ctx, strokeW, palette.outline);
 
-  // 1. Soft ground shadow
-  shadow(ctx, 0, 0, 160, 36, 0.3);
-
-  // 2. Pose dynamics
+  // 1. Pose dynamics
   let bodyYOffset = 0;
   let headExtend = 0;
   let bodyRotation = 0;
@@ -65,10 +62,11 @@ export function drawTurtle(ctx: CanvasRenderingContext2D, state: CharacterDrawSt
 
   switch (pose) {
     case 'walk': {
-      // Deliberate, cute slow walk
+      // Deliberate, cute slow walk with secondary waddle tilt
       const walkCycle = time * 3.5;
       bodyYOffset = -Math.abs(Math.sin(walkCycle)) * 6;
       headExtend = Math.sin(walkCycle) * 8;
+      bodyRotation = Math.sin(walkCycle) * 0.05;
       frontLegAngle = Math.sin(walkCycle) * 0.35;
       backLegAngle = -Math.sin(walkCycle) * 0.35;
       break;
@@ -113,6 +111,18 @@ export function drawTurtle(ctx: CanvasRenderingContext2D, state: CharacterDrawSt
     }
   }
 
+  // Dynamic squash & stretch based on bounce
+  const hopHeight = Math.max(0, -bodyYOffset);
+  let stretchX = 1.0;
+  let stretchY = 1.0;
+  if (hopHeight > 1) {
+    stretchY = 1.0 + Math.min(0.12, (hopHeight / 100) * 0.3);
+    stretchX = 1.0 - Math.min(0.08, (hopHeight / 100) * 0.2);
+  }
+
+  // 2. Soft ground shadow (reactive to hop height)
+  shadow(ctx, 0, 0, 160, 36, 0.3, hopHeight);
+
   // 3. Tail
   ctx.save();
   ctx.translate(-70, -45 + bodyYOffset);
@@ -155,6 +165,7 @@ export function drawTurtle(ctx: CanvasRenderingContext2D, state: CharacterDrawSt
   ctx.save();
   ctx.translate(0, bodyYOffset);
   ctx.rotate(bodyRotation);
+  ctx.scale(stretchX, stretchY);
 
   // Underside belly plastron
   ctx.fillStyle = palette.accent;
