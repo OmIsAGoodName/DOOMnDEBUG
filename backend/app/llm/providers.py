@@ -10,10 +10,16 @@ class BaseProvider(abc.ABC):
         """Returns raw text or JSON string from the model."""
         pass
 
+    def is_configured(self) -> bool:
+        return True
+
 class GeminiProvider(BaseProvider):
     def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
         self.api_key = api_key or settings.GEMINI_API_KEY
         self.model = model or settings.GEMINI_MODEL
+
+    def is_configured(self) -> bool:
+        return bool(self.api_key and "your-gemini" not in self.api_key.lower())
 
     async def call(self, system: str, user: str, temperature: float) -> str:
         if not self.api_key or "your-gemini" in self.api_key.lower():
@@ -55,6 +61,9 @@ class GroqProvider(BaseProvider):
     def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
         self.api_key = api_key or settings.GROQ_API_KEY
         self.model = model or settings.GROQ_MODEL
+
+    def is_configured(self) -> bool:
+        return bool(self.api_key and "your-groq" not in self.api_key.lower())
 
     async def call(self, system: str, user: str, temperature: float) -> str:
         if not self.api_key:

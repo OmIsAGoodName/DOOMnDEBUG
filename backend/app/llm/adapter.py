@@ -52,11 +52,15 @@ class LLMAdapter:
                 return cached_result
 
         provider_order = [p.strip().lower() for p in settings.LLM_PROVIDER_ORDER.split(",") if p.strip()]
-        last_error = None
+        errors_by_provider: Dict[str, str] = {}
 
         for provider_name in provider_order:
             provider = self.providers.get(provider_name)
             if not provider:
+                continue
+
+            if hasattr(provider, "is_configured") and not provider.is_configured():
+                errors_by_provider[provider_name] = "not configured"
                 continue
 
             current_user_prompt = user
@@ -75,23 +79,24 @@ class LLMAdapter:
                     return validated_dict
 
                 except (ValidationError, jsonschema.ValidationError, json.JSONDecodeError) as ve:
-                    last_error = ve
+                    errors_by_provider[provider_name] = f"Schema validation: {str(ve)[:80]}"
                     # Feed validation error back into the prompt for the next attempt
                     current_user_prompt = f"{user}\n\n[PREVIOUS ATTEMPT FAILED WITH PARSING/SCHEMA ERROR]: {str(ve)}\nPlease output strictly valid JSON conforming to the requirements."
                     await asyncio.sleep(0.5 * (2 ** attempt))
 
                 except Exception as e:
-                    last_error = e
+                    errors_by_provider[provider_name] = str(e)
                     # Backoff on rate-limits (429), timeouts, or server errors
                     err_msg = str(e).lower()
                     if "429" in err_msg or "500" in err_msg or "503" in err_msg or "timeout" in err_msg or "connection" in err_msg:
                         match = re.search(r"try again in (\d+\.?\d*)s", str(e))
-                        wait_time = float(match.group(1)) + 0.5 if match else 2.0 * (attempt + 1)
+                        wait_time = float(match.group(1)) + 0.5 if match else min(10.0, 2.0 * (attempt + 1))
                         await asyncio.sleep(wait_time)
                     else:
                         break # Unrecoverable provider error, switch provider
 
-        raise RuntimeError(f"All LLM providers failed. Last error: {last_error}")
+        formatted_errors = "; ".join(f"{p} ({err})" for p, err in errors_by_provider.items())
+        raise RuntimeError(f"All LLM providers failed. Details: {formatted_errors}")
 
 llm_adapter = LLMAdapter()
 
