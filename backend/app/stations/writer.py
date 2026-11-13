@@ -93,7 +93,7 @@ STORYTELLING & PACING RULES:
 1. Multi-Beat Scenes: Do NOT write single-beat scenes! Every scene must have 2 to 4 beats so characters interact and dialogue flows naturally.
 2. Character Dialogue: Feature at least 2 characters having lively, sweet conversations (use type: "SPEAK" with character_id).
 3. Sensory Detail & Warmth: Include evocative, child-friendly details (glowing fireflies, crunchy clover, fluffy clouds, warm cups of tea).
-4. Speech Length: Each beat must be between 14 and 24 words to ensure proper cartoon timing and runtime.
+4. Speech Length: Each beat must be between 14 and 24 words (< 25 words) to ensure proper cartoon timing and runtime.
 
 AVAILABLE ASSETS:
 Available Characters:
