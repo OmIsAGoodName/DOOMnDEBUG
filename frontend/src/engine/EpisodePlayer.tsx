@@ -102,6 +102,8 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
         return;
       }
       setValidationError(null);
+      resolvedChoiceBeatIdsRef.current.clear();
+      activeChoicePointRef.current = null;
 
       try {
         const tl = resolveTimeline(plan, audio, choicePath || []);
@@ -125,6 +127,7 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
     const isPlayingRef = useRef(false);
     const isListeningRef = useRef(false);
     const activeChoicePointRef = useRef<string | null>(null);
+    const resolvedChoiceBeatIdsRef = useRef<Set<string>>(new Set());
     const animFrameRef = useRef<number | null>(null);
     const lastTimestampRef = useRef<number | null>(null);
 
@@ -171,6 +174,7 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
         const choicePoint = timeline.choicePoints.find(
           (cp) =>
             nextTime >= cp.listeningStartTime &&
+            !resolvedChoiceBeatIdsRef.current.has(cp.choiceBeatId) &&
             activeChoicePointRef.current !== cp.choiceBeatId
         );
 
@@ -195,6 +199,7 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
             return;
           } else {
             // Watch mode: auto-resolve
+            resolvedChoiceBeatIdsRef.current.add(choicePoint.choiceBeatId);
             const chosenId =
               choicePath && choicePath.length > 0
                 ? choicePath[0]
@@ -225,6 +230,8 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
     const play = useCallback(async () => {
       if (timeRef.current >= timeline.totalDuration) {
         timeRef.current = 0;
+        resolvedChoiceBeatIdsRef.current.clear();
+        activeChoicePointRef.current = null;
       }
       isPlayingRef.current = true;
       isListeningRef.current = false;
@@ -256,6 +263,21 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
         timeRef.current = clampedT;
         lastTimestampRef.current = null;
 
+        // If seeking backward, un-resolve choice points that occur after the seek time
+        for (const cp of timeline.choicePoints) {
+          if (clampedT < cp.listeningStartTime) {
+            resolvedChoiceBeatIdsRef.current.delete(cp.choiceBeatId);
+          }
+        }
+        if (activeChoicePointRef.current) {
+          const activeCp = timeline.choicePoints.find(
+            (cp) => cp.choiceBeatId === activeChoicePointRef.current
+          );
+          if (activeCp && clampedT < activeCp.listeningStartTime) {
+            activeChoicePointRef.current = null;
+          }
+        }
+
         drawCurrentFrame(clampedT);
 
         const engine = audioEngineRef.current;
@@ -275,11 +297,29 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
         const choiceBeatId = activeChoicePointRef.current;
         if (!choiceBeatId) return;
 
+        // Mark this choice point as resolved so it cannot re-trigger
+        resolvedChoiceBeatIdsRef.current.add(choiceBeatId);
+        activeChoicePointRef.current = null;
+
         // Resolve choice (supports 'default' as alias)
         const reResolved = resolveFrom(timeline, choiceBeatId, optionId);
         setTimeline(reResolved);
         isListeningRef.current = false;
         setIsChoiceActive(false);
+
+        // Advance playback to target scene start time if branching
+        const currentChoicePoint = timeline.choicePoints.find(
+          (cp) => cp.choiceBeatId === choiceBeatId
+        );
+        const chosenOption = currentChoicePoint?.options.find((o) => o.id === optionId);
+        if (chosenOption?.next_scene) {
+          const targetScene = reResolved.scenes.find(
+            (s) => s.sceneId === chosenOption.next_scene
+          );
+          if (targetScene) {
+            timeRef.current = targetScene.startTime;
+          }
+        }
 
         play();
       },

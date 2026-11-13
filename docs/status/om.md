@@ -1,15 +1,31 @@
 # Om's Status & Milestone Log
 
-**Current Milestone**: System Diagnostics & API Quota Monitor, Live Key Hot-Swap & Canvas Quality Polish  
+**Current Milestone**: Multi-Choice Interactive Playback Polish & Ping-Pong Loop Fix  
 **Date**: 2026-11-14  
 **Active Branch**: `main` (synced with `origin/main`)  
 **Repository**: `https://github.com/OmIsAGoodName/DOOMnDEBUG.git`  
 
 ---
 
-## ⚡ Recent Updates (Strict Gemini Enforcement for Multi-Choice Trees & Failover Guard)
+## ⚡ Recent Updates (Multi-Choice Ping-Pong Loop Fix & Branch Playback Polish)
 
-1. **Strict Gemini Enforcement for Deep Multi-Choice Trees**:
+1. **Eliminated Interactive Choice Ping-Pong Loop in EpisodePlayer**:
+   - Diagnosed root cause: `activeChoicePointRef` was storing a single active choice beat ID (`string | null`).
+     - When the player traversed from Choice 1 (e.g., at 8.5s) to Choice 2 (at 16.5s), resolving Choice 2 updated `activeChoicePointRef` to Choice 2's beat ID.
+     - On subsequent clock ticks, `timeline.choicePoints.find()` matched Choice 1 again because its timestamp was in the past (`nextTime >= 8.5s`) and its ID differed from Choice 2 (`activeChoicePointRef !== cp.choiceBeatId`).
+     - This caused an infinite alternating ping-pong loop between Choice 1 and Choice 2 up to the maximum scene boundary (15+ choice popups).
+   - **Fix**:
+     - Introduced `resolvedChoiceBeatIdsRef = useRef<Set<string>>(new Set())` in [`frontend/src/engine/EpisodePlayer.tsx`](file:///d:/VoxFable/frontend/src/engine/EpisodePlayer.tsx) to permanently track all resolved choice points during forward playback.
+     - In `tick`, filter out all already-resolved choice points (`!resolvedChoiceBeatIdsRef.current.has(cp.choiceBeatId)`).
+     - In `resolveChoice`, mark the current choice point as resolved, clear `activeChoicePointRef`, and advance `timeRef.current` directly to the chosen branch scene's `startTime` (`targetScene.startTime`) so playback immediately enters the chosen branch.
+     - In `seek`, un-resolve choice points ahead of the scrubbed timestamp (`clampedT < cp.listeningStartTime`) to allow seamless rewinding.
+     - In `play` and replay resets, clear resolved choice IDs when looping back to time 0.
+
+2. **Branch Ending Badge Display Fix**:
+   - In [`frontend/src/ui/EpisodeView.tsx`](file:///d:/VoxFable/frontend/src/ui/EpisodeView.tsx), added `isCompleted` lifecycle tracking.
+   - The badge **"🏆 Distinct Branch Ending Reached"** is now only displayed when playback genuinely reaches the conclusion of the episode (`onEnd`), rather than prematurely displaying during midway choice selection.
+
+3. **Strict Gemini Enforcement for Deep Multi-Choice Trees**:
    - Implemented `strict_provider="gemini"` in [`backend/app/llm/adapter.py`](file:///d:/VoxFable/backend/app/llm/adapter.py) and [`backend/app/stations/writer.py`](file:///d:/VoxFable/backend/app/stations/writer.py):
      - When generating interactive stories with more than 1 choice screen (`num_choices > 1` or `force_interactive_tree`), the pipeline strictly requires Google Gemini.
      - Lower-context models (Groq) are prohibited from receiving complex 7+ scene trees to prevent degraded/truncated output.

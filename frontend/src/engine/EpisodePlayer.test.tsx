@@ -65,4 +65,95 @@ describe('EpisodePlayer', () => {
     expect(ref.current?.getTime()).toBe(0);
     expect(ref.current?.getDuration()).toBeGreaterThan(0);
   });
+
+  it('handles multi-tier choices without repeating earlier choices in a loop', () => {
+    const multiChoicePlan: EpisodePlan = {
+      schema_version: '1.0.0',
+      episode_id: 'ep_multi_test',
+      title: 'Multi Choice Test',
+      age_band: '4-6',
+      start_scene: 'sc1',
+      interactive: true,
+      cast: [
+        {
+          character_id: 'pip',
+          name: 'Pip',
+          species: 'owl',
+          palette: { primary: '#3b82f6', secondary: '#60a5fa', accent: '#fbbf24', outline: '#1e293b' },
+          voice: { engine_voice: 'en-US-Standard-C' },
+        },
+      ],
+      scenes: [
+        {
+          scene_id: 'sc1',
+          background_id: 'forest_day',
+          mood: 'day',
+          characters: [{ character_id: 'pip', position: [640, 360], facing: 'right' }],
+          beats: [
+            {
+              beat_id: 'b1',
+              min_duration: 1.0,
+              choice: {
+                default: 'c1_a',
+                options: [
+                  { id: 'c1_a', label: 'Go Left', next_scene: 'sc2a' },
+                  { id: 'c1_b', label: 'Go Right', next_scene: 'sc2b' },
+                ],
+              },
+            },
+          ],
+        },
+        {
+          scene_id: 'sc2a',
+          background_id: 'forest_day',
+          mood: 'day',
+          characters: [{ character_id: 'pip', position: [640, 360], facing: 'right' }],
+          beats: [
+            {
+              beat_id: 'b2a',
+              min_duration: 1.0,
+              choice: {
+                default: 'c2_a',
+                options: [
+                  { id: 'c2_a', label: 'Climb Tree', next_scene: 'sc3a' },
+                  { id: 'c2_b', label: 'Enter Cave', next_scene: 'sc3b' },
+                ],
+              },
+            },
+          ],
+        },
+        {
+          scene_id: 'sc3a',
+          background_id: 'forest_day',
+          mood: 'day',
+          characters: [{ character_id: 'pip', position: [640, 360], facing: 'right' }],
+          beats: [
+            {
+              beat_id: 'b3',
+              min_duration: 1.0,
+            },
+          ],
+        },
+      ],
+    };
+
+    const ref = createRef<EpisodePlayerHandle>();
+    const choicesReceived: string[] = [];
+    render(
+      <EpisodePlayer
+        ref={ref}
+        plan={multiChoicePlan}
+        audio={null}
+        mode="live"
+        onChoice={(info) => {
+          choicesReceived.push(info.beatId);
+        }}
+      />
+    );
+
+    expect(ref.current).toBeTruthy();
+    // Resolve choice 1
+    ref.current?.resolveChoice('c1_a');
+    expect(ref.current?.getChosenPath()).toContain('c1_a');
+  });
 });

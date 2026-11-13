@@ -65,6 +65,7 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
   // Choice state
   const [activeChoiceInfo, setActiveChoiceInfo] = useState<ChoiceInfo | null>(null);
   const [choiceHistory, setChoiceHistory] = useState<Array<{ id: string; label: string }>>([]);
+  const [isCompleted, setIsCompleted] = useState<boolean>(false);
 
   const handleResolveChoice = useCallback((optionId: string) => {
     const chosen = activeChoiceInfo?.choice.options.find((o) => o.id === optionId);
@@ -134,6 +135,7 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
   const handleReplay = () => {
     setActiveChoiceInfo(null);
     setChoiceHistory([]);
+    setIsCompleted(false);
     setCurrentTime(0);
     setIsPlaying(true);
     setHasStarted(true);
@@ -293,6 +295,7 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
           }}
           onEnd={() => {
             setIsPlaying(false);
+            setIsCompleted(true);
           }}
         />
 
@@ -494,7 +497,7 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
                 </span>
               </React.Fragment>
             ))}
-            {choiceHistory.length > 0 && (
+            {isCompleted && (
               <>
                 <span className="text-emerald-500 text-xs font-black">➔</span>
                 <span className="px-3 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-bold border border-emerald-300 dark:border-emerald-800">
