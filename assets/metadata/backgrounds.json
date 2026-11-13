@@ -11,7 +11,7 @@
   {
     "id": "forest_night",
     "name": "Night Forest",
-    "status": "planned_v1",
+    "status": "implemented",
     "tags": ["nature", "trees", "night", "stars"],
     "mood_hint": "night",
     "ground_band": [0.62, 0.92],
@@ -20,7 +20,7 @@
   {
     "id": "meadow_day",
     "name": "Green Meadow",
-    "status": "planned_v1",
+    "status": "implemented",
     "tags": ["grass", "flowers", "open"],
     "mood_hint": "day",
     "ground_band": [0.62, 0.92],
@@ -29,7 +29,7 @@
   {
     "id": "treehouse_interior",
     "name": "Cozy Treehouse",
-    "status": "planned_v1",
+    "status": "implemented",
     "tags": ["indoor", "wood", "cozy"],
     "mood_hint": "cozy",
     "ground_band": [0.62, 0.92],
@@ -38,7 +38,7 @@
   {
     "id": "village_street",
     "name": "Village Street",
-    "status": "planned_v1",
+    "status": "implemented",
     "tags": ["town", "houses", "path"],
     "mood_hint": "day",
     "ground_band": [0.62, 0.92],

@@ -1,7 +1,6 @@
 [
-  { "id": "music_cheerful", "name": "Cheerful Whistle", "duration_s": 30.0, "loop": true, "licence": "TBD", "source_url": "" },
-  { "id": "music_calm", "name": "Calm Lullaby", "duration_s": 32.0, "loop": true, "licence": "TBD", "source_url": "" },
-  { "id": "music_mystery_soft", "name": "Soft Mystery", "duration_s": 28.0, "loop": true, "licence": "TBD", "source_url": "" },
-  { "id": "music_adventure", "name": "Little Adventure", "duration_s": 34.0, "loop": true, "licence": "TBD", "source_url": "" }
+  { "id": "music_cheerful", "name": "Cheerful Whistle", "duration_s": 30.0, "loop": true, "licence": "CC0 1.0", "source_url": "https://opengameart.org/content/5-chiptunes-action" },
+  { "id": "music_calm", "name": "Calm Lullaby", "duration_s": 32.0, "loop": true, "licence": "CC BY 3.0", "source_url": "https://opengameart.org/content/lullaby-acoustic" },
+  { "id": "music_mystery_soft", "name": "Soft Mystery", "duration_s": 28.0, "loop": true, "licence": "CC BY 4.0", "source_url": "https://incompetech.com/music/royalty-free/" },
+  { "id": "music_adventure", "name": "Little Adventure", "duration_s": 34.0, "loop": true, "licence": "CC0 1.0", "source_url": "https://opengameart.org/content/town-theme-rpg" }
 ]
-

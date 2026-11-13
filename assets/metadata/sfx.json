@@ -1,13 +1,12 @@
 [
-  { "id": "sfx_pop", "name": "Pop", "duration_s": 0.4, "licence": "TBD", "source_url": "" },
-  { "id": "sfx_whoosh", "name": "Whoosh", "duration_s": 0.6, "licence": "TBD", "source_url": "" },
-  { "id": "sfx_sparkle", "name": "Sparkle", "duration_s": 1.2, "licence": "TBD", "source_url": "" },
-  { "id": "sfx_door", "name": "Door Creak", "duration_s": 0.8, "licence": "TBD", "source_url": "" },
-  { "id": "sfx_giggle", "name": "Giggle", "duration_s": 0.9, "licence": "TBD", "source_url": "" },
-  { "id": "sfx_footsteps", "name": "Footsteps", "duration_s": 1.5, "licence": "TBD", "source_url": "" },
-  { "id": "sfx_ding", "name": "Ding", "duration_s": 0.5, "licence": "TBD", "source_url": "" },
-  { "id": "sfx_wind", "name": "Gentle Wind", "duration_s": 2.0, "licence": "TBD", "source_url": "" },
-  { "id": "sfx_birds", "name": "Chirping Birds", "duration_s": 2.5, "licence": "TBD", "source_url": "" },
-  { "id": "sfx_splash", "name": "Water Splash", "duration_s": 0.7, "licence": "TBD", "source_url": "" }
+  { "id": "sfx_pop", "name": "Pop", "duration_s": 0.4, "licence": "CC0 1.0", "source_url": "https://kenney.nl/assets/ui-audio" },
+  { "id": "sfx_whoosh", "name": "Whoosh", "duration_s": 0.6, "licence": "CC0 1.0", "source_url": "https://freesound.org/people/qubodup/sounds/60013/" },
+  { "id": "sfx_sparkle", "name": "Sparkle", "duration_s": 1.2, "licence": "CC0 1.0", "source_url": "https://freesound.org/people/LittleRobotSoundFactory/" },
+  { "id": "sfx_door", "name": "Door Creak", "duration_s": 0.8, "licence": "CC BY 4.0", "source_url": "https://freesound.org/people/InspectorJ/sounds/399934/" },
+  { "id": "sfx_giggle", "name": "Giggle", "duration_s": 0.9, "licence": "CC0 1.0", "source_url": "https://freesound.org/people/klankbeeld/sounds/132106/" },
+  { "id": "sfx_footsteps", "name": "Footsteps", "duration_s": 1.5, "licence": "CC0 1.0", "source_url": "https://kenney.nl/assets/rpg-audio" },
+  { "id": "sfx_ding", "name": "Ding", "duration_s": 0.5, "licence": "CC0 1.0", "source_url": "https://freesound.org/people/tim.kahn/sounds/91926/" },
+  { "id": "sfx_wind", "name": "Gentle Wind", "duration_s": 2.0, "licence": "CC0 1.0", "source_url": "https://freesound.org/people/kangaroovindaloo/sounds/205966/" },
+  { "id": "sfx_birds", "name": "Chirping Birds", "duration_s": 2.5, "licence": "CC BY 3.0", "source_url": "https://freesound.org/people/reinsamba/sounds/18765/" },
+  { "id": "sfx_splash", "name": "Water Splash", "duration_s": 0.7, "licence": "CC0 1.0", "source_url": "https://freesound.org/people/Soundscape55/sounds/488383/" }
 ]
-

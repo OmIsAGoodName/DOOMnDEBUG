@@ -11,6 +11,8 @@
 
 import type { CharacterDrawState } from '@contracts';
 import { drawOwl } from './owl';
+import { drawFox } from './fox';
+import { drawKid } from './kid';
 import { shadow, roundedBody } from './kit';
 
 // Track warned species to avoid console spam in 60fps render loops
@@ -24,6 +26,14 @@ export function drawCharacter(ctx: CanvasRenderingContext2D, state: CharacterDra
   switch (species) {
     case 'owl':
       drawOwl(ctx, state);
+      break;
+
+    case 'fox':
+      drawFox(ctx, state);
+      break;
+
+    case 'kid':
+      drawKid(ctx, state);
       break;
 
     default:
@@ -104,4 +114,6 @@ function drawPlaceholderCharacter(
 }
 
 export { drawOwl } from './owl';
+export { drawFox } from './fox';
+export { drawKid } from './kid';
 export default drawCharacter;

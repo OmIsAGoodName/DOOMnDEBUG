@@ -9,6 +9,10 @@
  */
 
 import { drawForestDay } from './forest_day';
+import { drawForestNight } from './forest_night';
+import { drawMeadowDay } from './meadow_day';
+import { drawTreehouseInterior } from './treehouse_interior';
+import { drawVillageStreet } from './village_street';
 
 const warnedBackgrounds = new Set<string>();
 
@@ -26,6 +30,22 @@ export function drawBackground(
   switch (bgId) {
     case 'forest_day':
       drawForestDay(ctx, t, w, h);
+      break;
+
+    case 'forest_night':
+      drawForestNight(ctx, t, w, h);
+      break;
+
+    case 'meadow_day':
+      drawMeadowDay(ctx, t, w, h);
+      break;
+
+    case 'treehouse_interior':
+      drawTreehouseInterior(ctx, t, w, h);
+      break;
+
+    case 'village_street':
+      drawVillageStreet(ctx, t, w, h);
       break;
 
     default:
@@ -79,4 +99,8 @@ function drawPlaceholderBackground(
 }
 
 export { drawForestDay } from './forest_day';
+export { drawForestNight } from './forest_night';
+export { drawMeadowDay } from './meadow_day';
+export { drawTreehouseInterior } from './treehouse_interior';
+export { drawVillageStreet } from './village_street';
 export default drawBackground;
