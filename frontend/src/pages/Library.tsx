@@ -74,12 +74,12 @@ export default function Library() {
   return (
     <div className="py-10 px-6 max-w-5xl mx-auto space-y-8">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+          <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2">
             <span>📚</span> Story Library
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Browse and replay your animated stories and offline episodes.
           </p>
         </div>
@@ -92,7 +92,7 @@ export default function Library() {
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-800">
+        <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-xs font-semibold text-amber-800 dark:text-amber-300">
           {error}
         </div>
       )}
@@ -121,7 +121,7 @@ export default function Library() {
               <Link key={ep.id} to={`/episode/${ep.id}`} className="group block">
                 <Card
                   hoverEffect
-                  className="h-full flex flex-col justify-between overflow-hidden border-slate-200 group-hover:border-indigo-400 group-hover:-translate-y-1 transition-all"
+                  className="h-full flex flex-col justify-between overflow-hidden border-slate-200 dark:border-slate-800 group-hover:border-indigo-400 group-hover:-translate-y-1 transition-all"
                   padding="none"
                 >
                   {/* Thumbnail / Header Preview */}
@@ -147,17 +147,17 @@ export default function Library() {
                   {/* Body Content */}
                   <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
                     <div>
-                      <h3 className="font-bold text-lg text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">
+                      <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">
                         {ep.title}
                       </h3>
-                      <p className="text-xs text-slate-500 mt-1">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                         Age: {ep.plan?.age_band || '4-6'} &bull; Status: {ep.status}
                       </p>
                     </div>
 
-                    <div className="pt-2 flex items-center justify-between border-t border-slate-100">
+                    <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
                       <SafetyBadge status={ep.safety?.verdict || 'pass'} />
-                      <span className="text-xs font-bold text-indigo-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                      <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                         Play &rarr;
                       </span>
                     </div>
