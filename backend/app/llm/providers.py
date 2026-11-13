@@ -84,26 +84,42 @@ class GroqProvider(BaseProvider):
             messages.append({"role": "system", "content": system})
         messages.append({"role": "user", "content": user_content})
 
-        payload = {
-            "model": self.model,
-            "messages": messages,
-            "response_format": {"type": "json_object"},
-            "temperature": temperature
-        }
+        models_to_try = [self.model]
+        for candidate in ["openai/gpt-oss-20b", "qwen/qwen3.8-27b", "openai/gpt-oss-120b"]:
+            if candidate not in models_to_try:
+                models_to_try.append(candidate)
 
+        last_err = None
         async with httpx.AsyncClient(timeout=60.0) as client:
-            resp = await client.post(url, headers=headers, json=payload)
-            if resp.status_code == 429:
-                raise RuntimeError(f"Groq Rate Limit (429): {resp.text}")
-            if resp.status_code != 200:
-                raise RuntimeError(f"Groq Error ({resp.status_code}): {resp.text}")
-            resp.raise_for_status()
+            for model_name in models_to_try:
+                payload = {
+                    "model": model_name,
+                    "messages": messages,
+                    "response_format": {"type": "json_object"},
+                    "temperature": temperature
+                }
+                try:
+                    resp = await client.post(url, headers=headers, json=payload)
+                    if resp.status_code == 429:
+                        last_err = RuntimeError(f"Groq Rate Limit (429) on model `{model_name}`: {resp.text}")
+                        continue
+                    if resp.status_code != 200:
+                        last_err = RuntimeError(f"Groq Error ({resp.status_code}) on model `{model_name}`: {resp.text}")
+                        continue
 
-            data = resp.json()
-            choices = data.get("choices", [])
-            if not choices:
-                raise ValueError(f"No choices returned by Groq: {data}")
-            return choices[0].get("message", {}).get("content", "")
+                    data = resp.json()
+                    choices = data.get("choices", [])
+                    if not choices:
+                        last_err = ValueError(f"No choices returned by Groq for `{model_name}`: {data}")
+                        continue
+                    return choices[0].get("message", {}).get("content", "")
+                except (httpx.TimeoutException, httpx.NetworkError) as net_err:
+                    last_err = net_err
+                    continue
+
+        if last_err:
+            raise last_err
+        raise RuntimeError("All Groq candidate models failed.")
 
 class OllamaProvider(BaseProvider):
     def __init__(self, url: Optional[str] = None, model: Optional[str] = None):
