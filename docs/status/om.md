@@ -1,9 +1,37 @@
 # Om's Status & Milestone Log
 
-**Current Milestone**: Workstation Transition to Nigel (Art & UI Lead) — All Parts (0 through 5) Integrated, Verified & Complete  
+**Current Milestone**: Polish, Dark Theme & LLM Fallback Robustness Complete  
 **Date**: 2026-11-13  
-**Active Branch**: `main` (Head: `511fb56` / `origin/main`)  
+**Active Branch**: `main` (synced with `origin/main`)  
 **Repository**: `https://github.com/OmIsAGoodName/DOOMnDEBUG.git`  
+
+---
+
+## ⚡ Recent Updates (Animation Polish, Story Options, Dark Mode & Provider Robustness)
+1. **Resolved LLM Provider Failure & Safe Fallback**:
+   - Diagnosed root cause of `"All LLM providers failed. Last error: All connection attempts failed"`:
+     - Groq encountered a temporary connection timeout/rate limit.
+     - Fallback tried placeholder `GEMINI_API_KEY` and unreachable local `OLLAMA_URL` (`localhost:11434`), surfacing the connection refusal.
+     - The built-in offline `DEMO_MODE` fallback in `backend/app/pipeline.py` threw `NameError: name 'Path' is not defined` due to missing imports.
+   - **Fixes Applied**:
+     - Added `Path` and `json` imports in `backend/app/pipeline.py` so offline demo episodes load instantly whenever online LLMs hiccup.
+     - Enhanced `backend/app/llm/providers.py` and `adapter.py` with `is_configured()` checks and detailed per-provider error reporting.
+     - Restarted FastAPI/Uvicorn server; verified live generation succeeds end-to-end in ~8s.
+2. **2D Studio-Quality Animation Polish (Without Camera Moves)**:
+   - Cubic easing (`easeInOutCubic`) for natural acceleration and deceleration.
+   - Character idle breathing cycles across all 5 characters (`rabbit`, `turtle`, `fox`, `owl`, `kid`) at ~2Hz.
+   - Dynamic contact shadows scaling with bounce/hop altitude.
+   - Storybook vignette frame and mood-based atmospheric floating particles.
+3. **Story Duration Options (`/quick`)**:
+   - Added 3 interactive duration buttons: `< 1 min` (Snack Story, 2 scenes), `1 - 2 mins` (Bedtime Tale, 3-4 scenes), `2 - 3 mins` (Extended Tale, 4-5 scenes).
+   - Hooked up pipeline to adjust scene pacing and beat depth based on duration.
+4. **Custom Character Generation Option (`/quick`)**:
+   - Added checkbox: *"✨ Try generating new character designs for this story"*.
+   - Explains that custom palettes & voices take ~15–20s longer and auto-save into the Library.
+5. **Dark Mode by Default**:
+   - Added global Dark Mode toggle (`🌙 Dark` / `☀️ Light`) in header nav.
+   - Defaults to dark mode (`localStorage.getItem('voxfable_theme') || 'dark'`).
+   - Tailwind `darkMode: 'class'` configured with dark backgrounds, cards, inputs, and chips.
 
 ---
 
