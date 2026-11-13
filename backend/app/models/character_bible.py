@@ -17,3 +17,4 @@ class CharacterBible(BaseModel):
     rules: List[str] = Field(default_factory=list)
     animations: List[str] = Field(default_factory=list)
     expressions: List[str] = Field(default_factory=list)
+

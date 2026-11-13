@@ -13,3 +13,4 @@ class Series(BaseModel):
     age_band: Literal["3-5", "4-6", "6-8"]
     language: str = "en"
     character_ids: List[str] = Field(default_factory=list)
+

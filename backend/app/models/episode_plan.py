@@ -176,3 +176,4 @@ class EpisodePlan(BaseModel):
     scenes: List[Scene]
     safety: Optional[SafetyVerdict] = None
     continuity: Optional[ContinuityReport] = None
+

@@ -9,3 +9,4 @@ Follow docs/Master_Context.md Section 14.
 5. **No secrets or bloat:** Never commit `.env` files, API keys, `node_modules/`, `media/`, or files over 2 MB.
 6. **Update status:** At each milestone, record your progress in `docs/status/<name>.md`.
 7. **Fresh sessions:** Start a fresh agent task after pulling updates to keep context clear.
+

@@ -12,3 +12,4 @@
   { "id": "firefly_jar", "name": "Firefly Jar", "tags": ["light", "magic"], "default_slot": "hand", "licence": "original" },
   { "id": "kite", "name": "Sky Kite", "tags": ["toy", "wind"], "default_slot": "hand", "licence": "original" }
 ]
+

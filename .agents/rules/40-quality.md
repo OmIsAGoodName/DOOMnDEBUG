@@ -5,3 +5,4 @@
 3. **No secrets:** Never commit credentials or API keys. Use `.env.example` templates.
 4. **Honesty:** Be explicit about what is unproven, mocked, or broken. Prefer simple, dependable solutions over fragile complexity.
 5. **Keep main runnable:** Run typechecks and unit tests before every push to `main`.
+

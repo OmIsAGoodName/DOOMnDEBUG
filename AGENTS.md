@@ -8,3 +8,4 @@ Read docs/Master_Context.md before any task. It is the source of truth.
 6. Child-safe by default. Original art only. Record every asset licence in assets/LICENSES.md.
 7. Be honest: say what is unproven or broken. Prefer the simplest thing that works.
 8. Update docs/status/<name>.md at each milestone (Done/In progress/Next/Blockers/Requests/Contract proposals).
+

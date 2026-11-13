@@ -26,3 +26,4 @@ Thumbs.db
 
 # Agent identity (local per developer)
 .agents/rules/99-identity.md
+

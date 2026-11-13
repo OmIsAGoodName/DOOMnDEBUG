@@ -5,3 +5,4 @@
 3. **Art contract:** Characters ALWAYS draw facing right (engine handles horizontal mirroring). Missing asset IDs must draw a placeholder and warn, never throw.
 4. **No dynamic asset generation:** Never generate character art or audio assets during a user request; use pre-authored assets and metadata. Recolor, accessory, and name changes are parameter changes.
 5. **Never execute LLM-written code:** The LLM produces validated JSON adhering to JSON schemas only.
+

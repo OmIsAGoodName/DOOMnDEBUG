@@ -17,3 +17,4 @@ Story Writer -> Animation Director -> Validator + Asset Resolver -> Continuity S
 - Level A (Online): Everything live via Supabase, Gemini/Groq LLMs, Edge-TTS.
 - Level B (Degraded): "Demo Mode" login, local bundled episodes, tap choices, local FFmpeg export.
 - Level C (Offline/Fallback): Pre-baked static episodes & MP4 downloads in frontend/public/demo/.
+

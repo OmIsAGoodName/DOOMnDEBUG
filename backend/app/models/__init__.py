@@ -23,3 +23,4 @@ __all__ = [
     "MusicAsset",
     "SfxAsset",
 ]
+

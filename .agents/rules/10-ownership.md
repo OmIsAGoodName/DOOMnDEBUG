@@ -12,3 +12,4 @@ Every agent MUST edit ONLY their assigned person's directories.
 - **Stubs rule:** Om creates placeholder files in Push #1 so imports/routes work. From that moment, the assigned folder owner takes over and Om does not edit them.
 - **Shared files:** Any changes to `contracts/` or shared configs must be requested via `docs/status/<name>.md` under "Contract proposals" or "Requests".
 - **Dependencies rule:** Add npm/pip dependencies in small, separate commits. Run `git pull --rebase origin main` first.
+

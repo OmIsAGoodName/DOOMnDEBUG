@@ -28,3 +28,4 @@ class AudioManifest(BaseModel):
     lines: List[AudioLine]
     music: List[MusicAsset] = Field(default_factory=list)
     sfx: List[SfxAsset] = Field(default_factory=list)
+
