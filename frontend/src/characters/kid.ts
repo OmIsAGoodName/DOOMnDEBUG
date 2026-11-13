@@ -56,10 +56,7 @@ export function drawKid(ctx: CanvasRenderingContext2D, state: CharacterDrawState
   const strokeW = 4;
   setupOutline(ctx, strokeW, palette.outline);
 
-  // 1. Soft ground shadow
-  shadow(ctx, 0, 0, 135, 34, 0.26);
-
-  // 2. Pose calculations
+  // 1. Pose calculations
   let bodyBounceY = 0;
   let bodyRot = 0;
   let headTilt = 0;
@@ -145,6 +142,18 @@ export function drawKid(ctx: CanvasRenderingContext2D, state: CharacterDrawState
     blink = Math.max(blink, 0.7);
   }
 
+  // Dynamic squash & stretch based on bounce
+  const hopHeight = Math.max(0, -bodyBounceY);
+  let stretchX = 1.0;
+  let stretchY = 1.0;
+  if (hopHeight > 1) {
+    stretchY = 1.0 + Math.min(0.18, (hopHeight / 100) * 0.4);
+    stretchX = 1.0 - Math.min(0.12, (hopHeight / 100) * 0.25);
+  }
+
+  // 2. Soft ground shadow (reactive to hop height)
+  shadow(ctx, 0, 0, 135, 34, 0.26, hopHeight);
+
   // --- ACCESSORY: Cape (rear) ---
   if (accessories.includes('cape')) {
     drawKidCape(ctx, bodyBounceY, time, palette);
@@ -165,6 +174,7 @@ export function drawKid(ctx: CanvasRenderingContext2D, state: CharacterDrawState
   ctx.save();
   ctx.translate(0, bodyBounceY);
   ctx.rotate(bodyRot);
+  ctx.scale(stretchX, stretchY);
 
   // Shirt torso
   ctx.fillStyle = palette.primary;
@@ -202,8 +212,9 @@ export function drawKid(ctx: CanvasRenderingContext2D, state: CharacterDrawState
   // Ears
   drawKidEars(ctx, palette.outline);
 
-  // Hair back layer & top bangs (secondary palette color)
-  drawKidHair(ctx, palette);
+  // Hair back layer & top bangs (secondary palette color) with dynamic inertia
+  const hairLag = Math.sin(time * 7 - 0.5) * 0.15 + (bodyBounceY / 30) * 0.2;
+  drawKidHair(ctx, palette, hairLag);
 
   // Cheerful blush dots
   ctx.fillStyle = 'rgba(255, 112, 166, 0.4)';
@@ -296,7 +307,7 @@ function drawKidEars(ctx: CanvasRenderingContext2D, outlineColor: string): void 
   ctx.stroke();
 }
 
-function drawKidHair(ctx: CanvasRenderingContext2D, palette: Palette): void {
+function drawKidHair(ctx: CanvasRenderingContext2D, palette: Palette, hairLag = 0): void {
   ctx.fillStyle = palette.secondary;
   ctx.strokeStyle = palette.outline;
   ctx.lineWidth = 3.5;
@@ -314,11 +325,11 @@ function drawKidHair(ctx: CanvasRenderingContext2D, palette: Palette): void {
   ctx.fill();
   ctx.stroke();
 
-  // Perky hair tuft on top
+  // Perky hair tuft on top with dynamic inertia lag
   ctx.beginPath();
   ctx.moveTo(0, -68);
-  ctx.quadraticCurveTo(15, -92, 35, -88);
-  ctx.quadraticCurveTo(20, -75, 12, -70);
+  ctx.quadraticCurveTo(15 + hairLag * 8, -92 - hairLag * 4, 35 + hairLag * 10, -88);
+  ctx.quadraticCurveTo(20 + hairLag * 5, -75, 12, -70);
   ctx.closePath();
   ctx.fill();
   ctx.stroke();
