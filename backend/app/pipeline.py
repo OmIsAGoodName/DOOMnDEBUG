@@ -122,7 +122,53 @@ async def run_quick_story_pipeline(
 
     except Exception as e:
         error_msg = f"Generation failed: {str(e)}"
-        print(error_msg)
+        print(f"[Pipeline] {error_msg}")
+
+        from .config import settings
+        if settings.DEMO_MODE:
+            print("[Pipeline] DEMO_MODE active: activating offline demo episode fallback!")
+            fixture_name = "episode_live_demo.json" if interactive else "episode_quick_demo.json"
+            manifest_name = "audio_manifest_live_demo.json" if interactive else "audio_manifest_quick_demo.json"
+            fixtures_dir = Path(__file__).resolve().parent.parent.parent / "fixtures"
+
+            try:
+                with open(fixtures_dir / fixture_name, "r", encoding="utf-8") as f:
+                    fallback_plan_dict = json.load(f)
+                with open(fixtures_dir / manifest_name, "r", encoding="utf-8") as f:
+                    fallback_manifest_dict = json.load(f)
+
+                fb_ep_id = f"ep_{uuid.uuid4().hex[:8]}"
+                fallback_plan_dict["episode_id"] = fb_ep_id
+                fallback_manifest_dict["episode_id"] = fb_ep_id
+
+                episode_record = {
+                    "id": fb_ep_id,
+                    "title": prompt.strip().capitalize() if len(prompt) < 40 else fallback_plan_dict.get("title", "Magical Story"),
+                    "plan": fallback_plan_dict,
+                    "audio_manifest": fallback_manifest_dict,
+                    "safety": {"verdict": "pass", "age_fit": 1.0, "scary": 0.0, "notes": "Approved (Demo Net)"},
+                    "continuity": {"violations": []},
+                    "status": "ready"
+                }
+                await repo.create_episode(owner_id, episode_record)
+                await repo.update_generation(owner_id, generation_id, {
+                    "status": "succeeded",
+                    "stage": "ready",
+                    "progress": 100,
+                    "episode_ids": [fb_ep_id]
+                })
+                generation_tasks[generation_id] = {
+                    "id": generation_id,
+                    "status": "succeeded",
+                    "stage": "ready",
+                    "progress": 100,
+                    "episode_ids": [fb_ep_id]
+                }
+                print(f"[Pipeline] Fallback successfully served for {fb_ep_id} in DEMO_MODE.")
+                return fb_ep_id
+            except Exception as fb_err:
+                print(f"[Pipeline] Fallback generation error: {fb_err}")
+
         await repo.update_generation(owner_id, generation_id, {
             "status": "failed",
             "stage": "failed",
