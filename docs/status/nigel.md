@@ -1,50 +1,53 @@
 # Status: Nigel
 
-**Current Milestone**: Part 1 (Art Foundation, First Character & First Background) Complete  
+**Current Milestone**: Part 2 (Remaining Art, Props & Audio) Complete  
 **Date**: 2026-11-13  
-**Active Branch**: `nigel/art-setup`
+**Active Branch**: `nigel/art-setup` (Synced with `main` at `fced67d`)
 
 ---
 
 ## Done
+- [x] **N0.4 Art Style Guide (`docs/ART_STYLE.md`)**:
+  - Full original art specification: color palettes, shape language, 300 px scale rules, outline standards, 8 poses, 6 expressions, 3 mouths, 6 accessories, background layering, and polish checklist.
 - [x] **N1.1 Scaffold Verification**:
-  - Routes verified (`/dev/art`, `/quick`, `/studio`, `/login`, `/signup`).
-  - Types verified against `contracts/types.ts` (`CharacterDrawState`, `Palette`, `VoiceConfig`).
-  - Confirmed and verified all scaffold components typecheck cleanly.
+  - Routes, types, and build verified against `contracts/types.ts`.
 - [x] **N1.2 Drawing Kit Primitives (`frontend/src/characters/kit/`)**:
-  - Pure drawing and math utilities: `outline`, `roundedBody`, `ellipse`, `shadow`, `eye` (with deterministic `computeBlink` from `time`), `brows`, `mouth` (shapes: `closed`, `half`, `wide`), `limb`, `ease` functions (`linear`, `easeInOutQuad`, `easeInOutSine`, `easeOutBack`), `lerpColor`, and `shade`.
-  - Comprehensive unit test suite in `kit.test.ts` passing (7/7 tests).
+  - Pure drawing and math helpers with 7 unit tests passing.
 - [x] **N1.3 Species 1: Pip Owl (`pip_owl`) & Art Gallery (`/dev/art`)**:
-  - Implemented `frontend/src/characters/owl.ts`:
-    - Strict adherence to frozen art contract: faces right, origin at feet-center `(0, 0)`, height ~300 px at scale 1.0.
-    - 8 poses implemented (`idle`, `walk`, `talk`, `wave`, `laugh`, `listen`, `react`, `point`) driven deterministically by `time` and `poseT`.
-    - 6 expressions (`neutral`, `happy`, `sad`, `surprised`, `worried`, `excited`) with beak and mouth shapes (`closed`, `half`, `wide`).
-    - 6 accessories layered cleanly: `cape`, `backpack`, `scarf`, `bow`, `glasses`, `hat`.
-    - Soft ground shadow and clean color palette bindings.
-  - Implemented character dispatcher in `frontend/src/characters/index.ts`:
-    - Safely dispatches to `drawOwl` for `'owl'`.
-    - Friendly visual placeholder with single console warning for unknown or unreleased species; never throws.
-  - Implemented `/dev/art` gallery in `frontend/src/pages/dev/ArtGallery.tsx`:
-    - Full 1280x720 canvas preview with optional ground band guide lines.
-    - Interactive controls: species switch, background selector, play/pause, time reset, facing left mirror preview (`ctx.scale(-1, 1)`), scale slider, accessory toggles, and live palette color pickers.
-    - 8-pose matrix live grid showing all poses animating in real time.
-- [x] **N1.4 Background 1 (`forest_day`) & Metadata v1**:
-  - Implemented `frontend/src/backgrounds/forest_day.ts`:
-    - Full 720p layered scene: sunny sky gradient, drifting clouds (t-driven), dual far rolling hill ridges, distant pine tree silhouettes, midground oak trees with wind sway, lush ground band (y: 0.62 to 0.92) with winding cobblestone/pebble path, grass tufts, flowers, mushrooms, and floating forest pollen sparkles.
-    - No mood tinting in art (engine handles mood tint).
-  - Background dispatcher in `frontend/src/backgrounds/index.ts` with safe fallback placeholder.
-  - Updated `assets/metadata/characters.json` and `assets/metadata/backgrounds.json` reflecting implemented capabilities.
-- [x] **Contract & Integrity Unit Tests**:
-  - Added `frontend/src/characters/characters.test.ts` verifying determinism and crash-safety on missing data. All 11 frontend tests pass; TypeScript compiles with 0 errors.
+  - Owl character with 8 poses, 6 expressions, 3 mouths, 6 accessories, soft shadow.
+  - Interactive `/dev/art` testing suite with full scene preview and live 8-pose matrix.
+- [x] **N1.4 Background 1: Sunny Forest (`forest_day`)**:
+  - 8-layer composite with ground band (0.62–0.92) and ambient motion.
+- [x] **N2.1 Remaining Species: Rusty Fox (`rusty_fox`) & Mia Kid (`mia_kid`)**:
+  - Implemented `fox.ts`: bushy animated tail, pointed ears, white chest tuft, snout whiskers, 8 poses, 6 expressions, 3 mouths, 6 accessories.
+  - Implemented `kid.ts`: rounded head, stylized hair, t-shirt, shorts, sneakers, 8 poses, 6 expressions, 3 mouths, 6 accessories.
+  - Updated `characters/index.ts` dispatcher to handle all 3 species.
+- [x] **N2.2 Remaining Backgrounds 2-5**:
+  - Implemented `forest_night.ts`: midnight gradient, moon, twinkling stars, dark pines, fireflies.
+  - Implemented `meadow_day.ts`: rolling green hills, snow-capped mountains, clouds, wildflowers, butterflies.
+  - Implemented `treehouse_interior.ts`: wood plank walls, round canopy window, hanging lantern, bookshelf, cozy floor rug.
+  - Implemented `village_street.ts`: cobblestone street, timber-framed cottages, lit windows, lamppost, falling leaves.
+  - Updated `backgrounds/index.ts` dispatcher.
+- [x] **N2.3 12 Vocabulary Props (`frontend/src/props/index.ts`)**:
+  - Implemented vector rendering for all 12 props: `lantern`, `key`, `treasure_chest`, `book`, `apple`, `basket`, `umbrella`, `balloon`, `flower`, `glowing_door`, `firefly_jar`, `kite`.
+  - Added 12-prop interactive showcase to `/dev/art`.
+  - Synced `assets/metadata/props.json`.
+- [x] **N2.4 Audio Curation & Licensing**:
+  - Curated CC0 / CC-BY audio registry in `assets/LICENSES.md` with source URLs and authors.
+  - Wrote normalization and encoding scripts: `assets/prepare_audio.ps1` and `assets/prepare_audio.sh`.
+  - Updated `assets/metadata/sfx.json` and `assets/metadata/music.json`.
+- [x] **N2.5 Art Polish & Composite Performance Pass**:
+  - Validated composite render performance (3 characters + background + 2 props) well under the 8 ms budget (< 3 ms in unit test).
+  - All 27 frontend tests pass; TypeScript compiles with 0 errors.
 
 ## In progress
-- Standing by for Part 2 (Fox, Kid, Backgrounds 2-5, Props, SFX/Music Audio Curation).
+- PART 3: UI foundation, Auth pages, Quick Story (`/quick`), and Library (`/library`, `/episode/:id`).
 
 ## Next
-- N2.1: Implement `rusty_fox` (species 'fox') and `mia_kid` (species 'kid').
-- N2.2: Implement remaining backgrounds (`forest_night`, `meadow_day`, `treehouse_interior`, `village_street`).
-- N2.3: Implement 12 props in `frontend/src/props/`.
-- N2.4: Curate licensed audio (SFX and music) and generate `assets/LICENSES.md`.
+- N3.1: Create UI component library in `frontend/src/ui/` and modern Home page (`/`).
+- N3.2: Implement Auth pages (`/login`, `/signup`) using `useAuth()`.
+- N3.3: Implement Quick Story page (`/quick`) with generator stages, `<EpisodePlayer>`, Live Mode, and MP4 download.
+- N3.4: Implement Library & Episode pages.
 
 ## Blockers
 - None.
@@ -54,6 +57,7 @@
 
 ## Contract proposals
 - None at this time.
+
 
 
 
