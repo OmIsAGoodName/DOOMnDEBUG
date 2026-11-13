@@ -27,6 +27,62 @@ export interface LiveMatchResponse {
   method: 'keyword' | 'llm' | 'default';
 }
 
+export interface SystemStatsResponse {
+  ok: boolean;
+  providers: {
+    groq: {
+      configured: boolean;
+      masked_key: string;
+      model: string;
+      candidate_models: string[];
+      stats: {
+        calls: number;
+        successes: number;
+        rate_limits: number;
+        errors: number;
+        last_status: string;
+        last_model_used?: string | null;
+        last_error?: string | null;
+        last_error_time?: string | null;
+        needs_new_key: boolean;
+      };
+    };
+    gemini: {
+      configured: boolean;
+      masked_key: string;
+      model: string;
+      stats: {
+        calls: number;
+        successes: number;
+        rate_limits: number;
+        errors: number;
+        last_status: string;
+        last_error?: string | null;
+        last_error_time?: string | null;
+        needs_new_key: boolean;
+      };
+    };
+    ollama: {
+      configured: boolean;
+      url: string;
+      model: string;
+    };
+    tts: {
+      engine: string;
+      concurrency: number;
+      cached_audio_clips: number;
+    };
+  };
+  mode: 'online' | 'demo';
+  needs_attention: boolean;
+}
+
+export interface UpdateApiKeyParams {
+  provider: 'groq' | 'gemini';
+  api_key: string;
+  model?: string;
+}
+
 async function getAuthHeader(): Promise<Record<string, string>> {
   if (config.isDemoMode()) {
     return {};
@@ -197,6 +253,17 @@ export const api = {
     voice?: Record<string, string>;
   }): Promise<any> => {
     return request<any>('/api/characters', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+  },
+
+  getSystemStats: async (): Promise<SystemStatsResponse> => {
+    return request<SystemStatsResponse>('/api/system/stats');
+  },
+
+  updateApiKey: async (params: UpdateApiKeyParams): Promise<{ ok: boolean; message: string }> => {
+    return request<{ ok: boolean; message: string }>('/api/system/keys', {
       method: 'POST',
       body: JSON.stringify(params),
     });

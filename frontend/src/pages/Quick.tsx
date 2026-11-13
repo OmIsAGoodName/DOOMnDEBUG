@@ -152,11 +152,19 @@ export default function Quick() {
           )}
 
           {errorMessage && (
-            <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-xs font-semibold text-rose-700 dark:text-rose-300 text-left space-y-2">
+            <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-xs font-semibold text-rose-700 dark:text-rose-300 text-left space-y-3">
               <p>{errorMessage}</p>
-              <Button variant="danger" size="sm" onClick={handleReset}>
-                ↺ Try Again
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button variant="danger" size="sm" onClick={handleReset}>
+                  ↺ Try Again
+                </Button>
+                <a
+                  href="/debug"
+                  className="px-3 py-1.5 rounded-lg bg-slate-900 text-white dark:bg-slate-800 text-xs font-bold hover:bg-slate-800 transition-colors"
+                >
+                  ⚙️ Diagnostics / Swap Key
+                </a>
+              </div>
             </div>
           )}
         </Card>

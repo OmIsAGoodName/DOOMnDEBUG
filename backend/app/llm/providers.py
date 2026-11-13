@@ -1,8 +1,33 @@
 import abc
+import datetime
 import json
 import httpx
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from ..config import settings
+
+PROVIDER_STATS: Dict[str, Any] = {
+    "groq": {
+        "calls": 0,
+        "successes": 0,
+        "rate_limits": 0,
+        "errors": 0,
+        "last_status": "idle",
+        "last_model_used": None,
+        "last_error": None,
+        "last_error_time": None,
+        "needs_new_key": False
+    },
+    "gemini": {
+        "calls": 0,
+        "successes": 0,
+        "rate_limits": 0,
+        "errors": 0,
+        "last_status": "idle",
+        "last_error": None,
+        "last_error_time": None,
+        "needs_new_key": False
+    }
+}
 
 class BaseProvider(abc.ABC):
     @abc.abstractmethod
@@ -84,13 +109,21 @@ class GroqProvider(BaseProvider):
             messages.append({"role": "system", "content": system})
         messages.append({"role": "user", "content": user_content})
 
-        # Primary fast models with open quota (excluding 120b during daily rate-limit window)
+        PROVIDER_STATS["groq"]["calls"] += 1
+
+        # Priority order: premier flagship models first, failing over to lighter models if rate limited
+        candidate_priority = [
+            "openai/gpt-oss-120b",
+            "llama-3.3-70b-versatile",
+            "openai/gpt-oss-20b",
+            "llama-3.1-8b-instant"
+        ]
         models_to_try = []
-        if self.model and "120b" not in self.model:
+        if self.model and self.model in candidate_priority:
             models_to_try.append(self.model)
-        for candidate in ["openai/gpt-oss-20b", "llama-3.3-70b-versatile", "llama-3.1-8b-instant", "qwen/qwen3.8-27b"]:
-            if candidate not in models_to_try:
-                models_to_try.append(candidate)
+        for c in candidate_priority:
+            if c not in models_to_try:
+                models_to_try.append(c)
 
         last_err = None
         async with httpx.AsyncClient(timeout=60.0) as client:
@@ -105,9 +138,17 @@ class GroqProvider(BaseProvider):
                 try:
                     resp = await client.post(url, headers=headers, json=payload)
                     if resp.status_code == 429:
+                        PROVIDER_STATS["groq"]["rate_limits"] += 1
+                        PROVIDER_STATS["groq"]["last_status"] = "rate_limited"
+                        PROVIDER_STATS["groq"]["last_error"] = f"Rate limit on `{model_name}`: {resp.text}"
+                        PROVIDER_STATS["groq"]["last_error_time"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
                         last_err = RuntimeError(f"Groq Rate Limit (429) on model `{model_name}`: {resp.text}")
                         continue
                     if resp.status_code != 200:
+                        PROVIDER_STATS["groq"]["errors"] += 1
+                        PROVIDER_STATS["groq"]["last_status"] = "error"
+                        PROVIDER_STATS["groq"]["last_error"] = f"Error ({resp.status_code}) on `{model_name}`: {resp.text}"
+                        PROVIDER_STATS["groq"]["last_error_time"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
                         last_err = RuntimeError(f"Groq Error ({resp.status_code}) on model `{model_name}`: {resp.text}")
                         continue
 
@@ -116,11 +157,18 @@ class GroqProvider(BaseProvider):
                     if not choices:
                         last_err = ValueError(f"No choices returned by Groq for `{model_name}`: {data}")
                         continue
+
+                    # Success!
+                    PROVIDER_STATS["groq"]["successes"] += 1
+                    PROVIDER_STATS["groq"]["last_status"] = "healthy"
+                    PROVIDER_STATS["groq"]["last_model_used"] = model_name
+                    PROVIDER_STATS["groq"]["needs_new_key"] = False
                     return choices[0].get("message", {}).get("content", "")
                 except (httpx.TimeoutException, httpx.NetworkError) as net_err:
                     last_err = net_err
                     continue
 
+        PROVIDER_STATS["groq"]["needs_new_key"] = True
         if last_err:
             raise last_err
         raise RuntimeError("All Groq candidate models failed.")

@@ -12,6 +12,7 @@ const Signup = lazy(() => import('./pages/auth/Signup'));
 const EngineHarness = lazy(() => import('./engine/dev/Harness'));
 const LiveHarness = lazy(() => import('./live/dev/LiveHarness'));
 const ArtGallery = lazy(() => import('./pages/dev/ArtGallery'));
+const Debug = lazy(() => import('./pages/Debug'));
 
 export default function App() {
   const [isDark, setIsDark] = useState<boolean>(() => {
@@ -42,6 +43,7 @@ export default function App() {
               <Link to="/quick" className="hover:text-slate-900 dark:hover:text-white transition-colors">Quick Story</Link>
               <Link to="/studio" className="hover:text-slate-900 dark:hover:text-white transition-colors">Studio</Link>
               <Link to="/library" className="hover:text-slate-900 dark:hover:text-white transition-colors">Library</Link>
+              <Link to="/debug" className="hover:text-amber-500 dark:hover:text-amber-400 font-bold transition-colors">⚙️ Diagnostics</Link>
 
               {/* Dark Mode Toggle */}
               <button
@@ -69,6 +71,7 @@ export default function App() {
                   <Route path="/quick" element={<Quick />} />
                   <Route path="/studio" element={<Studio />} />
                   <Route path="/library" element={<Library />} />
+                  <Route path="/debug" element={<Debug />} />
                   <Route path="/episode/:id" element={<Episode />} />
                   <Route path="/dev/engine" element={<EngineHarness />} />
                   <Route path="/dev/live" element={<LiveHarness />} />

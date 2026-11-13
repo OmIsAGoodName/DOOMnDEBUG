@@ -2,21 +2,23 @@ import os
 import shutil
 import asyncio
 import uuid
+import httpx
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Literal
 from fastapi import FastAPI, Depends, HTTPException, Request, UploadFile, File, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from .config import settings
+from .config import settings, BASE_DIR
 from .auth import get_current_user
 from .repositories import get_repository, Repository
 from .pipeline import run_quick_story_pipeline, generation_tasks
 from .stations.batch import run_batch_generation
 from .live.matcher import match_transcript, MatchOption
 from .export.converter import convert_webm_to_mp4, export_tasks, get_export_dirs
+from .llm.providers import PROVIDER_STATS
 
 app = FastAPI(title="VoxFable API", version="0.1.0")
 
@@ -85,6 +87,138 @@ async def health():
         "llm": llm_desc,
         "ffmpeg": ffmpeg_available
     }
+
+# --- System Diagnostics & API Key Management ---
+class KeyUpdateRequest(BaseModel):
+    provider: Literal["groq", "gemini"]
+    api_key: str
+    model: Optional[str] = None
+
+@app.get("/api/system/stats")
+async def system_stats():
+    groq_key = settings.GROQ_API_KEY or ""
+    masked_groq = f"{groq_key[:6]}...{groq_key[-4:]}" if len(groq_key) > 10 else "Not configured"
+
+    gemini_key = settings.GEMINI_API_KEY or ""
+    has_gemini = bool(gemini_key and "your-gemini" not in gemini_key.lower())
+    masked_gemini = f"{gemini_key[:6]}...{gemini_key[-4:]}" if has_gemini else "Not configured"
+
+    media_audio = Path(settings.MEDIA_DIR) / "audio"
+    audio_clips = len(list(media_audio.glob("*.mp3"))) if media_audio.exists() else 0
+
+    return {
+        "ok": True,
+        "providers": {
+            "groq": {
+                "configured": bool(groq_key and "your-groq" not in groq_key.lower()),
+                "masked_key": masked_groq,
+                "model": settings.GROQ_MODEL,
+                "candidate_models": ["openai/gpt-oss-120b", "llama-3.3-70b-versatile", "openai/gpt-oss-20b", "llama-3.1-8b-instant"],
+                "stats": PROVIDER_STATS["groq"]
+            },
+            "gemini": {
+                "configured": has_gemini,
+                "masked_key": masked_gemini,
+                "model": settings.GEMINI_MODEL,
+                "stats": PROVIDER_STATS["gemini"]
+            },
+            "ollama": {
+                "configured": bool(settings.OLLAMA_URL),
+                "url": settings.OLLAMA_URL,
+                "model": settings.OLLAMA_MODEL
+            },
+            "tts": {
+                "engine": "Edge-TTS",
+                "concurrency": 6,
+                "cached_audio_clips": audio_clips
+            }
+        },
+        "mode": "demo" if settings.DEMO_MODE else "online",
+        "needs_attention": PROVIDER_STATS["groq"]["needs_new_key"] or PROVIDER_STATS["gemini"]["needs_new_key"]
+    }
+
+@app.post("/api/system/keys")
+async def update_api_key(req: KeyUpdateRequest):
+    key = req.api_key.strip()
+    if not key:
+        raise HTTPException(status_code=400, detail="API key cannot be empty")
+
+    if req.provider == "groq":
+        # Test key against Groq API
+        test_url = "https://api.groq.com/openai/v1/models"
+        headers = {"Authorization": f"Bearer {key}"}
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            try:
+                resp = await client.get(test_url, headers=headers)
+                if resp.status_code == 401:
+                    raise HTTPException(status_code=400, detail="Invalid Groq API key (Unauthorized 401)")
+                if resp.status_code == 429:
+                    raise HTTPException(status_code=400, detail="This Groq API key has already exceeded rate limits (429)")
+                if resp.status_code != 200:
+                    raise HTTPException(status_code=400, detail=f"Groq API returned HTTP {resp.status_code}: {resp.text}")
+            except httpx.RequestError as e:
+                raise HTTPException(status_code=502, detail=f"Could not connect to Groq API: {e}")
+
+        # Update in-memory settings
+        settings.GROQ_API_KEY = key
+        if req.model:
+            settings.GROQ_MODEL = req.model
+
+        # Reset provider stats
+        PROVIDER_STATS["groq"]["needs_new_key"] = False
+        PROVIDER_STATS["groq"]["last_status"] = "healthy"
+        PROVIDER_STATS["groq"]["last_error"] = None
+
+        # Persist to .env
+        env_path = BASE_DIR / "backend" / ".env"
+        if env_path.exists():
+            content = env_path.read_text(encoding="utf-8")
+            lines = []
+            for line in content.splitlines():
+                if line.startswith("GROQ_API_KEY="):
+                    lines.append(f"GROQ_API_KEY={key}")
+                elif req.model and line.startswith("GROQ_MODEL="):
+                    lines.append(f"GROQ_MODEL={req.model}")
+                else:
+                    lines.append(line)
+            env_path.write_text("\n".join(lines), encoding="utf-8")
+
+        return {"ok": True, "message": "Groq API key verified and applied successfully!"}
+
+    elif req.provider == "gemini":
+        test_url = f"https://generativelanguage.googleapis.com/v1beta/models?key={key}"
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            try:
+                resp = await client.get(test_url)
+                if resp.status_code != 200:
+                    raise HTTPException(status_code=400, detail=f"Gemini API returned HTTP {resp.status_code}: {resp.text}")
+            except httpx.RequestError as e:
+                raise HTTPException(status_code=502, detail=f"Could not connect to Gemini API: {e}")
+
+        settings.GEMINI_API_KEY = key
+        if req.model:
+            settings.GEMINI_MODEL = req.model
+
+        PROVIDER_STATS["gemini"]["needs_new_key"] = False
+        PROVIDER_STATS["gemini"]["last_status"] = "healthy"
+        PROVIDER_STATS["gemini"]["last_error"] = None
+
+        env_path = BASE_DIR / "backend" / ".env"
+        if env_path.exists():
+            content = env_path.read_text(encoding="utf-8")
+            lines = []
+            for line in content.splitlines():
+                if line.startswith("GEMINI_API_KEY="):
+                    lines.append(f"GEMINI_API_KEY={key}")
+                elif req.model and line.startswith("GEMINI_MODEL="):
+                    lines.append(f"GEMINI_MODEL={req.model}")
+                else:
+                    lines.append(line)
+            env_path.write_text("\n".join(lines), encoding="utf-8")
+
+        return {"ok": True, "message": "Gemini API key verified and applied successfully!"}
+
+    raise HTTPException(status_code=400, detail="Unsupported provider")
 
 # --- Request Models ---
 class GenerationCreateRequest(BaseModel):

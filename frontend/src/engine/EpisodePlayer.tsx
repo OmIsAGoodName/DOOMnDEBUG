@@ -144,6 +144,9 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+
         renderAt(ctx, timeline, t, { showCaptions: captions });
       },
       [timeline, captions]

@@ -1,15 +1,30 @@
 # Om's Status & Milestone Log
 
-**Current Milestone**: Interactive Branching Choice Tree with Multiple Endings & Fast Pipeline Complete  
+**Current Milestone**: System Diagnostics & API Quota Monitor, Live Key Hot-Swap & Canvas Quality Polish  
 **Date**: 2026-11-14  
 **Active Branch**: `main` (synced with `origin/main`)  
 **Repository**: `https://github.com/OmIsAGoodName/DOOMnDEBUG.git`  
 
 ---
 
-## ⚡ Recent Updates (Branching Choice Tree, Multiple Endings & Interactive Experience)
+## ⚡ Recent Updates (Diagnostics Tab, API Key Hot-Swap & Quality Polish)
 
-1. **True Branching Choice Tree & Multiple Endings**:
+1. **System Diagnostics & API Quota Monitor (`/debug`)**:
+   - Built a dedicated Diagnostics & Quota Monitor page ([`frontend/src/pages/Debug.tsx`](file:///d:/VoxFable/frontend/src/pages/Debug.tsx)) with a 1-click header link `⚙️ Diagnostics`.
+   - **Real-Time Quota Health Indicator**:
+     - Visual status banner detects whether Groq or Gemini have hit daily token limits (TPD) or per-minute rate limits (429/413) and alerts when a fresh key is needed.
+     - Displays masked active keys, current active model, total calls made, success counts, 429 hits, and the exact raw error response log from Groq/Gemini.
+   - **Live API Key Hot-Swapping**:
+     - Added `POST /api/system/keys` in [`backend/app/main.py`](file:///d:/VoxFable/backend/app/main.py): Tests the key live against the provider API before saving, applies it immediately to runtime in-memory settings without restarting the server, and persists it to `backend/.env`.
+     - Supports selecting target models (`openai/gpt-oss-120b`, `llama-3.3-70b-versatile`, `openai/gpt-oss-20b`, `llama-3.1-8b-instant`, `gemini-2.5-flash`).
+   - **Direct Rate-Limit Gateway in Quick Story**:
+     - Updated [`frontend/src/pages/Quick.tsx`](file:///d:/VoxFable/frontend/src/pages/Quick.tsx) so any rate limit error presents a direct 1-click button to open the Diagnostics tab and swap the key.
+
+2. **Video & Canvas Quality Polish**:
+   - **Flagship Model Restoration**: Re-enabled `openai/gpt-oss-120b` and `llama-3.3-70b-versatile` at the top of the provider priority ladder in [`backend/app/llm/providers.py`](file:///d:/VoxFable/backend/app/llm/providers.py), ensuring maximum Bluey-grade storytelling depth whenever quota is open or fresh keys are applied.
+   - **High-Precision Vector Anti-Aliasing**: In [`frontend/src/engine/EpisodePlayer.tsx`](file:///d:/VoxFable/frontend/src/engine/EpisodePlayer.tsx), enabled `ctx.imageSmoothingEnabled = true` and `ctx.imageSmoothingQuality = 'high'`, delivering razor-sharp 2D vector character outlines and smooth gradient backgrounds.
+
+3. **True Branching Choice Tree & Multiple Endings**:
    - Upgraded [`backend/app/stations/writer.py`](file:///d:/VoxFable/backend/app/stations/writer.py) and [`backend/app/prompts/writer.md`](file:///d:/VoxFable/backend/app/prompts/writer.md):
      - When `interactive=True`, instructs writer to generate a 5-scene branching story tree: Opening Dilemma (`sc1`) $\rightarrow$ Branch A (`sc2a`) / Branch B (`sc2b`) in distinct locations $\rightarrow$ Unique Ending A (`sc3a`) / Unique Ending B (`sc3b`).
      - Branch leaf scenes terminate with `next_scene: null`, creating genuine multiple endings traversed according to user choice.
