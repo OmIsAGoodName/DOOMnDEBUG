@@ -1,32 +1,16 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-
-export interface AuthContextType {
-  user: { id: string; email?: string } | null;
-  demoMode: boolean;
-}
-
-// In stub mode, let demo mode be enabled by default so routes are accessible
-export function useAuth() {
-  const isDemo = localStorage.getItem('voxfable_demo_mode') !== 'false';
-  return {
-    user: isDemo ? { id: 'demo', email: 'demo@voxfable.local' } : null,
-    demoMode: isDemo,
-    loading: false,
-    signIn: async () => {},
-    signUp: async () => {},
-    signOut: async () => {},
-    enterDemoMode: () => {
-      localStorage.setItem('voxfable_demo_mode', 'true');
-    },
-  };
-}
+import { useAuth } from './AuthProvider';
 
 export function AuthGuard() {
   const { user, demoMode, loading } = useAuth();
 
   if (loading) {
-    return <div className="p-8 text-center text-slate-500">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-[50vh] text-slate-500 font-medium">
+        Loading VoxFable session...
+      </div>
+    );
   }
 
   if (!user && !demoMode) {
@@ -37,4 +21,3 @@ export function AuthGuard() {
 }
 
 export default AuthGuard;
-

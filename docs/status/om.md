@@ -1,26 +1,27 @@
 # Status: Om
 
 ## Done
-- Repo skeleton, docs, and gitignore configured (Master Context Section 13).
-- AGENTS.md and Antigravity rule files (00-project, 10-ownership, 20-git, 30-contracts, 40-quality) established.
-- Frozen contracts v0: vocab.json, JSON schemas, types.ts, Pydantic v2 models, API spec.
-- Fixtures created & validated (episode_quick_demo, episode_live_demo, audio manifests).
-- Initial asset metadata stubs created (characters, backgrounds, props, animations, sfx, music).
-- Frontend scaffolded with React, TypeScript, Vite, Tailwind CSS, React Router, Vitest.
-- Route stubs and ownership placeholders created (/login, /signup, /, /quick, /studio, /library, /episode/:id, /dev/engine, /dev/live, /dev/art).
+- Part 0.2: Repo skeleton, docs, and .gitignore
+- Part 0.3: AGENTS.md and Antigravity rules (.agents/rules/*.md)
+- Part 0.4: Contracts v0 (vocab.json, schemas, types.ts, pydantic models, validate_fixtures.py)
+- Part 0.5: Quick and Live demo fixtures, asset metadata stubs
+- Part 0.6: Frontend scaffold (Vite + React + TS + Tailwind + Vitest + routes + stubs in all folders)
+- Part 0.7: Push #1 (Initial scaffold published to GitHub)
+- Part 0.8: Supabase schema migration (0001_init.sql with RLS & trigger), SUPABASE.md, test_rls.py
+- Part 0.9: Backend skeleton (FastAPI, auth dependency, health check, repositories), frontend shared libraries (config, supabase, AuthProvider, DataRepo, typed API client, useGeneration hook) - Ready for Push #2
 
 ## In progress
-- Push #1: Unblocking team (Maegan & Nigel).
+- Part 1: LLM adapter and story generation pipeline
 
 ## Next
-- 0.8 Supabase schema, RLS policies, trigger function, and two-account test.
-- 0.9 FastAPI backend skeleton, auth dependency, local and Supabase repositories, frontend lib/api client.
+- Part 1.1: LLM provider adapter (Gemini, Groq, Ollama)
+- Part 1.2: Story Writer station
 
 ## Blockers
-- None.
+- None
 
 ## Requests
-- None.
+- None
 
 ## Contract proposals
-- None.
+- None
