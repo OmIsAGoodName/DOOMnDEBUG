@@ -23,6 +23,8 @@ export default function Quick() {
   const [prompt, setPrompt] = useState('');
   const [ageBand, setAgeBand] = useState<'3-5' | '4-6' | '6-8'>('4-6');
   const [isInteractive, setIsInteractive] = useState<boolean>(true);
+  const [duration, setDuration] = useState<'<1min' | '1-2mins' | '2-3mins'>('1-2mins');
+  const [generateCharacters, setGenerateCharacters] = useState<boolean>(false);
 
   // Generation state
   const [generationId, setGenerationId] = useState<string | null>(null);
@@ -73,7 +75,9 @@ export default function Quick() {
         kind: 'quick',
         prompt: prompt.trim(),
         age_band: ageBand,
-        interactive: isInteractive
+        interactive: isInteractive,
+        duration,
+        generate_characters: generateCharacters
       });
 
       setGenerationId(res.generation_id);
