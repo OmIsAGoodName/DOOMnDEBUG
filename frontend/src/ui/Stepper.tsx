@@ -44,8 +44,8 @@ export const Stepper: React.FC<StepperProps> = ({ currentStage = 'understanding'
                   isDone
                     ? 'bg-emerald-500 text-white'
                     : isCurrent
-                    ? 'bg-indigo-600 text-white ring-4 ring-indigo-100 animate-pulse'
-                    : 'bg-slate-200 text-slate-500'
+                    ? 'bg-indigo-600 text-white ring-4 ring-indigo-100 dark:ring-indigo-950 animate-pulse'
+                    : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                 }`}
               >
                 {isDone ? '✓' : idx + 1}
@@ -53,10 +53,10 @@ export const Stepper: React.FC<StepperProps> = ({ currentStage = 'understanding'
               <span
                 className={`text-sm ${
                   isCurrent
-                    ? 'font-bold text-slate-900'
+                    ? 'font-bold text-slate-900 dark:text-slate-100'
                     : isDone
-                    ? 'font-medium text-slate-600'
-                    : 'text-slate-400'
+                    ? 'font-medium text-slate-600 dark:text-slate-300'
+                    : 'text-slate-400 dark:text-slate-500'
                 }`}
               >
                 {stage.label}

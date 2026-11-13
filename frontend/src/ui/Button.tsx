@@ -28,9 +28,9 @@ export const Button: React.FC<ButtonProps> = ({
     primary:
       'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm hover:shadow active:scale-[0.98] focus:ring-indigo-500',
     secondary:
-      'bg-slate-100 hover:bg-slate-200 text-slate-800 active:scale-[0.98] focus:ring-slate-400',
+      'bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100 active:scale-[0.98] focus:ring-slate-400',
     ghost:
-      'bg-transparent hover:bg-slate-100 text-slate-600 hover:text-slate-900 focus:ring-slate-400',
+      'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white focus:ring-slate-400',
     danger:
       'bg-rose-600 hover:bg-rose-700 text-white shadow-sm active:scale-[0.98] focus:ring-rose-500',
     'big-kid':
