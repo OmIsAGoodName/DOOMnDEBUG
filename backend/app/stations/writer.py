@@ -48,13 +48,13 @@ def build_writer_user_prompt(
 ) -> str:
     metadata = load_metadata()
 
-    # Characters available
+    # Characters and backgrounds available (compact token representation)
     if characters:
-        avail_chars = [f"- {c['slug'] or c['id']}: {c['name']} ({c.get('species', 'friend')})" for c in characters]
+        avail_chars = ", ".join(f"{c['slug'] or c['id']} ({c.get('species', 'friend')})" for c in characters)
     else:
-        avail_chars = [f"- {c['id']}: {c['name']} ({c['species']}) - {', '.join(c.get('tags', []))}" for c in metadata["characters"]]
+        avail_chars = ", ".join(f"{c['id']} ({c.get('species', 'friend')})" for c in metadata["characters"])
 
-    avail_bgs = [f"- {b['id']}: {b['name']} (hint: {b.get('mood_hint', 'day')})" for b in metadata["backgrounds"]]
+    avail_bgs = ", ".join(b["id"] for b in metadata["backgrounds"])
 
     if duration == "<1min":
         duration_req = (
@@ -96,13 +96,11 @@ STORYTELLING & PACING RULES:
 4. Speech Length: Each beat must be between 14 and 24 words (< 25 words) to ensure proper cartoon timing and runtime.
 
 AVAILABLE ASSETS:
-Available Characters:
-{chr(10).join(avail_chars)}
-
-Available Backgrounds:
-{chr(10).join(avail_bgs)}
+- Cast Candidates: {avail_chars}
+- Backgrounds: {avail_bgs}
 
 Write a heartwarming, engaging StoryDraft JSON for this story.
+Ensure speech lines are concise (< 25 words).
 """
     if series:
         user_prompt += f"\nSeries Setting & Rules: {json.dumps(series.get('world', {}))}\n"

@@ -33,27 +33,94 @@ def build_director_scene_prompt(
     cast_ids: List[str],
     metadata: Dict[str, Any]
 ) -> str:
-    avail_props = [p["id"] for p in metadata.get("props", [])]
-    avail_sfx = [s["id"] for s in metadata.get("sfx", [])]
-    avail_music = [m["id"] for m in metadata.get("music", [])]
+    # Lean token representation
+    avail_props = ", ".join(p["id"] for p in metadata.get("props", [])[:6])
+    avail_sfx = ", ".join(s["id"] for s in metadata.get("sfx", [])[:6])
+    avail_music = ", ".join(m["id"] for m in metadata.get("music", [])[:4])
 
-    return f"""
-DIRECT THIS SCENE:
-Draft Scene:
-{json.dumps(draft_scene.model_dump(), indent=2)}
+    return f"""Direct scene into 2D Canvas Scene JSON:
+Draft: {json.dumps(draft_scene.model_dump())}
+Cast: {', '.join(cast_ids)}
+Props: {avail_props} | SFX: {avail_sfx} | Music: {avail_music}
+Rules: First beat MUST have SET_CAMERA. Characters on ground band (y: 0.65-0.85). Set min_duration 5.0-7.0s. Add PLAY_ANIMATION and SET_EXPRESSION."""
 
-Scene Cast: {', '.join(cast_ids)}
-Available Props: {', '.join(avail_props)}
-Available SFX: {', '.join(avail_sfx)}
-Available Music: {', '.join(avail_music)}
+def direct_scene_rule_based(
+    draft_scene: DraftScene,
+    cast_ids: List[str]
+) -> Scene:
+    """Intelligent zero-token autonomous director fallback."""
+    initial_chars = []
+    positions = [(0.32, 0.76), (0.68, 0.76), (0.50, 0.76)]
+    for idx, cid in enumerate(cast_ids[:3]):
+        facing = "right" if idx == 0 else "left"
+        initial_chars.append({
+            "character_id": cid,
+            "position": positions[idx],
+            "facing": facing,
+            "expression": "happy",
+            "animation": "idle"
+        })
 
-DIRECTING INSTRUCTIONS:
-1. Direct EVERY beat in the draft scene into a rich 2D Canvas Scene JSON adhering to the Directing Rules.
-2. Opening beat MUST have a SET_CAMERA action.
-3. Characters must move, animate, and emote: use MOVE_TO, PLAY_ANIMATION (hop, wave, talk, nod, jump), and SET_EXPRESSION.
-4. Set min_duration for each beat to 5.0 to 7.0 seconds so character speech, reactions, and sound effects have ample breathing room.
-5. Add PLAY_SFX and PLAY_MUSIC to create a warm, cinematic storybook atmosphere.
-"""
+    beats_out = []
+    for b_idx, b in enumerate(draft_scene.beats):
+        speaker = b.speech.character_id
+        emotion = b.speech.emotion or "happy"
+        words_count = len(b.speech.text.split()) if b.speech.text else 0
+        est_speech = words_count / 2.4
+        min_dur = max(5.0, round(est_speech + 1.2, 1))
+
+        actions = []
+        if b_idx == 0:
+            actions.append({
+                "type": "SET_CAMERA",
+                "shot": "wide",
+                "movement": "slow_push_in",
+                "duration": 3.0
+            })
+            actions.append({
+                "type": "PLAY_MUSIC",
+                "music_id": "calm",
+                "volume": 0.25,
+                "fade": 1.0
+            })
+
+        if speaker:
+            anim = "talk" if b.speech.type == "SPEAK" else "idle"
+            actions.append({
+                "type": "PLAY_ANIMATION",
+                "character_id": speaker,
+                "animation": anim,
+                "duration": 2.0
+            })
+            actions.append({
+                "type": "SET_EXPRESSION",
+                "character_id": speaker,
+                "expression": emotion
+            })
+            if b_idx % 2 == 1:
+                actions.append({
+                    "type": "PLAY_SFX",
+                    "sfx_id": "chime",
+                    "volume": 0.5
+                })
+
+        beats_out.append({
+            "beat_id": b.beat_id,
+            "speech": b.speech.model_dump(),
+            "actions": actions,
+            "choice": b.choice.model_dump() if b.choice else None,
+            "min_duration": min_dur
+        })
+
+    return Scene.model_validate({
+        "scene_id": draft_scene.scene_id,
+        "background_id": draft_scene.background_id,
+        "mood": draft_scene.mood,
+        "next_scene": draft_scene.next_scene,
+        "props": [],
+        "characters": initial_chars,
+        "beats": beats_out
+    })
 
 async def direct_scene(
     draft_scene: DraftScene,
@@ -64,13 +131,17 @@ async def direct_scene(
     system_prompt = load_director_system_prompt()
     user_prompt = build_director_scene_prompt(draft_scene, cast_ids, metadata)
 
-    data = await llm_fn(
-        system=system_prompt,
-        user=user_prompt,
-        schema=Scene,
-        temperature=0.7
-    )
-    scene = Scene.model_validate(data)
+    try:
+        data = await llm_fn(
+            system=system_prompt,
+            user=user_prompt,
+            schema=Scene,
+            temperature=0.7
+        )
+        scene = Scene.model_validate(data)
+    except Exception as e:
+        print(f"[Director] Falling back to zero-token autonomous director for {draft_scene.scene_id}: {e}")
+        return direct_scene_rule_based(draft_scene, cast_ids)
 
     # Ensure beats have healthy duration breathing room
     for beat in scene.beats:
