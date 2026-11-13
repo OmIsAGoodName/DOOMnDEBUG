@@ -1,0 +1,112 @@
+{
+  "schema_version": "1.0",
+  "episode_id": "ep_torture_test",
+  "age_band": "4-6",
+  "title": "Torture Test Episode",
+  "start_scene": "sc_empty",
+  "interactive": true,
+  "cast": [
+    {
+      "character_id": "pip_owl",
+      "name": "Pip",
+      "species": "owl",
+      "palette": {
+        "primary": "#8b5e3c",
+        "secondary": "#d9b38c",
+        "accent": "#f2a65a",
+        "outline": "#3b2a1e"
+      },
+      "voice": {
+        "engine_voice": "en-US-AnaNeural"
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "scene_id": "sc_empty",
+      "background_id": "unknown_void_background",
+      "mood": "magical",
+      "next_scene": "sc_zero_beat",
+      "characters": [],
+      "props": [],
+      "beats": [
+        {
+          "beat_id": "b_empty",
+          "min_duration": 0
+        }
+      ]
+    },
+    {
+      "scene_id": "sc_zero_beat",
+      "background_id": "forest_day",
+      "mood": "day",
+      "next_scene": "sc_long_text",
+      "characters": [
+        {
+          "character_id": "pip_owl",
+          "position": [0.5, 0.75]
+        }
+      ],
+      "beats": [
+        {
+          "beat_id": "b_zero",
+          "min_duration": 0,
+          "actions": []
+        }
+      ]
+    },
+    {
+      "scene_id": "sc_long_text",
+      "background_id": "forest_day",
+      "mood": "sunset",
+      "next_scene": "sc_single_choice",
+      "characters": [
+        {
+          "character_id": "pip_owl",
+          "position": [0.5, 0.75]
+        }
+      ],
+      "beats": [
+        {
+          "beat_id": "b_long",
+          "speech": {
+            "type": "NARRATE",
+            "text": "This is a super long speech with a massive number of words designed to stress-test the wrap logic and duration estimator to see if multi-line text renders gracefully on canvas without overlapping or crashing the layout when there are more than forty or fifty words in a single continuous beat."
+          }
+        }
+      ]
+    },
+    {
+      "scene_id": "sc_single_choice",
+      "background_id": "forest_day",
+      "mood": "night",
+      "next_scene": null,
+      "characters": [
+        {
+          "character_id": "pip_owl",
+          "position": [0.5, 0.75]
+        }
+      ],
+      "beats": [
+        {
+          "beat_id": "b_choice",
+          "speech": {
+            "type": "SPEAK",
+            "character_id": "pip_owl",
+            "text": "Only one path forward!"
+          },
+          "choice": {
+            "options": [
+              {
+                "id": "single",
+                "label": "Continue",
+                "next_scene": "sc_empty"
+              }
+            ],
+            "default": "single"
+          }
+        }
+      ]
+    }
+  ]
+}

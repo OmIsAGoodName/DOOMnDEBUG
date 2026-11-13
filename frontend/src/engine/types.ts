@@ -10,16 +10,18 @@ import type {
   PlacedProp,
   Scene,
   Speech,
+  WordTiming,
 } from '@contracts';
 
 export type MoodName = 'day' | 'sunset' | 'night' | 'cozy' | 'magical';
 export type CameraShot = 'wide' | 'medium' | 'close';
 export type CameraMovement = 'static' | 'slow_push_in' | 'slow_pull_out' | 'pan_left' | 'pan_right';
 
-export interface Keyframe<T> {
-  t: number;
-  value: T;
-  duration?: number;
+export interface AttachedPropState {
+  propId: string;
+  slot: 'hand' | 'head' | 'ground';
+  characterId?: string;
+  position?: [number, number];
 }
 
 export interface CharacterActionState {
@@ -32,6 +34,7 @@ export interface CharacterActionState {
   scale: number;
   visible: boolean;
   alpha: number;
+  attachedProps: AttachedPropState[];
 }
 
 export interface ResolvedAction {
@@ -50,6 +53,7 @@ export interface ResolvedBeat {
   duration: number;
   speech?: Speech;
   lineId?: string;
+  words?: WordTiming[];
   speechDuration?: number;
   estimatedSpeech: boolean;
   actions: ResolvedAction[];
@@ -118,4 +122,3 @@ export interface RenderOptions {
   debugOverlay?: boolean;
   mouthOverride?: 'closed' | 'half' | 'wide';
 }
-

@@ -40,21 +40,81 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
     const recordedChunksRef = useRef<Blob[]>([]);
     const stopRecordingResolverRef = useRef<((blob: Blob) => void) | null>(null);
 
-    // Timeline state
-    const [timeline, setTimeline] = useState<ResolvedTimeline>(() =>
-      resolveTimeline(plan, audio, choicePath || [])
-    );
+    // Plan Validation Guard
+    const [validationError, setValidationError] = useState<string | null>(null);
 
-    // Re-resolve timeline if plan or audio changes
+    // Timeline state
+    const [timeline, setTimeline] = useState<ResolvedTimeline>(() => {
+      try {
+        if (!plan || !plan.scenes || !plan.start_scene) {
+          return resolveTimeline(
+            {
+              schema_version: '1.0',
+              episode_id: 'ep_fallback',
+              age_band: '4-6',
+              title: 'Empty Episode',
+              start_scene: 'sc_empty',
+              interactive: false,
+              cast: [],
+              scenes: [
+                {
+                  scene_id: 'sc_empty',
+                  background_id: 'forest_day',
+                  mood: 'day',
+                  beats: [{ beat_id: 'b1', min_duration: 1.0 }],
+                },
+              ],
+            },
+            null
+          );
+        }
+        return resolveTimeline(plan, audio, choicePath || []);
+      } catch (err) {
+        console.warn('[EpisodePlayer] Timeline initialization error:', err);
+        return resolveTimeline(
+          {
+            schema_version: '1.0',
+            episode_id: 'ep_fallback',
+            age_band: '4-6',
+            title: 'Fallback',
+            start_scene: 'sc_fallback',
+            interactive: false,
+            cast: [],
+            scenes: [
+              {
+                scene_id: 'sc_fallback',
+                background_id: 'forest_day',
+                mood: 'day',
+                beats: [{ beat_id: 'b1', min_duration: 1.0 }],
+              },
+            ],
+          },
+          null
+        );
+      }
+    });
+
     useEffect(() => {
-      if (plan) {
+      if (!plan || !plan.scenes || plan.scenes.length === 0 || !plan.start_scene) {
+        const msg = 'Invalid EpisodePlan: missing scenes or start_scene';
+        setValidationError(msg);
+        onError?.(new Error(msg));
+        return;
+      }
+      setValidationError(null);
+
+      try {
         const tl = resolveTimeline(plan, audio, choicePath || []);
         setTimeline(tl);
         audioEngineRef.current?.loadManifest(audio).catch((err) => {
           console.warn('[EpisodePlayer] Audio load error:', err);
         });
+      } catch (err) {
+        const e = err instanceof Error ? err : new Error(String(err));
+        setValidationError(e.message);
+        onError?.(e);
       }
-    }, [plan, audio, choicePath]);
+    }, [plan, audio, choicePath, onError]);
 
     // Clock state refs
     const timeRef = useRef(0);
@@ -65,7 +125,6 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
     const lastTimestampRef = useRef<number | null>(null);
 
     const [hasInteracted, setHasInteracted] = useState(false);
-    const [currentTimeDisplay, setCurrentTimeDisplay] = useState(0);
     const [isChoiceActive, setIsChoiceActive] = useState(false);
 
     // Mute handling
@@ -81,7 +140,6 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Render pure at time t
         renderAt(ctx, timeline, t, { showCaptions: captions });
       },
       [timeline, captions]
@@ -96,13 +154,11 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
           lastTimestampRef.current = now;
         }
 
-        // Clamp delta to avoid big jumps (tab sleep/unfocus)
         const deltaSeconds = Math.min((now - lastTimestampRef.current) / 1000, 0.1);
         lastTimestampRef.current = now;
 
         const nextTime = timeRef.current + deltaSeconds;
         timeRef.current = nextTime;
-        setCurrentTimeDisplay(nextTime);
 
         // Check for choices
         const choicePoint = timeline.choicePoints.find(
@@ -115,7 +171,6 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
           activeChoicePointRef.current = choicePoint.choiceBeatId;
 
           if (mode === 'live') {
-            // Live mode: pause clock, enter listening
             isPlayingRef.current = false;
             isListeningRef.current = true;
             setIsChoiceActive(true);
@@ -134,7 +189,7 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
           } else {
             // Watch mode: auto-resolve
             const chosenId =
-              (choicePath && choicePath.length > 0)
+              choicePath && choicePath.length > 0
                 ? choicePath[0]
                 : choicePoint.defaultOptionId;
 
@@ -159,7 +214,7 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
       [timeline, mode, choicePath, onChoice, onEnd, drawCurrentFrame]
     );
 
-    // Start / resume playback
+    // Play
     const play = useCallback(() => {
       if (timeRef.current >= timeline.totalDuration) {
         timeRef.current = 0;
@@ -176,7 +231,7 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
       animFrameRef.current = requestAnimationFrame(tick);
     }, [timeline, tick]);
 
-    // Pause playback
+    // Pause
     const pause = useCallback(() => {
       isPlayingRef.current = false;
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
@@ -184,12 +239,11 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
       audioEngineRef.current?.pause();
     }, []);
 
-    // Seek to time t
+    // Seek
     const seek = useCallback(
       (t: number) => {
         const clampedT = Math.max(0, Math.min(t, timeline.totalDuration));
         timeRef.current = clampedT;
-        setCurrentTimeDisplay(clampedT);
         lastTimestampRef.current = null;
 
         drawCurrentFrame(clampedT);
@@ -203,31 +257,30 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
       [timeline, drawCurrentFrame]
     );
 
-    // Resolve choice branch
+    // Resolve choice
     const resolveChoice = useCallback(
       (optionId: string) => {
         const choiceBeatId = activeChoicePointRef.current;
         if (!choiceBeatId) return;
 
+        // Resolve choice (supports 'default' as alias)
         const reResolved = resolveFrom(timeline, choiceBeatId, optionId);
         setTimeline(reResolved);
         isListeningRef.current = false;
         setIsChoiceActive(false);
 
-        // Resume playback immediately
         play();
       },
       [timeline, play]
     );
 
-    // Start recording client stream
+    // Recording: startRecording
     const startRecording = useCallback((opts?: { muteLocal?: boolean }) => {
       const canvas = canvasRef.current;
       if (!canvas) return;
 
       const stream = canvas.captureStream(30);
 
-      // Connect audio destination if present
       const audioCtx = audioEngineRef.current?.initContext();
       if (audioCtx) {
         const audioDest = audioCtx.createMediaStreamDestination();
@@ -238,6 +291,10 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
         }
       }
 
+      if (opts?.muteLocal) {
+        audioEngineRef.current?.setMuted(true);
+      }
+
       const mimeTypes = [
         'video/webm;codecs=vp9,opus',
         'video/webm;codecs=vp8,opus',
@@ -245,34 +302,41 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
       ];
       let selectedMime = 'video/webm';
       for (const mime of mimeTypes) {
-        if (MediaRecorder.isTypeSupported(mime)) {
+        if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(mime)) {
           selectedMime = mime;
           break;
         }
       }
 
       recordedChunksRef.current = [];
-      const recorder = new MediaRecorder(stream, { mimeType: selectedMime });
+      try {
+        const recorder = new MediaRecorder(stream, {
+          mimeType: selectedMime,
+          videoBitsPerSecond: 4000000,
+        });
 
-      recorder.ondataavailable = (e) => {
-        if (e.data && e.data.size > 0) {
-          recordedChunksRef.current.push(e.data);
-        }
-      };
+        recorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) {
+            recordedChunksRef.current.push(e.data);
+          }
+        };
 
-      recorder.onstop = () => {
-        const blob = new Blob(recordedChunksRef.current, { type: selectedMime });
-        if (stopRecordingResolverRef.current) {
-          stopRecordingResolverRef.current(blob);
-          stopRecordingResolverRef.current = null;
-        }
-      };
+        recorder.onstop = () => {
+          const blob = new Blob(recordedChunksRef.current, { type: selectedMime });
+          if (stopRecordingResolverRef.current) {
+            stopRecordingResolverRef.current(blob);
+            stopRecordingResolverRef.current = null;
+          }
+        };
 
-      recorderRef.current = recorder;
-      recorder.start(100); // 100ms chunks
+        recorderRef.current = recorder;
+        recorder.start(100);
+      } catch (err) {
+        console.warn('[EpisodePlayer] MediaRecorder initialization failed:', err);
+      }
     }, []);
 
-    // Stop recording and return Blob
+    // Recording: stopRecording
     const stopRecording = useCallback((): Promise<Blob> => {
       return new Promise<Blob>((resolve) => {
         if (!recorderRef.current || recorderRef.current.state === 'inactive') {
@@ -284,14 +348,33 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
       });
     }, []);
 
-    // Handle initial user interaction (Tap to start)
+    // Tab visibility handling (pause on background, resume on foreground)
+    useEffect(() => {
+      const handleVisibilityChange = () => {
+        if (document.hidden) {
+          if (isPlayingRef.current) {
+            pause();
+            isPlayingRef.current = true; // flag to resume
+          }
+        } else {
+          if (isPlayingRef.current) {
+            play();
+          }
+        }
+      };
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      return () => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
+    }, [pause, play]);
+
     const handleUserStart = () => {
       setHasInteracted(true);
       audioEngineRef.current?.initContext();
       play();
     };
 
-    // Forward ref implementation
     useImperativeHandle(
       ref,
       () => ({
@@ -308,12 +391,10 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
       [play, pause, seek, resolveChoice, startRecording, stopRecording, timeline]
     );
 
-    // Initial frame draw on mount / timeline change
     useEffect(() => {
       drawCurrentFrame(timeRef.current);
     }, [drawCurrentFrame]);
 
-    // Cleanup on unmount
     useEffect(() => {
       return () => {
         if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
@@ -333,8 +414,16 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
           className="w-full h-full object-contain"
         />
 
-        {/* Tap to start overlay (AudioContext unlocked on click) */}
-        {!hasInteracted && (
+        {/* Validation Error Message */}
+        {validationError && (
+          <div className="absolute inset-0 bg-rose-950/90 text-white flex flex-col items-center justify-center p-6 text-center z-30">
+            <p className="text-lg font-bold text-rose-300">Player Notice</p>
+            <p className="text-sm text-slate-300 mt-2 max-w-md">{validationError}</p>
+          </div>
+        )}
+
+        {/* Tap to start overlay */}
+        {!hasInteracted && !validationError && (
           <div
             onClick={handleUserStart}
             className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-slate-950/60 z-20"
@@ -353,11 +442,11 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
           </div>
         )}
 
-        {/* Live Choice Indicator */}
+        {/* Live Choice Indicator with animated thinking dots */}
         {isChoiceActive && (
-          <div className="absolute top-4 right-4 bg-amber-500/90 text-slate-950 px-4 py-2 rounded-full font-bold text-sm shadow-lg flex items-center gap-2 animate-pulse z-10">
-            <span className="w-2.5 h-2.5 rounded-full bg-slate-950"></span>
-            Listening for your choice...
+          <div className="absolute top-4 right-4 bg-amber-500/95 text-slate-950 px-4 py-2 rounded-full font-bold text-sm shadow-xl flex items-center gap-2 z-10 animate-bounce">
+            <span className="w-2.5 h-2.5 rounded-full bg-slate-950 animate-ping"></span>
+            Listening...
           </div>
         )}
       </div>
@@ -367,4 +456,3 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
 
 EpisodePlayer.displayName = 'EpisodePlayer';
 export default EpisodePlayer;
-

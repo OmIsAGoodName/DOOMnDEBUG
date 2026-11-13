@@ -121,10 +121,44 @@ export function renderAt(
     }
   }
 
-  // Camera Pan and Zoom transform on world layer
-  ctx.save();
-  const centerX = width / 2;
-  const centerY = height / 2;
+  // Cast map
+  const castMap = new Map<string, CastMember>();
+  for (const c of timeline.plan.cast) {
+    castMap.set(c.character_id, c);
+  }
+
+  // Evaluate characters
+  const charactersToDraw: Array<{
+    charId: string;
+    state: ReturnType<typeof evaluateCharacterState>;
+    cast: CastMember;
+  }> = [];
+
+  for (const initChar of activeScene.initialCharacters) {
+    const charId = initChar.character_id;
+    const castMember = castMap.get(charId);
+    if (!castMember) {
+      warnOnce(charId, 'cast_member');
+      continue;
+    }
+
+    const state = evaluateCharacterState(activeScene, charId, initChar, t);
+    if (state.visible) {
+      charactersToDraw.push({ charId, state, cast: castMember });
+    }
+  }
+
+  // Determine Camera Center
+  let centerX = width / 2;
+  let centerY = height / 2;
+
+  if (focusCharId) {
+    const focusChar = charactersToDraw.find((c) => c.charId === focusCharId);
+    if (focusChar) {
+      centerX = focusChar.state.x * width;
+      centerY = focusChar.state.y * height - 80; // center near upper torso
+    }
+  }
 
   let zoom = targetZoom;
   let panX = 0;
@@ -146,19 +180,21 @@ export function renderAt(
     panX = -(elapsed / currentBeat.duration) * 60;
   }
 
-  ctx.translate(centerX + panX, centerY + panY);
+  // Apply Camera Transform
+  ctx.save();
+  ctx.translate(width / 2 + panX, height / 2 + panY);
   ctx.scale(zoom, zoom);
   ctx.translate(-centerX, -centerY);
 
   // 2. Draw Background
   try {
     drawBackground(ctx, activeScene.backgroundId, t, width, height);
-  } catch (err) {
+  } catch {
     warnOnce(activeScene.backgroundId, 'background');
-    drawPlaceholder(ctx, activeScene.backgroundId, 'bg', centerX, centerY, width, height);
+    drawPlaceholder(ctx, activeScene.backgroundId, 'bg', width / 2, height / 2, width, height);
   }
 
-  // 3. Draw Props
+  // 3. Draw Scene Ground Props
   const allProps = [...activeScene.initialProps];
   for (const prop of allProps) {
     const px = prop.position[0] * width;
@@ -171,33 +207,7 @@ export function renderAt(
     }
   }
 
-  // 4. Characters sorted by y position
-  const castMap = new Map<string, typeof timeline.plan.cast[0]>();
-  for (const c of timeline.plan.cast) {
-    castMap.set(c.character_id, c);
-  }
-
-  const charactersToDraw: Array<{
-    charId: string;
-    state: ReturnType<typeof evaluateCharacterState>;
-    cast: typeof timeline.plan.cast[0];
-  }> = [];
-
-  for (const initChar of activeScene.initialCharacters) {
-    const charId = initChar.character_id;
-    const castMember = castMap.get(charId);
-    if (!castMember) {
-      warnOnce(charId, 'cast_member');
-      continue;
-    }
-
-    const state = evaluateCharacterState(activeScene, charId, initChar, t);
-    if (state.visible) {
-      charactersToDraw.push({ charId, state, cast: castMember });
-    }
-  }
-
-  // Sort characters by Y (feet position)
+  // 4. Draw Characters (sorted by Y feet position)
   charactersToDraw.sort((a, b) => a.state.y - b.state.y);
 
   for (const item of charactersToDraw) {
@@ -252,6 +262,34 @@ export function renderAt(
       warnOnce(charId, 'character');
       drawPlaceholder(ctx, charId, 'char', px, py);
     }
+
+    // 4.1 Draw Attached Props for this character
+    if (state.attachedProps && state.attachedProps.length > 0) {
+      for (const ap of state.attachedProps) {
+        let propX = px;
+        let propY = py;
+        const propScale = state.scale * 0.8;
+
+        if (ap.slot === 'head') {
+          propY = py - 145 * state.scale;
+        } else if (ap.slot === 'hand') {
+          const handOffsetX = state.facing === 'left' ? -35 : 35;
+          propX = px + handOffsetX * state.scale;
+          propY = py - 70 * state.scale;
+        } else if (ap.slot === 'ground') {
+          propX = px + 25 * state.scale;
+          propY = py;
+        }
+
+        try {
+          drawProp(ctx, ap.propId, propX, propY, propScale, t);
+        } catch {
+          warnOnce(ap.propId, 'attached_prop');
+          drawPlaceholder(ctx, ap.propId, 'prop', propX, propY, 40, 40);
+        }
+      }
+    }
+
     ctx.restore();
   }
 
@@ -270,7 +308,7 @@ export function renderAt(
     ctx.restore();
   }
 
-  // 6. Scene Cross-fade (0.5s total: 0.25s at scene start and 0.25s at scene end)
+  // 6. Scene Cross-fade
   const timeIntoScene = t - activeScene.startTime;
   const timeUntilSceneEnd = activeScene.endTime - t;
   const fadeDuration = 0.25;
@@ -290,7 +328,7 @@ export function renderAt(
     ctx.restore();
   }
 
-  // 7. Captions
+  // 7. Captions with Karaoke word highlighting and multi-line wrapping
   const showCaptions = opts?.showCaptions !== false;
   if (showCaptions && currentBeat?.speech?.text) {
     drawCaptions(ctx, currentBeat, t, width, height, castMap);
@@ -299,6 +337,9 @@ export function renderAt(
   ctx.restore();
 }
 
+/**
+ * Draws wrapped captions with rounded translucent pill and karaoke word highlighting.
+ */
 function drawCaptions(
   ctx: CanvasRenderingContext2D,
   beat: ResolvedBeat,
@@ -314,34 +355,99 @@ function drawCaptions(
   const speakerName = !isNarrate && speech.character_id ? castMap.get(speech.character_id)?.name || speech.character_id : null;
 
   ctx.save();
-  const paddingX = 24;
-  const paddingY = 12;
-  const bottomY = height - 48;
+  const fontSize = 22;
+  ctx.font = `bold ${fontSize}px system-ui, -apple-system, sans-serif`;
 
-  ctx.font = 'bold 22px system-ui, -apple-system, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
+  const timeInBeatMs = Math.max(0, (t - beat.startTime) * 1000);
+  const words = speech.text.trim().split(/\s+/).filter(Boolean);
 
-  const fullText = speakerName ? `${speakerName}: ${speech.text}` : speech.text;
-  const metrics = ctx.measureText(fullText);
-  const pillWidth = Math.min(width - 80, metrics.width + paddingX * 2);
-  const pillHeight = 48;
-  const pillX = width / 2 - pillWidth / 2;
+  // Check word timings for karaoke
+  const timings = beat.words || [];
+
+  // Break words into lines (max 2 lines, max width 1000px)
+  const maxLineWidth = 950;
+  const lines: string[][] = [[]];
+  let currentLineWidth = 0;
+
+  for (const w of words) {
+    const wordWidth = ctx.measureText(w + ' ').width;
+    if (currentLineWidth + wordWidth > maxLineWidth && lines.length === 1) {
+      lines.push([]);
+      currentLineWidth = 0;
+    }
+    lines[lines.length - 1].push(w);
+    currentLineWidth += wordWidth;
+  }
+
+  const lineHeight = fontSize + 10;
+  const pillPaddingX = 28;
+  const pillPaddingY = 14;
+  const pillHeight = lines.length * lineHeight + pillPaddingY * 2;
+  const bottomY = height - 42;
   const pillY = bottomY - pillHeight / 2;
 
-  // Background pill
-  ctx.fillStyle = isNarrate ? 'rgba(15, 23, 42, 0.75)' : 'rgba(30, 41, 59, 0.85)';
-  ctx.strokeStyle = isNarrate ? 'rgba(255, 255, 255, 0.15)' : 'rgba(251, 191, 36, 0.4)';
+  // Measure max line width for background pill
+  let maxW = 0;
+  for (const line of lines) {
+    const lineW = ctx.measureText((speakerName ? `${speakerName}: ` : '') + line.join(' ')).width;
+    if (lineW > maxW) maxW = lineW;
+  }
+  const pillWidth = Math.min(width - 80, maxW + pillPaddingX * 2);
+  const pillX = width / 2 - pillWidth / 2;
+
+  // Rounded background pill
+  ctx.fillStyle = isNarrate ? 'rgba(15, 23, 42, 0.82)' : 'rgba(30, 41, 59, 0.90)';
+  ctx.strokeStyle = isNarrate ? 'rgba(255, 255, 255, 0.18)' : 'rgba(251, 191, 36, 0.45)';
   ctx.lineWidth = 1.5;
 
   ctx.beginPath();
-  ctx.roundRect(pillX, pillY, pillWidth, pillHeight, 24);
+  ctx.roundRect(pillX, pillY, pillWidth, pillHeight, 20);
   ctx.fill();
   ctx.stroke();
 
-  // Text
-  ctx.fillStyle = isNarrate ? '#f8fafc' : '#fef08a';
-  ctx.fillText(fullText, width / 2, bottomY);
+  // Render text lines with karaoke highlighting
+  let wordGlobalIndex = 0;
+  for (let l = 0; l < lines.length; l++) {
+    const lineWords = lines[l];
+    const lineY = pillY + pillPaddingY + l * lineHeight + fontSize * 0.75;
+
+    // Compute line start X
+    let fullLineStr = lineWords.join(' ');
+    if (l === 0 && speakerName) {
+      fullLineStr = `${speakerName}: ${fullLineStr}`;
+    }
+    const lineTotalW = ctx.measureText(fullLineStr).width;
+    let currentX = width / 2 - lineTotalW / 2;
+
+    if (l === 0 && speakerName) {
+      ctx.fillStyle = '#f59e0b'; // Amber chip
+      const prefix = `${speakerName}: `;
+      ctx.fillText(prefix, currentX, lineY);
+      currentX += ctx.measureText(prefix).width;
+    }
+
+    for (const w of lineWords) {
+      const timing = timings[wordGlobalIndex];
+      let wordColor = '#f8fafc'; // default white
+
+      if (timing) {
+        if (timeInBeatMs >= timing.start_ms && timeInBeatMs <= timing.end_ms) {
+          wordColor = '#fde047'; // Active karaoke word (bright gold)
+        } else if (timeInBeatMs > timing.end_ms) {
+          wordColor = '#ffffff'; // Past spoken word
+        } else {
+          wordColor = 'rgba(248, 250, 252, 0.75)'; // Future word
+        }
+      } else {
+        wordColor = isNarrate ? '#f8fafc' : '#fef08a';
+      }
+
+      ctx.fillStyle = wordColor;
+      ctx.fillText(w, currentX, lineY);
+      currentX += ctx.measureText(w + ' ').width;
+      wordGlobalIndex++;
+    }
+  }
 
   ctx.restore();
 }

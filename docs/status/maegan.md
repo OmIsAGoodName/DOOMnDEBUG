@@ -1,21 +1,35 @@
 # Status: Maegan
 
 ## Done
-- **M1.1 Scaffold Verification**: Confirmed `@contracts`, `@fixtures`, and art stubs in `@/characters`, `@/backgrounds`, and `@/props` match the frozen contracts.
-- **M1.2 Timeline Resolver (`frontend/src/engine/resolveTimeline.ts`)**: Pure timeline computation, beat duration algorithm (`max(speech + 0.3s, action_end, min_duration, 1.0s)`), speech estimation (`words / 2.6 + 0.3s`), and `resolveFrom` dynamic choice re-resolution. 6 unit tests passing.
-- **M1.3 Pure Renderer (`frontend/src/engine/renderAt.ts`)**: Deterministic 1280x720 canvas renderer, camera zoom/pan, depth sorting by character Y, horizontal mirroring for `facing: left`, mood tint overlay from `vocab.json`, captions, and non-throwing placeholder fallback for unknown IDs. 3 unit tests passing.
-- **M1.4 Master Clock & `<EpisodePlayer>` (`frontend/src/engine/EpisodePlayer.tsx`)**: React component implementing `EpisodePlayerHandle` (`play`, `pause`, `seek`, `resolveChoice`, `startRecording`, `stopRecording`, `getTime`, `getDuration`, `getChosenPath`), clamped delta clock, and "Tap to start" AudioContext unlock. 1 unit test passing.
-- **M1.5 Audio Engine (`frontend/src/engine/audio/engine.ts`)**: Web Audio pipeline with manifest decoding (concurrency 4), speech scheduling, music ducking (-12dB under speech), SFX triggers, and recording destination node.
-- **M1.6 Lip-sync (`frontend/src/engine/audio/lipsync.ts`)**: 50ms window RMS calculation, 95th percentile normalization, hysteresis hold (80ms), and deterministic fallback cycling. 4 unit tests passing.
-- **M1.7 Dev Harness (`frontend/src/engine/dev/Harness.tsx`)**: Interactive test environment at `/dev/engine` with quick/live fixture picker, scrubbing with scene tick marks, debug overlay (FPS, frame time ms, timeline state), interactive choice resolution, and WebM recording/downloading.
-- All 15 engine unit tests pass; TypeScript typecheck passes with 0 errors.
+- **Part 1: Engine Core (M1.1 – M1.7)**:
+  - Timeline resolver (`resolveTimeline.ts`), pure 1280x720 canvas renderer (`renderAt.ts`), master clock (`EpisodePlayer.tsx`), Web Audio engine (`audio/engine.ts`), RMS lipsync (`audio/lipsync.ts`), dev harness (`dev/Harness.tsx`). Pushed in `dd3c201`.
+- **Part 2: Features and Polish (M2.1 – M2.4)**:
+  - `SET_CAMERA` focus tracking on character coordinates (`focus_character_id`).
+  - `ATTACH_PROP` with support for head, hand, and ground slots.
+  - `INTERACT` coordinated sequences for `wave_at`, `high_five`, `hand_off`, and `hug`.
+  - Entrance and exit animations (`fade`, `slide_left`, `slide_right`, `pop`).
+  - M2.2 Karaoke word highlighting captions with multi-line wrapping and speaker chip.
+  - M2.3 Robustness: lenient plan validation guard in `EpisodePlayer`, tab visibility auto-pause/resume, cycle-branch guard (max 20 scenes), unmount cleanup.
+  - Torture testing fixture and test suite (`torture_fixture.json`, `torture.test.ts`).
+  - M2.4 Performance: average frame time ~1.1ms - 1.4ms (60 FPS steady), documented in `README.md`.
+- **Part 3: Live Mode (M3.1 – M3.3)**:
+  - Listening state in engine with animated thinking indicator and clean choice resolution.
+  - `matchChoice.ts`: client-side keyword matching with child speech stemming and filler word tolerance.
+  - `useLiveChoices.ts`: Web Speech API recognition, 2.5s fallback to `api.matchLive`, 12s overall timeout defaulting.
+  - `LiveController.tsx`: child-friendly UI with >=64px tap targets, pulsing mic ring, speech bubble for heard phrases, choice progress trail.
+  - `LiveHarness.tsx` at `/dev/live` with keyword simulator and stats.
+- **Part 4: Recording & Export Client (M4.1 – M4.2)**:
+  - `recorder.ts`: `EpisodeRecorder` with `canvas.captureStream(30)` + Web Audio destination node mix, vp9/vp8 WebM encoding.
+  - `exportFlow.ts`: `exportEpisode` workflow orchestration with progress reporting and injected `uploader` function (no API coupling in engine).
+- **Part 5: Integration & Verification (M5.1 – M5.7)**:
+  - Verified against Quick and Live demo fixtures and torture edge cases.
+  - 26 unit tests passing across 9 test suites; `tsc --noEmit` passing with 0 errors.
 
 ## In progress
-- Complete on PART 1. Paused per instruction ("dont run any other prompt till i say").
+- All parts (Part 1 through Part 5) fully implemented, verified, and synchronized.
 
 ## Next
-- PART 2: Features and polish (M2.1 remaining commands: INTERACT sequences, props attachment; M2.2 advanced karaoke captions).
-- PART 3: Live Mode (`frontend/src/live/`).
+- Assist Om and Nigel during Integration 1/2 milestones if they propose contract updates or hand off export tasks.
 
 ## Blockers
 - None.

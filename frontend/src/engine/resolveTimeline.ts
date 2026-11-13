@@ -1,12 +1,20 @@
 import type {
   Action,
+  ActionAttachProp,
+  ActionInteract,
   ActionMoveTo,
+  ActionPlayAnimation,
+  ActionRemoveCharacter,
+  ActionSetExpression,
+  ActionSpawnCharacter,
+  AudioLine,
   AudioManifest,
   EpisodePlan,
   PlacedCharacter,
   Scene,
 } from '@contracts';
 import type {
+  AttachedPropState,
   MoodName,
   ResolvedAction,
   ResolvedAudioEvent,
@@ -32,14 +40,16 @@ export function resolveTimeline(
   chosenOptionIds: string[] = []
 ): ResolvedTimeline {
   const scenesMap = new Map<string, Scene>();
-  for (const s of plan.scenes) {
-    scenesMap.set(s.scene_id, s);
+  if (plan.scenes) {
+    for (const s of plan.scenes) {
+      scenesMap.set(s.scene_id, s);
+    }
   }
 
-  const audioLinesMap = new Map<string, number>(); // line_id -> duration in seconds
+  const audioLinesMap = new Map<string, AudioLine>();
   if (audio && audio.lines) {
     for (const line of audio.lines) {
-      audioLinesMap.set(line.line_id, (line.duration_ms || 0) / 1000);
+      audioLinesMap.set(line.line_id, line);
     }
   }
 
@@ -52,11 +62,11 @@ export function resolveTimeline(
   let currentSceneId: string | null = plan.start_scene;
   let currentTime = 0;
   let choiceIndex = 0;
+  let sceneCount = 0;
+  const maxScenes = 20; // Guard against infinite branch cycles
 
-  const visitedScenes = new Set<string>();
-
-  while (currentSceneId && !visitedScenes.has(currentSceneId)) {
-    visitedScenes.add(currentSceneId);
+  while (currentSceneId && sceneCount < maxScenes) {
+    sceneCount++;
     const scene = scenesMap.get(currentSceneId);
     if (!scene) {
       console.warn(`[resolveTimeline] Scene ${currentSceneId} not found in plan`);
@@ -68,156 +78,160 @@ export function resolveTimeline(
 
     let nextSceneId: string | null = scene.next_scene ?? null;
 
-    for (const beat of scene.beats) {
-      const beatStartTime = currentTime;
-      const lineId = `${plan.episode_id}:${scene.scene_id}:${beat.beat_id}`;
+    if (scene.beats) {
+      for (const beat of scene.beats) {
+        const beatStartTime = currentTime;
+        const lineId = `${plan.episode_id}:${scene.scene_id}:${beat.beat_id}`;
 
-      let speechDuration = 0;
-      let isEstimated = false;
+        let speechDuration = 0;
+        let isEstimated = false;
+        let wordsTiming = undefined;
 
-      if (beat.speech && beat.speech.text) {
-        if (audioLinesMap.has(lineId)) {
-          speechDuration = audioLinesMap.get(lineId)!;
-        } else {
-          speechDuration = estimateSpeechDuration(beat.speech.text);
-          isEstimated = true;
-        }
+        if (beat.speech && beat.speech.text) {
+          const audioLine = audioLinesMap.get(lineId);
+          if (audioLine) {
+            speechDuration = (audioLine.duration_ms || 0) / 1000;
+            wordsTiming = audioLine.words;
+          } else {
+            speechDuration = estimateSpeechDuration(beat.speech.text);
+            isEstimated = true;
+          }
 
-        // Register speech audio event
-        if (audio && audio.lines) {
-          const line = audio.lines.find((l) => l.line_id === lineId);
-          if (line) {
+          if (audioLine) {
             audioEvents.push({
               type: 'speech',
               id: lineId,
-              url: line.url,
+              url: audioLine.url,
               startTime: beatStartTime,
               duration: speechDuration,
             });
           }
         }
-      }
 
-      // Resolve beat actions
-      let latestActionEnd = 0;
-      const resolvedActions: ResolvedAction[] = [];
+        // Resolve beat actions
+        let latestActionEnd = 0;
+        const resolvedActions: ResolvedAction[] = [];
 
-      if (beat.actions) {
-        for (let i = 0; i < beat.actions.length; i++) {
-          const action = beat.actions[i];
-          const delay = action.delay ?? 0;
-          let duration = action.duration ?? 0;
+        if (beat.actions) {
+          for (let i = 0; i < beat.actions.length; i++) {
+            const action = beat.actions[i];
+            const delay = action.delay ?? 0;
+            let duration = action.duration ?? 0;
 
-          if (action.type === 'MOVE_TO') {
-            duration = action.duration;
-          } else if (action.type === 'WAIT') {
-            duration = action.duration;
-          } else if (action.type === 'PLAY_MUSIC' && !action.duration) {
-            duration = 0;
+            if (action.type === 'MOVE_TO') {
+              duration = action.duration;
+            } else if (action.type === 'WAIT') {
+              duration = action.duration;
+            } else if (action.type === 'INTERACT') {
+              duration = action.duration ?? 1.5;
+            } else if (action.type === 'ATTACH_PROP') {
+              duration = action.duration ?? 0.2;
+            } else if (action.type === 'PLAY_ANIMATION') {
+              duration = action.duration ?? 1.5;
+            }
+
+            const actionStart = beatStartTime + delay;
+            const actionEnd = actionStart + duration;
+            if (actionEnd - beatStartTime > latestActionEnd) {
+              latestActionEnd = actionEnd - beatStartTime;
+            }
+
+            resolvedActions.push({
+              id: `${beat.beat_id}_act_${i}`,
+              action,
+              startTime: actionStart,
+              endTime: actionEnd,
+              duration,
+            });
+
+            // Music / SFX audio events
+            if (action.type === 'PLAY_MUSIC') {
+              if (action.music_id && audio?.music) {
+                const m = audio.music.find((item) => item.music_id === action.music_id);
+                if (m) {
+                  audioEvents.push({
+                    type: 'music',
+                    id: action.music_id,
+                    url: m.url,
+                    startTime: actionStart,
+                    volume: action.volume,
+                    fade: action.fade,
+                    loop: true,
+                  });
+                }
+              }
+            } else if (action.type === 'PLAY_SFX') {
+              if (action.sfx_id && audio?.sfx) {
+                const s = audio.sfx.find((item) => item.sfx_id === action.sfx_id);
+                if (s) {
+                  audioEvents.push({
+                    type: 'sfx',
+                    id: action.sfx_id,
+                    url: s.url,
+                    startTime: actionStart,
+                    volume: action.volume,
+                  });
+                }
+              }
+            }
+          }
+        }
+
+        // Beat length = max(speech + 0.3s, latest action end, min_duration, 1.0s)
+        const speechWithPadding = speechDuration > 0 ? speechDuration + 0.3 : 0;
+        const minDur = beat.min_duration ?? 0;
+        const beatDuration = Math.max(speechWithPadding, latestActionEnd, minDur, 1.0);
+        const beatEndTime = beatStartTime + beatDuration;
+
+        let listeningStart: number | undefined;
+
+        if (beat.choice) {
+          listeningStart = beatStartTime + Math.max(speechDuration, latestActionEnd);
+
+          let chosenId: string;
+          if (choiceIndex < chosenPath.length) {
+            chosenId = chosenPath[choiceIndex];
+          } else {
+            chosenId = beat.choice.default;
+            chosenPath.push(chosenId);
+          }
+          choiceIndex++;
+
+          const opt = beat.choice.options.find((o) => o.id === chosenId) || beat.choice.options[0];
+          if (opt) {
+            nextSceneId = opt.next_scene;
           }
 
-          const actionStart = beatStartTime + delay;
-          const actionEnd = actionStart + duration;
-          if (actionEnd - beatStartTime > latestActionEnd) {
-            latestActionEnd = actionEnd - beatStartTime;
-          }
-
-          resolvedActions.push({
-            id: `${beat.beat_id}_act_${i}`,
-            action,
-            startTime: actionStart,
-            endTime: actionEnd,
-            duration,
+          choicePoints.push({
+            choiceBeatId: beat.beat_id,
+            sceneId: scene.scene_id,
+            listeningStartTime: listeningStart,
+            options: beat.choice.options,
+            defaultOptionId: beat.choice.default,
+            prompt: beat.speech?.text || 'What should happen next?',
           });
-
-          // Music/SFX audio events
-          if (action.type === 'PLAY_MUSIC') {
-            if (action.music_id && audio?.music) {
-              const m = audio.music.find((item) => item.music_id === action.music_id);
-              if (m) {
-                audioEvents.push({
-                  type: 'music',
-                  id: action.music_id,
-                  url: m.url,
-                  startTime: actionStart,
-                  volume: action.volume,
-                  fade: action.fade,
-                  loop: true,
-                });
-              }
-            }
-          } else if (action.type === 'PLAY_SFX') {
-            if (action.sfx_id && audio?.sfx) {
-              const s = audio.sfx.find((item) => item.sfx_id === action.sfx_id);
-              if (s) {
-                audioEvents.push({
-                  type: 'sfx',
-                  id: action.sfx_id,
-                  url: s.url,
-                  startTime: actionStart,
-                  volume: action.volume,
-                });
-              }
-            }
-          }
-        }
-      }
-
-      // Beat duration = max(speech + 0.3, latest action end, min_duration, 1.0)
-      const speechWithPadding = speechDuration > 0 ? speechDuration + 0.3 : 0;
-      const minDur = beat.min_duration ?? 0;
-      const beatDuration = Math.max(speechWithPadding, latestActionEnd, minDur, 1.0);
-      const beatEndTime = beatStartTime + beatDuration;
-
-      let listeningStart: number | undefined;
-
-      if (beat.choice) {
-        // Listening begins after speech finishes or latest action finishes
-        listeningStart = beatStartTime + Math.max(speechDuration, latestActionEnd);
-
-        // Determine choice branch: from chosenOptionIds or choice.default
-        let chosenId: string;
-        if (choiceIndex < chosenPath.length) {
-          chosenId = chosenPath[choiceIndex];
-        } else {
-          chosenId = beat.choice.default;
-          chosenPath.push(chosenId);
-        }
-        choiceIndex++;
-
-        const opt = beat.choice.options.find((o) => o.id === chosenId) || beat.choice.options[0];
-        if (opt) {
-          nextSceneId = opt.next_scene;
         }
 
-        choicePoints.push({
-          choiceBeatId: beat.beat_id,
+        const resBeat: ResolvedBeat = {
+          beatId: beat.beat_id,
           sceneId: scene.scene_id,
+          startTime: beatStartTime,
+          endTime: beatEndTime,
+          duration: beatDuration,
+          speech: beat.speech,
+          lineId: beat.speech ? lineId : undefined,
+          words: wordsTiming,
+          speechDuration: speechDuration > 0 ? speechDuration : undefined,
+          estimatedSpeech: isEstimated,
+          actions: resolvedActions,
+          choice: beat.choice,
           listeningStartTime: listeningStart,
-          options: beat.choice.options,
-          defaultOptionId: beat.choice.default,
-          prompt: beat.speech?.text || 'What should happen next?',
-        });
+        };
+
+        resolvedBeats.push(resBeat);
+        allBeats.push(resBeat);
+        currentTime = beatEndTime;
       }
-
-      const resBeat: ResolvedBeat = {
-        beatId: beat.beat_id,
-        sceneId: scene.scene_id,
-        startTime: beatStartTime,
-        endTime: beatEndTime,
-        duration: beatDuration,
-        speech: beat.speech,
-        lineId: beat.speech ? lineId : undefined,
-        speechDuration: speechDuration > 0 ? speechDuration : undefined,
-        estimatedSpeech: isEstimated,
-        actions: resolvedActions,
-        choice: beat.choice,
-        listeningStartTime: listeningStart,
-      };
-
-      resolvedBeats.push(resBeat);
-      allBeats.push(resBeat);
-      currentTime = beatEndTime;
     }
 
     const sceneEndTime = currentTime;
@@ -251,20 +265,21 @@ export function resolveTimeline(
   };
 }
 
-/**
- * Re-resolves the timeline from a choice point onward, preserving all past events.
- */
 export function resolveFrom(
   timeline: ResolvedTimeline,
   choiceBeatId: string,
   optionId: string
 ): ResolvedTimeline {
-  // Find choice beat index
   const choiceIdx = timeline.choicePoints.findIndex((cp) => cp.choiceBeatId === choiceBeatId);
   const newChosenPath = [...timeline.chosenPath];
   if (choiceIdx >= 0) {
-    newChosenPath[choiceIdx] = optionId;
-    newChosenPath.splice(choiceIdx + 1); // truncate subsequent choices
+    // Check if optionId is 'default' alias
+    const actualOptionId =
+      optionId === 'default'
+        ? timeline.choicePoints[choiceIdx].defaultOptionId
+        : optionId;
+    newChosenPath[choiceIdx] = actualOptionId;
+    newChosenPath.splice(choiceIdx + 1);
   } else {
     newChosenPath.push(optionId);
   }
@@ -273,7 +288,7 @@ export function resolveFrom(
 }
 
 /**
- * Evaluates character state (position, animation, expression, facing, visibility) at time t.
+ * Evaluates character state (position, animation, expression, facing, visibility, attached props) at time t.
  */
 export function evaluateCharacterState(
   scene: ResolvedScene,
@@ -290,6 +305,7 @@ export function evaluateCharacterState(
   scale: number;
   visible: boolean;
   alpha: number;
+  attachedProps: AttachedPropState[];
 } {
   let x = initialChar.position[0];
   let y = initialChar.position[1];
@@ -299,12 +315,20 @@ export function evaluateCharacterState(
   let animStartTime = scene.startTime;
   let visible = true;
   let alpha = 1.0;
+  let scaleMod = 1.0;
+  const attachedProps: AttachedPropState[] = [];
 
-  // Process all beats and actions in this scene up to t
+  // Check scene props for initially attached props
+  for (const p of scene.initialProps) {
+    if (p.prop_id && p.position) {
+      // scene props stay on ground unless attached
+    }
+  }
+
   for (const beat of scene.beats) {
     if (t < beat.startTime) break;
 
-    // Check beat speech (SPEAK sets talking animation and expression)
+    // Check SPEAK
     if (beat.speech && beat.speech.type === 'SPEAK' && beat.speech.character_id === charId) {
       if (t >= beat.startTime && t < beat.endTime) {
         animation = 'talk';
@@ -315,39 +339,60 @@ export function evaluateCharacterState(
       }
     }
 
-    // Process actions
+    // Check actions
     for (const act of beat.actions) {
       const a = act.action;
-      if (!('character_id' in a) || a.character_id !== charId) continue;
 
-      if (a.type === 'SPAWN_CHARACTER') {
+      if (a.type === 'SPAWN_CHARACTER' && a.character_id === charId) {
+        const spawn = a as ActionSpawnCharacter;
         if (t >= act.startTime) {
-          x = a.position[0];
-          y = a.position[1];
-          if (a.facing) facing = a.facing;
-          if (a.expression) expression = a.expression;
-          if (a.animation) {
-            animation = a.animation;
+          x = spawn.position[0];
+          y = spawn.position[1];
+          if (spawn.facing) facing = spawn.facing;
+          if (spawn.expression) expression = spawn.expression;
+          if (spawn.animation) {
+            animation = spawn.animation;
             animStartTime = act.startTime;
           }
           visible = true;
 
-          // Entrance animation
-          if (a.entrance === 'fade' && act.duration && t < act.endTime) {
-            alpha = Math.min(1, Math.max(0, (t - act.startTime) / act.duration));
-          } else if (a.entrance === 'pop' && act.duration && t < act.endTime) {
-            alpha = 1;
+          const duration = act.duration || 0.5;
+          const elapsed = t - act.startTime;
+          if (elapsed < duration) {
+            const p = Math.min(1, Math.max(0, elapsed / duration));
+            if (spawn.entrance === 'fade') {
+              alpha = p;
+            } else if (spawn.entrance === 'slide_left') {
+              x = spawn.position[0] - (1 - p) * 0.25;
+            } else if (spawn.entrance === 'slide_right') {
+              x = spawn.position[0] + (1 - p) * 0.25;
+            } else if (spawn.entrance === 'pop') {
+              scaleMod = Math.sin(p * Math.PI * 0.5) * 1.1;
+            }
+          } else {
+            alpha = 1.0;
+            scaleMod = 1.0;
           }
         } else {
           visible = false;
         }
-      } else if (a.type === 'REMOVE_CHARACTER') {
+      } else if (a.type === 'REMOVE_CHARACTER' && a.character_id === charId) {
+        const remove = a as ActionRemoveCharacter;
         if (t >= act.endTime) {
           visible = false;
-        } else if (t >= act.startTime && a.exit === 'fade' && act.duration) {
-          alpha = Math.max(0, 1 - (t - act.startTime) / act.duration);
+        } else if (t >= act.startTime) {
+          const duration = act.duration || 0.5;
+          const elapsed = t - act.startTime;
+          const p = Math.min(1, Math.max(0, elapsed / duration));
+          if (remove.exit === 'fade') {
+            alpha = 1 - p;
+          } else if (remove.exit === 'slide_left') {
+            x -= p * 0.3;
+          } else if (remove.exit === 'slide_right') {
+            x += p * 0.3;
+          }
         }
-      } else if (a.type === 'MOVE_TO') {
+      } else if (a.type === 'MOVE_TO' && a.character_id === charId) {
         const moveTo = a as ActionMoveTo;
         if (t >= act.startTime && t < act.endTime) {
           const progress = act.duration > 0 ? (t - act.startTime) / act.duration : 1;
@@ -369,27 +414,68 @@ export function evaluateCharacterState(
             animStartTime = act.endTime;
           }
         }
-      } else if (a.type === 'SET_EXPRESSION') {
+      } else if (a.type === 'SET_EXPRESSION' && a.character_id === charId) {
         if (t >= act.startTime) {
-          expression = a.expression;
+          expression = (a as ActionSetExpression).expression;
         }
-      } else if (a.type === 'PLAY_ANIMATION') {
+      } else if (a.type === 'PLAY_ANIMATION' && a.character_id === charId) {
+        const playAnim = a as ActionPlayAnimation;
         if (t >= act.startTime) {
-          if (!act.duration || t < act.endTime) {
-            animation = a.animation;
+          if (playAnim.loop || !act.duration || t < act.endTime) {
+            animation = playAnim.animation;
             animStartTime = act.startTime;
-          } else {
+          } else if (t >= act.endTime && !playAnim.loop) {
             animation = 'idle';
             animStartTime = act.endTime;
+          }
+        }
+      } else if (a.type === 'INTERACT') {
+        const interact = a as ActionInteract;
+        if (interact.character_id === charId || interact.target_id === charId) {
+          if (t >= act.startTime && t < act.endTime) {
+            const isActor = interact.character_id === charId;
+            if (interact.kind === 'wave_at') {
+              animation = isActor ? 'wave' : 'react';
+              animStartTime = act.startTime;
+            } else if (interact.kind === 'high_five') {
+              animation = 'point';
+              animStartTime = act.startTime;
+            } else if (interact.kind === 'hug') {
+              animation = 'react';
+              animStartTime = act.startTime;
+            } else if (interact.kind === 'hand_off') {
+              animation = isActor ? 'point' : 'react';
+              animStartTime = act.startTime;
+            }
+          }
+        }
+      } else if (a.type === 'ATTACH_PROP' && a.character_id === charId) {
+        const attach = a as ActionAttachProp;
+        if (t >= act.startTime) {
+          const idx = attachedProps.findIndex((ap) => ap.propId === attach.prop_id);
+          if (attach.remove) {
+            if (idx >= 0) attachedProps.splice(idx, 1);
+          } else {
+            const slot = attach.slot || 'hand';
+            if (idx >= 0) {
+              attachedProps[idx].slot = slot;
+            } else {
+              attachedProps.push({
+                propId: attach.prop_id,
+                slot,
+                characterId: charId,
+              });
+            }
           }
         }
       }
     }
   }
 
-  // Calculate depth scale: scale = lerp(0.8, 1.15, clamp((y - 0.62) / 0.30))
+  // Depth scale: lerp(0.8, 1.15, clamp((y - 0.62) / 0.30)) * scaleMod
   const depthFactor = Math.max(0, Math.min(1, (y - 0.62) / 0.3));
-  const scale = 0.8 + depthFactor * (1.15 - 0.8);
+  const baseScale = 0.8 + depthFactor * (1.15 - 0.8);
+  const scale = baseScale * scaleMod;
 
   return {
     x,
@@ -401,6 +487,6 @@ export function evaluateCharacterState(
     scale,
     visible,
     alpha,
+    attachedProps,
   };
 }
-
