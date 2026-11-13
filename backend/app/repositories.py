@@ -152,7 +152,12 @@ class SupabaseRepository(Repository):
 
 
 def get_repository() -> Repository:
-    if settings.DEMO_MODE or not settings.SUPABASE_URL or not settings.SUPABASE_SECRET_KEY:
+    if (
+        settings.DEMO_MODE
+        or not settings.SUPABASE_URL
+        or not settings.SUPABASE_SECRET_KEY
+        or "your-project" in settings.SUPABASE_URL
+    ):
         return LocalFileRepository()
     try:
         return SupabaseRepository(settings.SUPABASE_URL, settings.SUPABASE_SECRET_KEY)

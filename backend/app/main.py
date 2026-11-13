@@ -1,9 +1,10 @@
 import os
 import shutil
 import asyncio
+import uuid
 from pathlib import Path
 from typing import Dict, Any, List, Optional
-from fastapi import FastAPI, Depends, HTTPException, Request, status
+from fastapi import FastAPI, Depends, HTTPException, Request, UploadFile, File, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
@@ -13,6 +14,9 @@ from .config import settings
 from .auth import get_current_user
 from .repositories import get_repository, Repository
 from .pipeline import run_quick_story_pipeline, generation_tasks
+from .stations.batch import run_batch_generation
+from .live.matcher import match_transcript, MatchOption
+from .export.converter import convert_webm_to_mp4, export_tasks, get_export_dirs
 
 app = FastAPI(title="VoxFable API", version="0.1.0")
 
@@ -73,7 +77,7 @@ async def health():
         "ffmpeg": ffmpeg_available
     }
 
-# --- Request / Response Models ---
+# --- Request Models ---
 class GenerationCreateRequest(BaseModel):
     kind: str = "quick" # "quick" | "batch"
     prompt: Optional[str] = None
@@ -83,6 +87,11 @@ class GenerationCreateRequest(BaseModel):
     age_band: Optional[str] = "4-6"
     language: Optional[str] = "en"
     interactive: Optional[bool] = False
+
+class LiveMatchApiRequest(BaseModel):
+    prompt: str
+    options: List[MatchOption]
+    transcript: str
 
 # --- Generations Endpoints ---
 @app.post("/api/generations")
@@ -102,18 +111,29 @@ async def create_generation(
     created = await repo.create_generation(user["user_id"], gen_data)
     gen_id = created["id"]
 
-    # Launch background task
-    asyncio.create_task(run_quick_story_pipeline(
-        generation_id=gen_id,
-        owner_id=user["user_id"],
-        prompt=req.prompt or "A charming friendship adventure",
-        age_band=req.age_band or "4-6",
-        language=req.language or "en",
-        interactive=req.interactive or False,
-        series=req.series,
-        characters=req.characters,
-        repo=repo
-    ))
+    if req.kind == "batch" and req.series:
+        asyncio.create_task(run_batch_generation(
+            generation_id=gen_id,
+            owner_id=user["user_id"],
+            series=req.series,
+            characters=req.characters or [],
+            count=req.count or 3,
+            age_band=req.age_band or "4-6",
+            language=req.language or "en",
+            repo=repo
+        ))
+    else:
+        asyncio.create_task(run_quick_story_pipeline(
+            generation_id=gen_id,
+            owner_id=user["user_id"],
+            prompt=req.prompt or "A charming friendship adventure",
+            age_band=req.age_band or "4-6",
+            language=req.language or "en",
+            interactive=req.interactive or False,
+            series=req.series,
+            characters=req.characters,
+            repo=repo
+        ))
 
     return {"generation_id": gen_id, "status": "queued"}
 
@@ -123,12 +143,11 @@ async def get_generation(
     user: Dict[str, Any] = Depends(get_current_user),
     repo: Repository = Depends(get_repository)
 ):
-    # Check in-memory task cache first
     cached = generation_tasks.get(generation_id)
     if cached:
         return {
             "id": cached["id"],
-            "kind": "quick",
+            "kind": cached.get("kind", "quick"),
             "status": cached.get("status", "running"),
             "stage": cached.get("stage", "understanding"),
             "progress": cached.get("progress"),
@@ -191,4 +210,69 @@ async def get_episode(
         "audio_manifest": ep.get("audio_manifest"),
         "status": ep.get("status", "draft"),
         "video_url": ep.get("video_path")
+    }
+
+# --- Live Mode Matching ---
+@app.post("/api/live/match")
+async def live_match(
+    req: LiveMatchApiRequest,
+    user: Dict[str, Any] = Depends(get_current_user)
+):
+    res = await match_transcript(
+        prompt=req.prompt,
+        options=req.options,
+        transcript=req.transcript
+    )
+    return {
+        "option_id": res.option_id,
+        "confidence": res.confidence,
+        "method": res.method
+    }
+
+# --- Video Export Endpoints ---
+@app.post("/api/episodes/{episode_id}/export")
+async def export_episode(
+    episode_id: str,
+    file: UploadFile = File(...),
+    user: Dict[str, Any] = Depends(get_current_user)
+):
+    MAX_SIZE = 200 * 1024 * 1024
+    content = await file.read()
+    if len(content) > MAX_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail={"code": "PAYLOAD_TOO_LARGE", "message": "Video exceeds 200 MB limit"}
+        )
+
+    export_id = f"exp_{uuid.uuid4().hex[:8]}"
+    _, tmp_dir = get_export_dirs()
+    temp_webm = tmp_dir / f"{export_id}.webm"
+
+    with open(temp_webm, "wb") as f:
+        f.write(content)
+
+    asyncio.create_task(convert_webm_to_mp4(
+        export_id=export_id,
+        episode_id=episode_id,
+        webm_path=temp_webm,
+        owner_id=user["user_id"]
+    ))
+
+    return {"export_id": export_id}
+
+@app.get("/api/exports/{export_id}")
+async def get_export_status(
+    export_id: str,
+    user: Dict[str, Any] = Depends(get_current_user)
+):
+    task = export_tasks.get(export_id)
+    if not task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"code": "NOT_FOUND", "message": f"Export task {export_id} not found"}
+        )
+    return {
+        "status": task["status"],
+        "mp4_url": task.get("mp4_url"),
+        "error": task.get("error")
     }
