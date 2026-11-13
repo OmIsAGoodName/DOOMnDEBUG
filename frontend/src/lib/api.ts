@@ -29,6 +29,9 @@ export interface LiveMatchResponse {
 
 export interface SystemStatsResponse {
   ok: boolean;
+  active_provider: string;
+  active_model: string;
+  provider_order: string[];
   providers: {
     groq: {
       configured: boolean;
@@ -80,6 +83,11 @@ export interface SystemStatsResponse {
 export interface UpdateApiKeyParams {
   provider: 'groq' | 'gemini';
   api_key: string;
+  model?: string;
+}
+
+export interface SwitchActiveProviderParams {
+  provider: 'groq' | 'gemini' | 'ollama';
   model?: string;
 }
 
@@ -264,6 +272,19 @@ export const api = {
 
   updateApiKey: async (params: UpdateApiKeyParams): Promise<{ ok: boolean; message: string }> => {
     return request<{ ok: boolean; message: string }>('/api/system/keys', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+  },
+
+  switchActiveProvider: async (params: SwitchActiveProviderParams): Promise<{
+    ok: boolean;
+    active_provider: string;
+    active_model: string;
+    provider_order: string[];
+    message: string;
+  }> => {
+    return request('/api/system/active-provider', {
       method: 'POST',
       body: JSON.stringify(params),
     });

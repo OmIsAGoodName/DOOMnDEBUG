@@ -33,4 +33,15 @@ class LLMCache:
         except Exception:
             pass
 
+    def clear(self):
+        """Clears all cached LLM JSON files so switching providers generates fresh output."""
+        try:
+            for p in self.dir.glob("*.json"):
+                try:
+                    p.unlink()
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
 cache = LLMCache()

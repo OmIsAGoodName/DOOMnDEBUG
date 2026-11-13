@@ -13,6 +13,9 @@ export default function Debug() {
   const [showKey, setShowKey] = useState<boolean>(false);
   const [selectedModel, setSelectedModel] = useState<string>('openai/gpt-oss-120b');
   const [updating, setUpdating] = useState<boolean>(false);
+  const [switchingProvider, setSwitchingProvider] = useState<string | null>(null);
+  const [groqModelChoice, setGroqModelChoice] = useState<string>('openai/gpt-oss-120b');
+  const [geminiModelChoice, setGeminiModelChoice] = useState<string>('gemini-flash-lite-latest');
   const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const fetchStats = async () => {
@@ -22,12 +25,41 @@ export default function Debug() {
       const res = await api.getSystemStats();
       setStats(res);
       if (res.providers.groq.model) {
-        setSelectedModel(res.providers.groq.model);
+        setGroqModelChoice(res.providers.groq.model);
+        if (res.active_provider === 'groq') {
+          setSelectedModel(res.providers.groq.model);
+        }
+      }
+      if (res.providers.gemini.model) {
+        setGeminiModelChoice(res.providers.gemini.model);
+        if (res.active_provider === 'gemini') {
+          setSelectedModel(res.providers.gemini.model);
+        }
       }
     } catch (err: any) {
       setError(`Failed to fetch system stats: ${err.message}`);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSwitchActive = async (targetProvider: 'groq' | 'gemini', targetModel: string) => {
+    try {
+      setSwitchingProvider(targetProvider);
+      setActionMessage(null);
+      const res = await api.switchActiveProvider({
+        provider: targetProvider,
+        model: targetModel,
+      });
+      setActionMessage({ type: 'success', text: res.message });
+      await fetchStats();
+    } catch (err: any) {
+      setActionMessage({
+        type: 'error',
+        text: err.message || `Failed to switch active engine to ${targetProvider}.`,
+      });
+    } finally {
+      setSwitchingProvider(null);
     }
   };
 
@@ -90,6 +122,149 @@ export default function Debug() {
           </Button>
         </div>
       </div>
+
+      {/* Active Generation Engine Hard Switcher */}
+      <Card padding="lg" className="border-indigo-200 dark:border-indigo-900/60 shadow-md bg-gradient-to-br from-indigo-50/50 via-white to-purple-50/30 dark:from-indigo-950/20 dark:via-slate-900 dark:to-purple-950/20 space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-indigo-100 dark:border-indigo-950/80 pb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xl">🎛️</span>
+              <h2 className="text-lg font-black text-slate-900 dark:text-slate-100">
+                Active Story Generation Engine
+              </h2>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Hard switch the active model and key used by the Writer & Director pipeline.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Currently In Use:</span>
+            <span className="px-3 py-1 rounded-full text-xs font-black bg-indigo-600 text-white shadow-sm flex items-center gap-1.5 animate-pulse">
+              <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+              {(stats?.active_provider || 'groq').toUpperCase()}: {stats?.active_model || 'loading...'}
+            </span>
+          </div>
+        </div>
+
+        {/* Engine Switcher Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Groq Engine Card */}
+          <div
+            className={`p-4 rounded-2xl border-2 transition-all flex flex-col justify-between gap-4 ${
+              stats?.active_provider === 'groq'
+                ? 'border-amber-500 bg-amber-50/50 dark:bg-amber-950/20 shadow-md'
+                : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 hover:border-slate-300'
+            }`}
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">⚡</span>
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900 dark:text-slate-100">
+                      Groq Cloud (LPU Inference)
+                    </h3>
+                    <p className="text-[11px] text-slate-400 font-mono">
+                      {groq?.masked_key || 'No key set'}
+                    </p>
+                  </div>
+                </div>
+
+                {stats?.active_provider === 'groq' && (
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-white shadow-xs">
+                    ACTIVE
+                  </span>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                  Engine Model:
+                </label>
+                <select
+                  value={groqModelChoice}
+                  onChange={(e) => setGroqModelChoice(e.target.value)}
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500"
+                >
+                  <option value="openai/gpt-oss-120b">openai/gpt-oss-120b (Flagship Studio)</option>
+                  <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (Recommended)</option>
+                  <option value="openai/gpt-oss-20b">openai/gpt-oss-20b (Fast & Reliable)</option>
+                  <option value="llama-3.1-8b-instant">llama-3.1-8b-instant (Fastest)</option>
+                </select>
+              </div>
+            </div>
+
+            <Button
+              variant={stats?.active_provider === 'groq' ? 'primary' : 'secondary'}
+              size="sm"
+              disabled={!groq?.configured || switchingProvider === 'groq'}
+              loading={switchingProvider === 'groq'}
+              onClick={() => handleSwitchActive('groq', groqModelChoice)}
+              className="w-full justify-center"
+            >
+              {stats?.active_provider === 'groq' ? '✓ Currently Active (Re-apply)' : '⚡ Switch to Groq Engine'}
+            </Button>
+          </div>
+
+          {/* Gemini Engine Card */}
+          <div
+            className={`p-4 rounded-2xl border-2 transition-all flex flex-col justify-between gap-4 ${
+              stats?.active_provider === 'gemini'
+                ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/20 shadow-md'
+                : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 hover:border-slate-300'
+            }`}
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">💎</span>
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900 dark:text-slate-100">
+                      Google Gemini (AI Studio)
+                    </h3>
+                    <p className="text-[11px] text-slate-400 font-mono">
+                      {gemini?.masked_key || 'No key set'}
+                    </p>
+                  </div>
+                </div>
+
+                {stats?.active_provider === 'gemini' && (
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-600 text-white shadow-xs">
+                    ACTIVE
+                  </span>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                  Engine Model:
+                </label>
+                <select
+                  value={geminiModelChoice}
+                  onChange={(e) => setGeminiModelChoice(e.target.value)}
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="gemini-flash-lite-latest">gemini-flash-lite-latest (Recommended - Fast & Free)</option>
+                  <option value="gemini-flash-latest">gemini-flash-latest (Full Flash)</option>
+                  <option value="gemini-pro-latest">gemini-pro-latest (Pro Quality)</option>
+                </select>
+              </div>
+            </div>
+
+            <Button
+              variant={stats?.active_provider === 'gemini' ? 'primary' : 'secondary'}
+              size="sm"
+              disabled={!gemini?.configured || switchingProvider === 'gemini'}
+              loading={switchingProvider === 'gemini'}
+              onClick={() => handleSwitchActive('gemini', geminiModelChoice)}
+              className="w-full justify-center"
+            >
+              {stats?.active_provider === 'gemini' ? '✓ Currently Active (Re-apply)' : '💎 Switch to Gemini Engine'}
+            </Button>
+          </div>
+        </div>
+      </Card>
 
       {/* Quota Health Alert Banner */}
       {isRateLimited ? (
@@ -190,8 +365,9 @@ export default function Debug() {
                   </>
                 ) : (
                   <>
-                    <option value="gemini-2.5-flash">gemini-2.5-flash</option>
-                    <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+                    <option value="gemini-flash-lite-latest">gemini-flash-lite-latest (Recommended - Fast & Free)</option>
+                    <option value="gemini-flash-latest">gemini-flash-latest</option>
+                    <option value="gemini-pro-latest">gemini-pro-latest</option>
                   </>
                 )}
               </select>
@@ -342,6 +518,100 @@ export default function Debug() {
           )}
         </Card>
 
+        {/* Gemini Card */}
+        <Card padding="md" className="border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div className="flex items-center gap-2.5">
+              <span className="text-xl">💎</span>
+              <div>
+                <h3 className="font-black text-slate-900 dark:text-slate-100 text-sm">
+                  Google Gemini API
+                </h3>
+                <p className="text-[11px] text-slate-400 font-mono">
+                  {gemini?.masked_key || 'Not configured'}
+                </p>
+              </div>
+            </div>
+
+            <span
+              className={`px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider ${
+                gemini?.stats?.needs_new_key
+                  ? 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-800'
+                  : gemini?.configured
+                  ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+              }`}
+            >
+              {gemini?.stats?.needs_new_key
+                ? 'Rate Limited'
+                : gemini?.configured
+                ? 'Operational'
+                : 'Unset'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+            <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
+              <span className="block text-xs text-slate-400">Total Calls</span>
+              <strong className="text-base text-slate-800 dark:text-slate-100">
+                {gemini?.stats?.calls || 0}
+              </strong>
+            </div>
+
+            <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
+              <span className="block text-xs text-slate-400">Successes</span>
+              <strong className="text-base text-emerald-600 dark:text-emerald-400">
+                {gemini?.stats?.successes || 0}
+              </strong>
+            </div>
+
+            <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
+              <span className="block text-xs text-slate-400">Rate Limits</span>
+              <strong className="text-base text-amber-600 dark:text-amber-400">
+                {gemini?.stats?.rate_limits || 0}
+              </strong>
+            </div>
+
+            <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
+              <span className="block text-xs text-slate-400">Configured</span>
+              <strong className="text-xs text-slate-700 dark:text-slate-200 truncate block">
+                {gemini?.model || 'lite-latest'}
+              </strong>
+            </div>
+          </div>
+
+          {/* Model Candidates */}
+          <div className="text-xs text-slate-600 dark:text-slate-300 space-y-1">
+            <span className="font-bold text-slate-500 text-[11px] uppercase tracking-wider block">
+              Gemini Fallback Models:
+            </span>
+            <div className="flex flex-wrap gap-1.5 pt-0.5">
+              {['gemini-flash-lite-latest (1st)', 'gemini-flash-latest (2nd)', 'gemini-pro-latest (3rd)'].map(
+                (m, i) => (
+                  <span
+                    key={i}
+                    className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono text-[10px]"
+                  >
+                    {m}
+                  </span>
+                )
+              )}
+            </div>
+          </div>
+
+          {/* Last Gemini Error if any */}
+          {gemini?.stats?.last_error && (
+            <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/60 rounded-xl p-3 text-xs space-y-1">
+              <span className="font-bold text-amber-800 dark:text-amber-300 block">
+                Latest Gemini Warning / Error:
+              </span>
+              <p className="font-mono text-[11px] text-amber-900 dark:text-amber-200 line-clamp-3">
+                {gemini.stats.last_error}
+              </p>
+            </div>
+          )}
+        </Card>
+
         {/* Supporting Engines Card */}
         <Card padding="md" className="border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
@@ -392,3 +662,4 @@ export default function Debug() {
     </div>
   );
 }
+

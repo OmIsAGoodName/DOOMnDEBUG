@@ -7,9 +7,20 @@
 
 ---
 
-## ⚡ Recent Updates (Diagnostics Tab, API Key Hot-Swap & Quality Polish)
+## ⚡ Recent Updates (Active Engine Hard-Switcher, Gemini Integration & Universal Position Resilience)
 
-1. **System Diagnostics & API Quota Monitor (`/debug`)**:
+1. **Active Generation Engine Hard Switcher (`/debug`)**:
+   - Built a dedicated **Active Story Generation Engine** switcher at the top of [`frontend/src/pages/Debug.tsx`](file:///d:/VoxFable/frontend/src/pages/Debug.tsx).
+   - Allows 1-click hard-switching between **⚡ Groq Cloud** and **💎 Google Gemini** with live visual badges (`ACTIVE`), model selection dropdowns (`gemini-flash-lite-latest`, `gemini-flash-latest`, `gemini-pro-latest`, `openai/gpt-oss-120b`, `llama-3.3-70b-versatile`), and masked key status.
+   - Added backend API endpoint `POST /api/system/active-provider` in [`backend/app/main.py`](file:///d:/VoxFable/backend/app/main.py) which reorders `settings.LLM_PROVIDER_ORDER`, sets the active model, clears `cache` (to guarantee fresh generation), and persists changes to `backend/.env`.
+   - Added dynamic getters (`@property current_api_key`, `@property current_model`) in [`backend/app/llm/providers.py`](file:///d:/VoxFable/backend/app/llm/providers.py) so provider objects react to runtime configuration updates without requiring server restarts.
+
+2. **Universal Position & Coordinate Resilience (Eliminated `'dict' object has no attribute 'position'`)**:
+   - Implemented `extract_pos()`, `update_pos()`, `extract_to()`, and `update_to()` in [`backend/app/validation/validator.py`](file:///d:/VoxFable/backend/app/validation/validator.py).
+   - Safely parses and clamps character positions, prop positions, and action target coordinates across all representation types (Pydantic models, raw dictionaries `{"position": ...}`, coordinate dicts `{"x": ..., "y": ...}`, tuples `(x, y)`, and lists `[x, y]`).
+   - In [`backend/app/stations/director.py`](file:///d:/VoxFable/backend/app/stations/director.py), instantiated initial character placements as typed `PlacedCharacter` objects rather than raw dictionaries.
+
+3. **System Diagnostics & API Quota Monitor (`/debug`)**:
    - Built a dedicated Diagnostics & Quota Monitor page ([`frontend/src/pages/Debug.tsx`](file:///d:/VoxFable/frontend/src/pages/Debug.tsx)) with a 1-click header link `⚙️ Diagnostics`.
    - **Real-Time Quota Health Indicator**:
      - Visual status banner detects whether Groq or Gemini have hit daily token limits (TPD) or per-minute rate limits (429/413) and alerts when a fresh key is needed.

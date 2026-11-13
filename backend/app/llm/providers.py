@@ -40,17 +40,37 @@ class BaseProvider(abc.ABC):
 
 class GeminiProvider(BaseProvider):
     def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
-        self.api_key = api_key or settings.GEMINI_API_KEY
-        self.model = model or settings.GEMINI_MODEL
+        self._api_key = api_key
+        self._model = model
+
+    @property
+    def current_api_key(self) -> str:
+        return self._api_key or settings.GEMINI_API_KEY or ""
+
+    @property
+    def current_model(self) -> str:
+        m = self._model or settings.GEMINI_MODEL or "gemini-flash-lite-latest"
+        # Sanitize if model had openai prefix or deprecated name
+        if "openai" in m or "2.5-flash" in m or "2.0-flash" in m:
+            return "gemini-flash-lite-latest"
+        return m
 
     def is_configured(self) -> bool:
-        return bool(self.api_key and "your-gemini" not in self.api_key.lower())
+        k = self.current_api_key
+        return bool(k and "your-gemini" not in k.lower())
 
     async def call(self, system: str, user: str, temperature: float) -> str:
-        if not self.api_key or "your-gemini" in self.api_key.lower():
+        api_key = self.current_api_key
+        if not api_key or "your-gemini" in api_key.lower():
             raise ValueError("GEMINI_API_KEY not configured or placeholder")
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent?key={self.api_key}"
+        PROVIDER_STATS["gemini"]["calls"] += 1
+
+        candidate_models = [self.current_model]
+        for fallback in ["gemini-flash-lite-latest", "gemini-flash-latest", "gemini-pro-latest"]:
+            if fallback not in candidate_models:
+                candidate_models.append(fallback)
+
         payload = {
             "contents": [
                 {"role": "user", "parts": [{"text": user}]}
@@ -65,38 +85,78 @@ class GeminiProvider(BaseProvider):
                 "parts": [{"text": system}]
             }
 
+        last_err = None
         async with httpx.AsyncClient(timeout=60.0) as client:
-            resp = await client.post(url, json=payload)
-            if resp.status_code == 429:
-                raise RuntimeError(f"Gemini Rate Limit (429): {resp.text}")
-            if resp.status_code >= 500:
-                raise RuntimeError(f"Gemini Server Error ({resp.status_code}): {resp.text}")
-            resp.raise_for_status()
+            for model_name in candidate_models:
+                clean_model = model_name.replace("models/", "")
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/{clean_model}:generateContent?key={api_key}"
+                try:
+                    resp = await client.post(url, json=payload)
+                    if resp.status_code == 429:
+                        PROVIDER_STATS["gemini"]["rate_limits"] += 1
+                        PROVIDER_STATS["gemini"]["last_status"] = "rate_limited"
+                        PROVIDER_STATS["gemini"]["last_error"] = f"Rate limit on `{clean_model}`: {resp.text}"
+                        PROVIDER_STATS["gemini"]["last_error_time"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+                        last_err = RuntimeError(f"Gemini Rate Limit (429) on model `{clean_model}`: {resp.text}")
+                        continue
+                    if resp.status_code != 200:
+                        PROVIDER_STATS["gemini"]["errors"] += 1
+                        PROVIDER_STATS["gemini"]["last_status"] = "error"
+                        PROVIDER_STATS["gemini"]["last_error"] = f"Error ({resp.status_code}) on `{clean_model}`: {resp.text}"
+                        PROVIDER_STATS["gemini"]["last_error_time"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+                        last_err = RuntimeError(f"Gemini Error ({resp.status_code}) on model `{clean_model}`: {resp.text}")
+                        continue
 
-            data = resp.json()
-            candidates = data.get("candidates", [])
-            if not candidates:
-                raise ValueError(f"No candidates returned by Gemini: {data}")
-            parts = candidates[0].get("content", {}).get("parts", [])
-            if not parts:
-                raise ValueError(f"Empty parts returned by Gemini: {candidates[0]}")
-            return parts[0].get("text", "")
+                    data = resp.json()
+                    candidates = data.get("candidates", [])
+                    if not candidates:
+                        last_err = ValueError(f"No candidates returned by Gemini for `{clean_model}`: {data}")
+                        continue
+                    parts = candidates[0].get("content", {}).get("parts", [])
+                    if not parts:
+                        last_err = ValueError(f"Empty parts returned by Gemini for `{clean_model}`: {candidates[0]}")
+                        continue
+
+                    # Success!
+                    PROVIDER_STATS["gemini"]["successes"] += 1
+                    PROVIDER_STATS["gemini"]["last_status"] = "healthy"
+                    PROVIDER_STATS["gemini"]["last_error"] = None
+                    PROVIDER_STATS["gemini"]["needs_new_key"] = False
+                    return parts[0].get("text", "")
+                except (httpx.TimeoutException, httpx.NetworkError) as net_err:
+                    last_err = net_err
+                    continue
+
+        PROVIDER_STATS["gemini"]["needs_new_key"] = True
+        if last_err:
+            raise last_err
+        raise RuntimeError("All Gemini candidate models failed.")
 
 class GroqProvider(BaseProvider):
     def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
-        self.api_key = api_key or settings.GROQ_API_KEY
-        self.model = model or settings.GROQ_MODEL
+        self._api_key = api_key
+        self._model = model
+
+    @property
+    def current_api_key(self) -> str:
+        return self._api_key or settings.GROQ_API_KEY or ""
+
+    @property
+    def current_model(self) -> str:
+        return self._model or settings.GROQ_MODEL or "openai/gpt-oss-120b"
 
     def is_configured(self) -> bool:
-        return bool(self.api_key and "your-groq" not in self.api_key.lower())
+        k = self.current_api_key
+        return bool(k and "your-groq" not in k.lower())
 
     async def call(self, system: str, user: str, temperature: float) -> str:
-        if not self.api_key:
+        api_key = self.current_api_key
+        if not api_key:
             raise ValueError("GROQ_API_KEY not configured")
 
         url = "https://api.groq.com/openai/v1/chat/completions"
         headers = {
-            "Authorization": f"Bearer {self.api_key}",
+            "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
         }
         messages = []

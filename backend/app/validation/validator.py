@@ -1,13 +1,71 @@
 import copy
-from typing import Tuple, List, Dict, Any, Set
+from typing import Tuple, List, Dict, Any, Set, Optional
 from ..models.episode_plan import EpisodePlan, Scene, Beat, Action, CastMember, Palette, VoiceConfig
 from .resolver import AssetResolver
 
 def clamp_x(x: float) -> float:
-    return max(0.05, min(0.95, round(x, 3)))
+    return max(0.05, min(0.95, round(float(x), 3)))
 
 def clamp_y(y: float) -> float:
-    return max(0.62, min(0.92, round(y, 3)))
+    return max(0.62, min(0.92, round(float(y), 3)))
+
+def extract_pos(item: Any, default: Tuple[float, float] = (0.5, 0.76)) -> Tuple[float, float]:
+    """Safely extracts (x, y) coordinates from an object or dictionary in any format."""
+    raw = getattr(item, "position", None) if not isinstance(item, dict) else item.get("position")
+    if raw is None:
+        return default
+    if isinstance(raw, dict):
+        x = raw.get("x", raw.get("left", default[0]))
+        y = raw.get("y", raw.get("top", default[1]))
+        try:
+            return (float(x), float(y))
+        except (ValueError, TypeError):
+            return default
+    if isinstance(raw, (list, tuple)) and len(raw) >= 2:
+        try:
+            return (float(raw[0]), float(raw[1]))
+        except (ValueError, TypeError):
+            return default
+    return default
+
+def update_pos(item: Any, new_pos: Tuple[float, float]):
+    """Safely sets position tuple on either a model instance or dictionary."""
+    if isinstance(item, dict):
+        item["position"] = new_pos
+    elif hasattr(item, "position"):
+        try:
+            item.position = new_pos
+        except Exception:
+            pass
+
+def extract_to(item: Any) -> Optional[Tuple[float, float]]:
+    """Safely extracts target 'to' coordinate from an action model or dict."""
+    raw = getattr(item, "to", None) if not isinstance(item, dict) else item.get("to")
+    if raw is None:
+        return None
+    if isinstance(raw, dict):
+        x = raw.get("x", raw.get("left", 0.5))
+        y = raw.get("y", raw.get("top", 0.76))
+        try:
+            return (float(x), float(y))
+        except (ValueError, TypeError):
+            return None
+    if isinstance(raw, (list, tuple)) and len(raw) >= 2:
+        try:
+            return (float(raw[0]), float(raw[1]))
+        except (ValueError, TypeError):
+            return None
+    return None
+
+def update_to(item: Any, new_to: Tuple[float, float]):
+    """Safely sets 'to' tuple on either an action model or dictionary."""
+    if isinstance(item, dict):
+        item["to"] = new_to
+    elif hasattr(item, "to"):
+        try:
+            item.to = new_to
+        except Exception:
+            pass
 
 class PlanValidator:
     def __init__(self, resolver: AssetResolver = None):
@@ -52,38 +110,26 @@ class PlanValidator:
 
             # Clamp initial character placements
             for char in scene.characters:
-                orig_pos = char.position if hasattr(char, "position") else (char.get("position") if isinstance(char, dict) else (0.5, 0.76))
+                orig_pos = extract_pos(char, default=(0.5, 0.76))
                 clamped = (clamp_x(orig_pos[0]), clamp_y(orig_pos[1]))
-                if hasattr(char, "position"):
-                    char.position = clamped
-                    cid = getattr(char, "character_id", "unknown")
-                elif isinstance(char, dict):
-                    char["position"] = clamped
-                    cid = char.get("character_id", "unknown")
-                else:
-                    cid = "unknown"
+                update_pos(char, clamped)
+                cid = char.get("character_id", "unknown") if isinstance(char, dict) else getattr(char, "character_id", "unknown")
                 if clamped != orig_pos:
                     repairs.append(f"Clamped character {cid} pos {orig_pos} -> {clamped}")
 
             # Clamp initial props
             for prop in scene.props:
-                orig_pos = prop.position if hasattr(prop, "position") else (prop.get("position") if isinstance(prop, dict) else (0.5, 0.76))
+                orig_pos = extract_pos(prop, default=(0.5, 0.76))
                 clamped = (clamp_x(orig_pos[0]), clamp_y(orig_pos[1]))
-                if hasattr(prop, "position"):
-                    prop.position = clamped
-                    pid = getattr(prop, "prop_id", "prop")
-                elif isinstance(prop, dict):
-                    prop["position"] = clamped
-                    pid = prop.get("prop_id", "prop")
-                else:
-                    pid = "prop"
+                update_pos(prop, clamped)
+                pid = prop.get("prop_id", "prop") if isinstance(prop, dict) else getattr(prop, "prop_id", "prop")
                 resolved_prop, rep = self.resolver.resolve_prop(pid)
                 if rep:
                     repairs.append(rep)
-                    if hasattr(prop, "prop_id"):
-                        prop.prop_id = resolved_prop
-                    elif isinstance(prop, dict):
+                    if isinstance(prop, dict):
                         prop["prop_id"] = resolved_prop
+                    elif hasattr(prop, "prop_id"):
+                        prop.prop_id = resolved_prop
 
             # Ensure choice beat is last beat & validate choice options
             choice_beat_idx = -1
@@ -121,10 +167,13 @@ class PlanValidator:
                 valid_actions = []
                 for act in beat.actions:
                     # Numeric clamping on coordinates
-                    if hasattr(act, "to") and act.to:
-                        act.to = (clamp_x(act.to[0]), clamp_y(act.to[1]))
-                    if hasattr(act, "position") and act.position:
-                        act.position = (clamp_x(act.position[0]), clamp_y(act.position[1]))
+                    target_to = extract_to(act)
+                    if target_to:
+                        update_to(act, (clamp_x(target_to[0]), clamp_y(target_to[1])))
+
+                    target_pos = extract_pos(act, default=None)
+                    if target_pos is not None:
+                        update_pos(act, (clamp_x(target_pos[0]), clamp_y(target_pos[1])))
 
                     # Duration checks
                     if hasattr(act, "duration") and act.duration is not None and act.duration <= 0:

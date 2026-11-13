@@ -57,13 +57,13 @@ def direct_scene_rule_based(
         else:
             x_pos = round(0.18 + (idx / max(1, num_chars - 1)) * 0.64, 2)
         facing = "right" if x_pos <= 0.50 else "left"
-        initial_chars.append({
-            "character_id": cid,
-            "position": (x_pos, 0.76),
-            "facing": facing,
-            "expression": "happy",
-            "animation": "idle"
-        })
+        initial_chars.append(PlacedCharacter(
+            character_id=cid,
+            position=(x_pos, 0.76),
+            facing=facing,
+            expression="happy",
+            animation="idle"
+        ))
 
     beats_out = []
     for b_idx, b in enumerate(draft_scene.beats):

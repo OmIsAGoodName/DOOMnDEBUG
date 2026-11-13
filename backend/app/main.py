@@ -19,6 +19,7 @@ from .stations.batch import run_batch_generation
 from .live.matcher import match_transcript, MatchOption
 from .export.converter import convert_webm_to_mp4, export_tasks, get_export_dirs
 from .llm.providers import PROVIDER_STATS
+from .llm.cache import cache
 
 app = FastAPI(title="VoxFable API", version="0.1.0")
 
@@ -94,6 +95,10 @@ class KeyUpdateRequest(BaseModel):
     api_key: str
     model: Optional[str] = None
 
+class ActiveProviderRequest(BaseModel):
+    provider: Literal["groq", "gemini", "ollama"]
+    model: Optional[str] = None
+
 @app.get("/api/system/stats")
 async def system_stats():
     groq_key = settings.GROQ_API_KEY or ""
@@ -106,8 +111,19 @@ async def system_stats():
     media_audio = Path(settings.MEDIA_DIR) / "audio"
     audio_clips = len(list(media_audio.glob("*.mp3"))) if media_audio.exists() else 0
 
+    active_prov = settings.LLM_PROVIDER_ORDER.split(",")[0].strip().lower()
+    if active_prov == "gemini":
+        active_model = settings.GEMINI_MODEL
+    elif active_prov == "groq":
+        active_model = settings.GROQ_MODEL
+    else:
+        active_model = settings.OLLAMA_MODEL
+
     return {
         "ok": True,
+        "active_provider": active_prov,
+        "active_model": active_model,
+        "provider_order": [p.strip().lower() for p in settings.LLM_PROVIDER_ORDER.split(",") if p.strip()],
         "providers": {
             "groq": {
                 "configured": bool(groq_key and "your-groq" not in groq_key.lower()),
@@ -120,6 +136,7 @@ async def system_stats():
                 "configured": has_gemini,
                 "masked_key": masked_gemini,
                 "model": settings.GEMINI_MODEL,
+                "candidate_models": ["gemini-flash-lite-latest", "gemini-flash-latest", "gemini-pro-latest"],
                 "stats": PROVIDER_STATS["gemini"]
             },
             "ollama": {
@@ -135,6 +152,53 @@ async def system_stats():
         },
         "mode": "demo" if settings.DEMO_MODE else "online",
         "needs_attention": PROVIDER_STATS["groq"]["needs_new_key"] or PROVIDER_STATS["gemini"]["needs_new_key"]
+    }
+
+@app.post("/api/system/active-provider")
+async def switch_active_provider(req: ActiveProviderRequest):
+    new_active = req.provider.lower()
+    all_providers = ["groq", "gemini", "ollama"]
+    reordered = [new_active] + [p for p in all_providers if p != new_active]
+    settings.LLM_PROVIDER_ORDER = ",".join(reordered)
+
+    if req.model:
+        if new_active == "gemini":
+            settings.GEMINI_MODEL = req.model
+        elif new_active == "groq":
+            settings.GROQ_MODEL = req.model
+        elif new_active == "ollama":
+            settings.OLLAMA_MODEL = req.model
+
+    # Clear response cache so new provider produces fresh stories
+    cache.clear()
+
+    # Persist to .env
+    env_path = BASE_DIR / "backend" / ".env"
+    if env_path.exists():
+        content = env_path.read_text(encoding="utf-8")
+        lines = []
+        for line in content.splitlines():
+            if line.startswith("LLM_PROVIDER_ORDER="):
+                lines.append(f"LLM_PROVIDER_ORDER={settings.LLM_PROVIDER_ORDER}")
+            elif req.model and new_active == "gemini" and line.startswith("GEMINI_MODEL="):
+                lines.append(f"GEMINI_MODEL={req.model}")
+            elif req.model and new_active == "groq" and line.startswith("GROQ_MODEL="):
+                lines.append(f"GROQ_MODEL={req.model}")
+            else:
+                lines.append(line)
+        env_path.write_text("\n".join(lines), encoding="utf-8")
+
+    current_model = (
+        settings.GEMINI_MODEL if new_active == "gemini" else
+        (settings.GROQ_MODEL if new_active == "groq" else settings.OLLAMA_MODEL)
+    )
+
+    return {
+        "ok": True,
+        "active_provider": new_active,
+        "active_model": current_model,
+        "provider_order": reordered,
+        "message": f"Switched active provider to {new_active.upper()} ({current_model})!"
     }
 
 @app.post("/api/system/keys")
