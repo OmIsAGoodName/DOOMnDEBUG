@@ -98,11 +98,20 @@ def assemble_cast_snapshots(cast_ids: List[str], metadata: Dict[str, Any]) -> Li
             else:
                 palette_raw = {"primary": "#8b5e3c", "secondary": "#d9b38c", "accent": "#f2a65a", "outline": "#3b2a1e"}
 
-        voice_raw = meta.get("default_voice", {
-            "engine_voice": "en-US-AnaNeural",
-            "rate": "+0%",
-            "pitch": "+0Hz"
-        })
+        voice_raw = meta.get("default_voice")
+        if not voice_raw:
+            if species == "rabbit":
+                voice_raw = {"engine_voice": "en-US-BrianMultilingualNeural", "rate": "+6%", "pitch": "+3Hz"}
+            elif species == "turtle":
+                voice_raw = {"engine_voice": "en-US-ChristopherNeural", "rate": "-8%", "pitch": "-2Hz"}
+            elif species == "fox":
+                voice_raw = {"engine_voice": "en-US-AndrewMultilingualNeural", "rate": "+4%", "pitch": "+0Hz"}
+            elif species == "owl":
+                voice_raw = {"engine_voice": "en-US-EmmaNeural", "rate": "+2%", "pitch": "+1Hz"}
+            elif species == "kid":
+                voice_raw = {"engine_voice": "en-US-AvaMultilingualNeural", "rate": "+3%", "pitch": "+2Hz"}
+            else:
+                voice_raw = {"engine_voice": "en-US-AvaNeural", "rate": "+0%", "pitch": "+0Hz"}
         cast.append(CastMember(
             character_id=cid,
             name=meta.get("name", cid.replace("_", " ").title()),

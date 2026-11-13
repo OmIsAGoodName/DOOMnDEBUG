@@ -76,12 +76,18 @@ async def build_audio_manifest(
     used_music_ids = set()
     used_sfx_ids = set()
 
+    narrator_voice = {
+        "engine_voice": "en-US-AvaNeural",
+        "rate": "-4%",
+        "pitch": "+0Hz"
+    }
+
     for scene in plan.scenes:
         for beat in scene.beats:
             if beat.speech and beat.speech.text:
                 speaker = beat.speech.character_id if beat.speech.type == "SPEAK" and beat.speech.character_id else "narrator"
-                v_config = cast_voices.get(speaker, {
-                    "engine_voice": "en-US-AnaNeural",
+                v_config = cast_voices.get(speaker) or (narrator_voice if speaker == "narrator" else {
+                    "engine_voice": "en-US-AvaNeural",
                     "rate": "+0%",
                     "pitch": "+0Hz"
                 })
