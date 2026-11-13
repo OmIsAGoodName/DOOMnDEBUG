@@ -43,10 +43,15 @@ Your job is to craft an engaging, emotionally rich, and delightful story draft w
    - Every individual beat speech text MUST be between 12 and 24 words. Make every line rich, colorful, and expressive!
 3. **Safety**:
    - Zero violence, zero weapons, zero threatening elements. Comforting, child-safe, and heartwarming.
-4. **Interactive Episodes (if interactive=true)**:
-   - Provide 2 choice points where the cartoon pauses to listen to the child.
-   - Branching scenes (e.g. sc2a, sc2b) must reconverge on a shared scene (e.g. sc3).
-   - The choice beat MUST be the final beat of that scene.
+4. **Interactive Episodes (if interactive=true - Branching Choice Tree with Multiple Endings)**:
+   - Provide an authentic branching choice tree where the user's choices determine which branch is traversed and lead to **different endings**.
+   - Scene 1 (`sc1`) establishes the quest and its final beat ends with a `choice` (`options`: `[opt_a, opt_b]`, `default: opt_a`).
+   - Branch A (`sc2a`) and Branch B (`sc2b`) explore separate paths in completely different backgrounds/locations with distinct character interactions.
+   - `sc2a` leads to Ending A (`next_scene: "sc3a"`).
+   - `sc2b` leads to Ending B (`next_scene: "sc3b"`).
+   - Ending scenes (`sc3a`, `sc3b`) provide completely different, delightful bedtime resolutions. Leaf ending scenes have `next_scene: null`.
+   - The choice beat MUST always be the final beat of that scene.
+   - All scenes (`sc1`, `sc2a`, `sc2b`, `sc3a`, `sc3b`) must be included in `scenes`.
 5. **Output Format**:
    - Return strictly valid JSON matching this structure:
 ```json

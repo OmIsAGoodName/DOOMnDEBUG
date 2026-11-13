@@ -85,11 +85,17 @@ class PlanValidator:
                     elif isinstance(prop, dict):
                         prop["prop_id"] = resolved_prop
 
-            # Ensure choice beat is last beat
+            # Ensure choice beat is last beat & validate choice options
             choice_beat_idx = -1
             for b_idx, beat in enumerate(scene.beats):
                 if beat.choice:
                     choice_beat_idx = b_idx
+                    # Validate that all option branch targets exist in scene_ids
+                    for opt in beat.choice.options:
+                        if opt.next_scene and opt.next_scene not in scene_ids:
+                            fallback_sc = p.scenes[-1].scene_id
+                            repairs.append(f"Option '{opt.id}' target '{opt.next_scene}' does not exist -> defaulted to '{fallback_sc}'")
+                            opt.next_scene = fallback_sc
 
             if choice_beat_idx != -1 and choice_beat_idx != len(scene.beats) - 1:
                 repairs.append(f"Scene '{scene.scene_id}': Choice was beat #{choice_beat_idx}; moved to final beat")

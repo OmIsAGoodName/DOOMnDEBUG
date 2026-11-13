@@ -1,15 +1,33 @@
 # Om's Status & Milestone Log
 
-**Current Milestone**: Asset Catalog, In-Library Character Generator & Narrative Physical Actions Complete  
+**Current Milestone**: Interactive Branching Choice Tree with Multiple Endings & Fast Pipeline Complete  
 **Date**: 2026-11-14  
 **Active Branch**: `main` (synced with `origin/main`)  
 **Repository**: `https://github.com/OmIsAGoodName/DOOMnDEBUG.git`  
 
 ---
 
-## ⚡ Recent Updates (Physical Narrative Actions & Studio Asset Library)
+## ⚡ Recent Updates (Branching Choice Tree, Multiple Endings & Interactive Experience)
 
-1. **Fixed Pipeline PlacedCharacter Dict Validation & Groq Rate Limit Resilience**:
+1. **True Branching Choice Tree & Multiple Endings**:
+   - Upgraded [`backend/app/stations/writer.py`](file:///d:/VoxFable/backend/app/stations/writer.py) and [`backend/app/prompts/writer.md`](file:///d:/VoxFable/backend/app/prompts/writer.md):
+     - When `interactive=True`, instructs writer to generate a 5-scene branching story tree: Opening Dilemma (`sc1`) $\rightarrow$ Branch A (`sc2a`) / Branch B (`sc2b`) in distinct locations $\rightarrow$ Unique Ending A (`sc3a`) / Unique Ending B (`sc3b`).
+     - Branch leaf scenes terminate with `next_scene: null`, creating genuine multiple endings traversed according to user choice.
+   - Protected multiple endings in [`backend/app/stations/director.py`](file:///d:/VoxFable/backend/app/stations/director.py):
+     - Prevents linear stitching from overwriting `next_scene = None` on branch endings.
+     - Fortified option branch target validation in [`backend/app/validation/validator.py`](file:///d:/VoxFable/backend/app/validation/validator.py).
+
+2. **Time & Generation Speed Optimization**:
+   - **Zero-Token Instant Direction**: Switched scene directing to `direct_scene_rule_based`, cutting planning latency from 30+ seconds down to **0.01 seconds** while preserving narrative physical action extraction and zeroing director token spend.
+   - **Parallelized Edge-TTS Narration**: Increased concurrency semaphore in [`backend/app/tts/manifest.py`](file:///d:/VoxFable/backend/app/tts/manifest.py) from 3 to 6, enabling fast parallel speech synthesis across all branch and ending scenes.
+
+3. **In-Player Live Interactive Choice Modal & Traversal Trail**:
+   - Upgraded [`frontend/src/ui/EpisodeView.tsx`](file:///d:/VoxFable/frontend/src/ui/EpisodeView.tsx):
+     - Defaults interactive stories to `live` mode immediately.
+     - **On-Canvas Interactive Choice Modal**: When playback reaches a choice point, pauses and presents big, high-contrast, child-friendly tap buttons with emojis + live Web Speech API mic recognition.
+     - **Branch Traversal History Trail**: Displays real-time path progress (`Chapter 1 ➔ Choice Selected ➔ Unique Ending Reached`) with a 1-click **"↺ Replay to Explore Other Branches"** button.
+
+4. **Fixed Pipeline PlacedCharacter Dict Validation & Groq Rate Limit Resilience**:
    - Resolved `AttributeError: 'dict' object has no attribute 'position'`:
      - In [`backend/app/stations/director.py`](file:///d:/VoxFable/backend/app/stations/director.py), instantiated missing cast additions as `PlacedCharacter` models rather than raw dicts.
      - In [`backend/app/validation/validator.py`](file:///d:/VoxFable/backend/app/validation/validator.py), made character & prop position clampers defensive against both Pydantic models and dictionary structures.

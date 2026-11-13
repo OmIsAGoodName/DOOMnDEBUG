@@ -90,6 +90,22 @@ def build_writer_user_prompt(
             "- Spoken runtime target: 85 to 115 seconds."
         )
 
+    if interactive:
+        interactive_section = """- Interactive: YES (BRANCHING CHOICE TREE WITH MULTIPLE ENDINGS)
+  * Construct a genuine branching story tree so the user's choices lead to completely DIFFERENT adventures and MULTIPLE UNIQUE ENDINGS!
+  * Structure:
+    - Scene 1 (Opening Dilemma, e.g. "sc1"): Establishes the quest. Its FINAL beat MUST contain a `choice` with 2 distinct options:
+      * Option A (id: "opt_a", label: "...", keywords: [...], next_scene: "sc2a")
+      * Option B (id: "opt_b", label: "...", keywords: [...], next_scene: "sc2b")
+      * default: "opt_a"
+    - Branch Scene A (e.g. "sc2a"): Explores Option A in a unique location (different background). Leads to Ending A (next_scene: "sc3a").
+    - Branch Scene B (e.g. "sc2b"): Explores Option B in a completely different location. Leads to Ending B (next_scene: "sc3b").
+    - Ending Scene A (e.g. "sc3a"): Unique, heartwarming climax and bedtime ending for Path A. next_scene: null.
+    - Ending Scene B (e.g. "sc3b"): Completely distinct, heartwarming climax and bedtime ending for Path B. next_scene: null.
+  * Total scenes: Provide all 5 scenes (sc1, sc2a, sc2b, sc3a, sc3b) in `scenes` so any branch can be traversed according to the user's choice!"""
+    else:
+        interactive_section = "- Interactive: NO (linear single-path story)"
+
     user_prompt = f"""
 STORY REQUEST:
 - User Premise: "{prompt}"
@@ -98,7 +114,7 @@ STORY REQUEST:
 - Target Duration Requirement:
 {duration_req}
 
-- Interactive: {"YES (2 choice points with reconverging branch)" if interactive else "NO (linear)"}
+{interactive_section}
 {"- Character Creation: Try generating original, creative character designs suited to this story premise and include them in the cast list." if generate_characters else ""}
 
 STORYTELLING & PACING RULES:

@@ -5,7 +5,7 @@ from ..models.episode_plan import EpisodePlan
 from ..models.audio_manifest import AudioManifest, AudioLine, WordTiming, MusicAsset, SfxAsset
 from .synthesizer import synthesize_line
 
-semaphore = asyncio.Semaphore(3)
+semaphore = asyncio.Semaphore(6)
 
 async def process_line(
     plan_episode_id: str,

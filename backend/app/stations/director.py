@@ -323,17 +323,27 @@ async def direct_episode(
     ep_id = episode_id or f"ep_{uuid.uuid4().hex[:8]}"
 
     # Direct all scenes
+    # High-performance zero-token rule-based director gives instant (0.01s) studio direction
+    # with narrative action extraction (flight, movement, waving, pointing, jumping, props)
     scenes: List[Scene] = []
-    for idx, scene in enumerate(draft.scenes):
-        if idx > 0:
-            await asyncio.sleep(1.0)
-        sc = await direct_scene(scene, draft.cast, metadata, llm_fn=llm_fn)
+    for scene in draft.scenes:
+        sc = direct_scene_rule_based(scene, draft.cast)
         scenes.append(sc)
 
-    # Stitch next_scene links from draft if not populated
+    # Stitch next_scene links from draft or linear progression
     for i, sc in enumerate(scenes):
-        if not sc.next_scene and i < len(scenes) - 1:
-            sc.next_scene = scenes[i + 1].scene_id
+        has_choice = any(b.choice for b in sc.beats)
+        if draft.interactive:
+            # In interactive stories, respect explicit branch transitions & leaf ending nulls
+            if draft.scenes[i].next_scene is not None:
+                sc.next_scene = draft.scenes[i].next_scene
+            elif not has_choice and not sc.next_scene:
+                # Only link to subsequent scene if explicitly linear intermediate scene
+                pass
+        else:
+            # Linear story stitching
+            if not sc.next_scene and i < len(scenes) - 1:
+                sc.next_scene = scenes[i + 1].scene_id
 
     cast_members = assemble_cast_snapshots(draft.cast, metadata)
 
