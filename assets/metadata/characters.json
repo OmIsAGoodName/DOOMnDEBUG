@@ -18,9 +18,9 @@
       "outline": "#3b2a1e"
     },
     "default_voice": {
-      "engine_voice": "en-US-AnaNeural",
-      "rate": "+0%",
-      "pitch": "+0Hz"
+      "engine_voice": "en-US-EmmaNeural",
+      "rate": "+2%",
+      "pitch": "+1Hz"
     },
     "licence": "original"
   },
@@ -43,8 +43,8 @@
       "outline": "#2b1e1a"
     },
     "default_voice": {
-      "engine_voice": "en-US-GuyNeural",
-      "rate": "+0%",
+      "engine_voice": "en-US-AndrewMultilingualNeural",
+      "rate": "+4%",
       "pitch": "+0Hz"
     },
     "licence": "original"
@@ -68,9 +68,9 @@
       "outline": "#1e293b"
     },
     "default_voice": {
-      "engine_voice": "en-US-JennyNeural",
-      "rate": "+0%",
-      "pitch": "+0Hz"
+      "engine_voice": "en-US-AvaMultilingualNeural",
+      "rate": "+3%",
+      "pitch": "+2Hz"
     },
     "licence": "original"
   },
@@ -93,9 +93,9 @@
       "outline": "#1f2937"
     },
     "default_voice": {
-      "engine_voice": "en-US-AndrewNeural",
-      "rate": "+5%",
-      "pitch": "+2Hz"
+      "engine_voice": "en-US-BrianMultilingualNeural",
+      "rate": "+6%",
+      "pitch": "+3Hz"
     },
     "licence": "original"
   },
@@ -118,8 +118,8 @@
       "outline": "#14532d"
     },
     "default_voice": {
-      "engine_voice": "en-US-BrianNeural",
-      "rate": "-5%",
+      "engine_voice": "en-US-ChristopherNeural",
+      "rate": "-8%",
       "pitch": "-2Hz"
     },
     "licence": "original"
