@@ -1,0 +1,79 @@
+{
+  "episode_id": "demo_quick",
+  "lines": [
+    {
+      "line_id": "demo_quick:sc1:b1",
+      "scene_id": "sc1",
+      "beat_id": "b1",
+      "speaker": "narrator",
+      "url": "/demo/episodes/demo_quick/audio/65bfe8a4b875ca4322c429493731b99b7d24a5824658bdba9d2efb7f49e078d3.mp3",
+      "duration_ms": 5400,
+      "words": []
+    },
+    {
+      "line_id": "demo_quick:sc1:b2",
+      "scene_id": "sc1",
+      "beat_id": "b2",
+      "speaker": "pip_owl",
+      "url": "/demo/episodes/demo_quick/audio/fc4a8e0212e2517d007652b56c2bbe379d4c815811ca195cdbccdcb45fae1aa8.mp3",
+      "duration_ms": 4296,
+      "words": []
+    },
+    {
+      "line_id": "demo_quick:sc2:b1",
+      "scene_id": "sc2",
+      "beat_id": "b1",
+      "speaker": "rusty_fox",
+      "url": "/demo/episodes/demo_quick/audio/a988d9e566c7fa9ff6905585c7b1a9386827f6b1e080812dcb25c33c646a5a40.mp3",
+      "duration_ms": 6024,
+      "words": []
+    },
+    {
+      "line_id": "demo_quick:sc2:b2",
+      "scene_id": "sc2",
+      "beat_id": "b2",
+      "speaker": "pip_owl",
+      "url": "/demo/episodes/demo_quick/audio/295c8b8428bf68050d19f7b6708a86eed367d3a5998acc889602f818957fb6d8.mp3",
+      "duration_ms": 6768,
+      "words": []
+    },
+    {
+      "line_id": "demo_quick:sc3:b1",
+      "scene_id": "sc3",
+      "beat_id": "b1",
+      "speaker": "pip_owl",
+      "url": "/demo/episodes/demo_quick/audio/6a58de96d7ae7adaa857377092f72e78e0d5e2e4a0948d16a1b7eac0c4fcc7dd.mp3",
+      "duration_ms": 5592,
+      "words": []
+    },
+    {
+      "line_id": "demo_quick:sc3:b2",
+      "scene_id": "sc3",
+      "beat_id": "b2",
+      "speaker": "narrator",
+      "url": "/demo/episodes/demo_quick/audio/2efb668000468494004a05234235da3076beba38b5faa1f0b4ac69d21828485e.mp3",
+      "duration_ms": 5256,
+      "words": []
+    }
+  ],
+  "music": [
+    {
+      "music_id": "music_calm",
+      "url": "/assets/audio/music/calm.mp3"
+    }
+  ],
+  "sfx": [
+    {
+      "sfx_id": "sfx_giggle",
+      "url": "/assets/audio/sfx/giggle.mp3"
+    },
+    {
+      "sfx_id": "sfx_pop",
+      "url": "/assets/audio/sfx/pop.mp3"
+    },
+    {
+      "sfx_id": "sfx_sparkle",
+      "url": "/assets/audio/sfx/sparkle.mp3"
+    }
+  ]
+}

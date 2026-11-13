@@ -1,0 +1,23 @@
+[
+  {
+    "id": "demo_quick",
+    "title": "The Glowing Berries",
+    "interactive": false,
+    "has_video": false,
+    "video_url": "/demo/episodes/demo_quick/video.mp4"
+  },
+  {
+    "id": "demo_live",
+    "title": "The Two Doors of Whispering Cave",
+    "interactive": true,
+    "has_video": false,
+    "video_url": "/demo/episodes/demo_live/video.mp4"
+  },
+  {
+    "id": "demo_studio",
+    "title": "Luna's Sky Glider",
+    "interactive": false,
+    "has_video": false,
+    "video_url": "/demo/episodes/demo_studio/video.mp4"
+  }
+]

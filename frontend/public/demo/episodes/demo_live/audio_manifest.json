@@ -1,0 +1,101 @@
+{
+  "episode_id": "demo_live",
+  "lines": [
+    {
+      "line_id": "demo_live:sc1:b1",
+      "scene_id": "sc1",
+      "beat_id": "b1",
+      "speaker": "narrator",
+      "url": "/demo/episodes/demo_live/audio/3e998e032f3104ca59099b42e88c590be18a565f124b01e35849c461492630ea.mp3",
+      "duration_ms": 4992,
+      "words": []
+    },
+    {
+      "line_id": "demo_live:sc1:b2",
+      "scene_id": "sc1",
+      "beat_id": "b2",
+      "speaker": "pip_owl",
+      "url": "/demo/episodes/demo_live/audio/0f9d5a10cd4e6af90da5f3d2b3525f389b3bb87d20882fe2bb3bd0d37ce6eaa2.mp3",
+      "duration_ms": 5688,
+      "words": []
+    },
+    {
+      "line_id": "demo_live:sc2a:b1",
+      "scene_id": "sc2a",
+      "beat_id": "b1",
+      "speaker": "narrator",
+      "url": "/demo/episodes/demo_live/audio/8f774d02b0c4031d053f43dedb24efe9fed2774b7f54eacb4b1d803151b182fd.mp3",
+      "duration_ms": 4992,
+      "words": []
+    },
+    {
+      "line_id": "demo_live:sc2a:b2",
+      "scene_id": "sc2a",
+      "beat_id": "b2",
+      "speaker": "pip_owl",
+      "url": "/demo/episodes/demo_live/audio/0eee92351f8bc6329f4925d0aaedb65f63edbb396efca88eccd86455e626043d.mp3",
+      "duration_ms": 5640,
+      "words": []
+    },
+    {
+      "line_id": "demo_live:sc2b:b1",
+      "scene_id": "sc2b",
+      "beat_id": "b1",
+      "speaker": "narrator",
+      "url": "/demo/episodes/demo_live/audio/9c909cf92ecdb45b44305ed7ccd087fbdc9faa1f81bd175da8d5003f4e0843f0.mp3",
+      "duration_ms": 4992,
+      "words": []
+    },
+    {
+      "line_id": "demo_live:sc2b:b2",
+      "scene_id": "sc2b",
+      "beat_id": "b2",
+      "speaker": "pip_owl",
+      "url": "/demo/episodes/demo_live/audio/79bfe678e488d47ac20b1fb54d646a3ea5a58d038d04b13fa10b4162c7d21d93.mp3",
+      "duration_ms": 4440,
+      "words": []
+    },
+    {
+      "line_id": "demo_live:sc3:b1",
+      "scene_id": "sc3",
+      "beat_id": "b1",
+      "speaker": "rusty_fox",
+      "url": "/demo/episodes/demo_live/audio/3edea894020990abd5e906ee8a5323e641b7e7f9ee5b95c2a1c7026bb0b084a4.mp3",
+      "duration_ms": 4752,
+      "words": []
+    },
+    {
+      "line_id": "demo_live:sc3:b2",
+      "scene_id": "sc3",
+      "beat_id": "b2",
+      "speaker": "narrator",
+      "url": "/demo/episodes/demo_live/audio/b1a611bd7c6f0ce5150b1c2971573637b259a8da6dce8a372c461a4b6787b987.mp3",
+      "duration_ms": 5448,
+      "words": []
+    }
+  ],
+  "music": [
+    {
+      "music_id": "music_calm",
+      "url": "/assets/audio/music/calm.mp3"
+    }
+  ],
+  "sfx": [
+    {
+      "sfx_id": "sfx_ding",
+      "url": "/assets/audio/sfx/ding.mp3"
+    },
+    {
+      "sfx_id": "sfx_door",
+      "url": "/assets/audio/sfx/door.mp3"
+    },
+    {
+      "sfx_id": "sfx_pop",
+      "url": "/assets/audio/sfx/pop.mp3"
+    },
+    {
+      "sfx_id": "sfx_sparkle",
+      "url": "/assets/audio/sfx/sparkle.mp3"
+    }
+  ]
+}

@@ -96,7 +96,42 @@ export const api = {
   },
 
   getEpisode: async (episodeId: string): Promise<EpisodeRecord> => {
+    // Check if offline/demo bundled episode exists first
+    if (config.isDemoMode() || episodeId.startsWith('demo_')) {
+      try {
+        const planRes = await fetch(`/demo/episodes/${episodeId}/plan.json`);
+        if (planRes.ok) {
+          const plan = await planRes.json();
+          let audioManifest = null;
+          try {
+            const manifestRes = await fetch(`/demo/episodes/${episodeId}/audio_manifest.json`);
+            if (manifestRes.ok) {
+              audioManifest = await manifestRes.json();
+            }
+          } catch {}
+          return {
+            id: episodeId,
+            title: plan.title || episodeId,
+            plan,
+            audio_manifest: audioManifest,
+            video_url: `/demo/episodes/${episodeId}/video.mp4`,
+            status: 'ready',
+            created_at: new Date().toISOString(),
+          };
+        }
+      } catch {}
+    }
     return request<EpisodeRecord>(`/api/episodes/${episodeId}`);
+  },
+
+  listDemoEpisodes: async (): Promise<Array<{ id: string; title: string; interactive: boolean; has_video: boolean; video_url: string }>> => {
+    try {
+      const res = await fetch('/demo/episodes/index.json');
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch {}
+    return [];
   },
 
   matchLive: async (

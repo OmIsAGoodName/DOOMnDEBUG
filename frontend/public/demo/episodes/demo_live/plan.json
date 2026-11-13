@@ -1,0 +1,422 @@
+{
+  "schema_version": "1.0",
+  "episode_id": "demo_live",
+  "series_id": null,
+  "age_band": "4-6",
+  "language": "en",
+  "title": "The Two Doors of Whispering Cave",
+  "start_scene": "sc1",
+  "interactive": true,
+  "cast": [
+    {
+      "character_id": "pip_owl",
+      "name": "Pip",
+      "species": "owl",
+      "palette": {
+        "primary": "#8b5e3c",
+        "secondary": "#d9b38c",
+        "accent": "#f2a65a",
+        "outline": "#3b2a1e"
+      },
+      "accessories": [
+        "scarf"
+      ],
+      "voice": {
+        "engine_voice": "en-US-AnaNeural",
+        "rate": "+0%",
+        "pitch": "+0Hz"
+      }
+    },
+    {
+      "character_id": "rusty_fox",
+      "name": "Rusty",
+      "species": "fox",
+      "palette": {
+        "primary": "#d95f32",
+        "secondary": "#f4c28d",
+        "accent": "#2f3e46",
+        "outline": "#2b1e1a"
+      },
+      "accessories": [],
+      "voice": {
+        "engine_voice": "en-US-GuyNeural",
+        "rate": "+0%",
+        "pitch": "+0Hz"
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "scene_id": "sc1",
+      "background_id": "forest_day",
+      "mood": "day",
+      "next_scene": null,
+      "props": [
+        {
+          "prop_id": "glowing_door",
+          "position": [
+            0.72,
+            0.78
+          ]
+        }
+      ],
+      "characters": [
+        {
+          "character_id": "pip_owl",
+          "position": [
+            0.25,
+            0.72
+          ],
+          "facing": "right",
+          "expression": "neutral",
+          "animation": "idle"
+        }
+      ],
+      "beats": [
+        {
+          "beat_id": "b1",
+          "speech": {
+            "type": "NARRATE",
+            "text": "In the sleepy forest, Pip the owl found something strange."
+          },
+          "actions": [
+            {
+              "type": "SET_CAMERA",
+              "shot": "wide",
+              "movement": "slow_push_in",
+              "delay": 0,
+              "duration": 4.0
+            },
+            {
+              "type": "PLAY_MUSIC",
+              "music_id": "music_calm",
+              "volume": 0.25,
+              "fade": 1.5,
+              "delay": 0
+            }
+          ],
+          "min_duration": 3.0
+        },
+        {
+          "beat_id": "b2",
+          "speech": {
+            "type": "SPEAK",
+            "character_id": "pip_owl",
+            "text": "A glowing door! Should I follow the firefly or open the door?",
+            "expression": "surprised"
+          },
+          "actions": [
+            {
+              "type": "MOVE_TO",
+              "character_id": "pip_owl",
+              "to": [
+                0.55,
+                0.74
+              ],
+              "duration": 1.5,
+              "delay": 0
+            },
+            {
+              "type": "PLAY_SFX",
+              "sfx_id": "sfx_sparkle",
+              "delay": 0.2
+            }
+          ],
+          "choice": {
+            "options": [
+              {
+                "id": "a",
+                "label": "Follow the firefly",
+                "keywords": [
+                  "firefly",
+                  "follow"
+                ],
+                "next_scene": "sc2a"
+              },
+              {
+                "id": "b",
+                "label": "Open the door",
+                "keywords": [
+                  "door",
+                  "open"
+                ],
+                "next_scene": "sc2b"
+              }
+            ],
+            "default": "a"
+          },
+          "min_duration": 3.5
+        }
+      ]
+    },
+    {
+      "scene_id": "sc2a",
+      "background_id": "meadow_day",
+      "mood": "day",
+      "next_scene": null,
+      "props": [
+        {
+          "prop_id": "key",
+          "position": [
+            0.75,
+            0.75
+          ]
+        }
+      ],
+      "characters": [
+        {
+          "character_id": "pip_owl",
+          "position": [
+            0.25,
+            0.74
+          ],
+          "facing": "right",
+          "expression": "happy",
+          "animation": "idle"
+        }
+      ],
+      "beats": [
+        {
+          "beat_id": "b1",
+          "speech": {
+            "type": "NARRATE",
+            "text": "The firefly led Pip to a sunlit meadow with a golden key!"
+          },
+          "actions": [
+            {
+              "type": "SET_CAMERA",
+              "shot": "medium",
+              "movement": "static",
+              "delay": 0
+            },
+            {
+              "type": "PLAY_SFX",
+              "sfx_id": "sfx_ding",
+              "delay": 0.5
+            }
+          ],
+          "min_duration": 3.0
+        },
+        {
+          "beat_id": "b2",
+          "speech": {
+            "type": "SPEAK",
+            "character_id": "pip_owl",
+            "text": "What next? Should we look up at the clouds, or run together?",
+            "expression": "excited"
+          },
+          "actions": [
+            {
+              "type": "MOVE_TO",
+              "character_id": "pip_owl",
+              "to": [
+                0.55,
+                0.74
+              ],
+              "duration": 1.2,
+              "delay": 0
+            }
+          ],
+          "choice": {
+            "options": [
+              {
+                "id": "c1",
+                "label": "Look at the clouds",
+                "keywords": [
+                  "clouds",
+                  "look",
+                  "sky"
+                ],
+                "next_scene": "sc3"
+              },
+              {
+                "id": "c2",
+                "label": "Run together",
+                "keywords": [
+                  "run",
+                  "together",
+                  "go"
+                ],
+                "next_scene": "sc3"
+              }
+            ],
+            "default": "c1"
+          },
+          "min_duration": 3.0
+        }
+      ]
+    },
+    {
+      "scene_id": "sc2b",
+      "background_id": "treehouse_interior",
+      "mood": "cozy",
+      "next_scene": null,
+      "props": [
+        {
+          "prop_id": "treasure_chest",
+          "position": [
+            0.75,
+            0.75
+          ]
+        }
+      ],
+      "characters": [
+        {
+          "character_id": "pip_owl",
+          "position": [
+            0.25,
+            0.74
+          ],
+          "facing": "right",
+          "expression": "surprised",
+          "animation": "idle"
+        }
+      ],
+      "beats": [
+        {
+          "beat_id": "b1",
+          "speech": {
+            "type": "NARRATE",
+            "text": "Behind the door was a cozy treehouse room with a treasure chest."
+          },
+          "actions": [
+            {
+              "type": "SET_CAMERA",
+              "shot": "medium",
+              "movement": "static",
+              "delay": 0
+            },
+            {
+              "type": "PLAY_SFX",
+              "sfx_id": "sfx_door",
+              "delay": 0.2
+            }
+          ],
+          "min_duration": 3.0
+        },
+        {
+          "beat_id": "b2",
+          "speech": {
+            "type": "SPEAK",
+            "character_id": "pip_owl",
+            "text": "Should I open the shiny chest, or peek through the window?",
+            "expression": "happy"
+          },
+          "actions": [
+            {
+              "type": "PLAY_ANIMATION",
+              "character_id": "pip_owl",
+              "animation": "wave",
+              "delay": 0.2
+            }
+          ],
+          "choice": {
+            "options": [
+              {
+                "id": "d1",
+                "label": "Open the chest",
+                "keywords": [
+                  "chest",
+                  "open"
+                ],
+                "next_scene": "sc3"
+              },
+              {
+                "id": "d2",
+                "label": "Peek through window",
+                "keywords": [
+                  "window",
+                  "peek",
+                  "look"
+                ],
+                "next_scene": "sc3"
+              }
+            ],
+            "default": "d1"
+          },
+          "min_duration": 3.0
+        }
+      ]
+    },
+    {
+      "scene_id": "sc3",
+      "background_id": "forest_day",
+      "mood": "day",
+      "next_scene": null,
+      "props": [],
+      "characters": [
+        {
+          "character_id": "pip_owl",
+          "position": [
+            0.3,
+            0.74
+          ],
+          "facing": "right",
+          "expression": "happy",
+          "animation": "idle"
+        },
+        {
+          "character_id": "rusty_fox",
+          "position": [
+            0.7,
+            0.74
+          ],
+          "facing": "left",
+          "expression": "happy",
+          "animation": "idle"
+        }
+      ],
+      "beats": [
+        {
+          "beat_id": "b1",
+          "speech": {
+            "type": "SPEAK",
+            "character_id": "rusty_fox",
+            "text": "Pip! You made great choices on our grand adventure!",
+            "expression": "happy"
+          },
+          "actions": [
+            {
+              "type": "INTERACT",
+              "kind": "high_five",
+              "character_id": "rusty_fox",
+              "target_id": "pip_owl",
+              "delay": 0.2
+            },
+            {
+              "type": "PLAY_SFX",
+              "sfx_id": "sfx_pop",
+              "delay": 0.5
+            }
+          ],
+          "min_duration": 3.0
+        },
+        {
+          "beat_id": "b2",
+          "speech": {
+            "type": "NARRATE",
+            "text": "And whenever you listen closely, there is always another story waiting."
+          },
+          "actions": [
+            {
+              "type": "PLAY_ANIMATION",
+              "character_id": "pip_owl",
+              "animation": "laugh",
+              "delay": 0.2
+            }
+          ],
+          "min_duration": 3.5
+        }
+      ]
+    }
+  ],
+  "safety": {
+    "age_fit": 1.0,
+    "scary": 0.0,
+    "verdict": "pass",
+    "notes": "Interactive gentle exploration."
+  },
+  "continuity": {
+    "violations": []
+  }
+}
