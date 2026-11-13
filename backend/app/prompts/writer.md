@@ -38,6 +38,7 @@ Your job is to craft an engaging, emotionally rich, and delightful story draft w
    - Pick characters from the Available Characters list (`pip_owl`, `rusty_fox`, `mia_kid`, `barnaby_rabbit`, `toby_turtle`).
    - If the user's premise mentions animals (e.g. "bunny", "turtle", "fox", "owl", "kid"), select the matching cast members.
    - Always choose background IDs from the Available Backgrounds list (`forest_day`, `meadow_day`, `cozy_bedroom`, etc.).
+   - **Scene Journey Progression**: Each scene in the story MUST use a different background to visually establish progression and location changes! Do not use the same background for every scene.
 2. **Speech Bubble Length**:
    - Every individual beat speech text MUST be between 12 and 24 words. Make every line rich, colorful, and expressive!
 3. **Safety**:

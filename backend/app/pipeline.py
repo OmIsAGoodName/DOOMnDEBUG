@@ -129,8 +129,10 @@ async def run_quick_story_pipeline(
         print(f"[Pipeline] {error_msg}")
 
         from .config import settings
-        if settings.DEMO_MODE:
-            print("[Pipeline] DEMO_MODE active: activating offline demo episode fallback!")
+        # Only use pre-baked demo episode if no LLM is configured at all
+        has_llm = bool(settings.GROQ_API_KEY or (settings.GEMINI_API_KEY and "your-gemini" not in settings.GEMINI_API_KEY))
+        if settings.DEMO_MODE and not has_llm:
+            print("[Pipeline] No LLM configured: activating offline demo episode fallback!")
             fixture_name = "episode_live_demo.json" if interactive else "episode_quick_demo.json"
             manifest_name = "audio_manifest_live_demo.json" if interactive else "audio_manifest_quick_demo.json"
             fixtures_dir = Path(__file__).resolve().parent.parent.parent / "fixtures"

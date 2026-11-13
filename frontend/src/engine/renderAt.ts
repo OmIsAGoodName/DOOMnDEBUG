@@ -312,10 +312,10 @@ export function renderAt(
     ctx.restore();
   }
 
-  // 6. Scene Cross-fade
+  // 6. Scene Cross-fade (Studio transition between scenes)
   const timeIntoScene = t - activeScene.startTime;
   const timeUntilSceneEnd = activeScene.endTime - t;
-  const fadeDuration = 0.25;
+  const fadeDuration = 0.5;
 
   let fadeAlpha = 0;
   if (timeIntoScene < fadeDuration && activeScene !== timeline.scenes[0]) {

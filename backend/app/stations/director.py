@@ -50,12 +50,16 @@ def direct_scene_rule_based(
 ) -> Scene:
     """Intelligent zero-token autonomous director fallback."""
     initial_chars = []
-    positions = [(0.32, 0.76), (0.68, 0.76), (0.50, 0.76)]
-    for idx, cid in enumerate(cast_ids[:3]):
-        facing = "right" if idx == 0 else "left"
+    num_chars = len(cast_ids)
+    for idx, cid in enumerate(cast_ids):
+        if num_chars == 1:
+            x_pos = 0.50
+        else:
+            x_pos = round(0.18 + (idx / max(1, num_chars - 1)) * 0.64, 2)
+        facing = "right" if x_pos <= 0.50 else "left"
         initial_chars.append({
             "character_id": cid,
-            "position": positions[idx],
+            "position": (x_pos, 0.76),
             "facing": facing,
             "expression": "happy",
             "animation": "idle"
@@ -142,6 +146,22 @@ async def direct_scene(
     except Exception as e:
         print(f"[Director] Falling back to zero-token autonomous director for {draft_scene.scene_id}: {e}")
         return direct_scene_rule_based(draft_scene, cast_ids)
+
+    # Ensure all cast members are represented on stage
+    existing_cids = {c.character_id for c in scene.characters}
+    missing_cids = [cid for cid in cast_ids if cid not in existing_cids]
+    if missing_cids:
+        total_chars = len(cast_ids)
+        for m_idx, m_cid in enumerate(missing_cids):
+            slot = len(existing_cids) + m_idx
+            x_pos = round(0.18 + (slot / max(1, total_chars - 1)) * 0.64, 2)
+            scene.characters.append({
+                "character_id": m_cid,
+                "position": (min(0.88, x_pos), 0.76),
+                "facing": "left" if x_pos > 0.50 else "right",
+                "expression": "happy",
+                "animation": "idle"
+            })
 
     # Ensure beats have healthy duration breathing room
     for beat in scene.beats:
