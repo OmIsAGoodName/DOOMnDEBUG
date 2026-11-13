@@ -1,33 +1,42 @@
 # Om's Status & Milestone Log
 
-**Current Milestone**: Studio Story Quality, Multi-Beat Dialogue & Strict Duration Enforcement Complete  
+**Current Milestone**: LLM Token Optimization & Studio-Grade 2D Canvas Animation Polish Complete  
 **Date**: 2026-11-13  
 **Active Branch**: `main` (synced with `origin/main`)  
 **Repository**: `https://github.com/OmIsAGoodName/DOOMnDEBUG.git`  
 
 ---
 
-## ⚡ Recent Updates (Studio Story Depth, Dialogue Flow & Duration Calibration)
-1. **Multi-Beat Narrative & Character Dialogue Architecture**:
-   - Upgraded [`backend/app/prompts/writer.md`](file:///d:/VoxFable/backend/app/prompts/writer.md) and [`backend/app/stations/writer.py`](file:///d:/VoxFable/backend/app/stations/writer.py):
-     - Eliminated single-beat monologues; each scene now mandates **2 to 4 beats** with genuine back-and-forth conversational dialogue between cast members (`type: "SPEAK"`).
-     - Characters exhibit distinct personalities, question each other, react with emotion, and cooperate to solve gentle everyday curiosities.
-     - Narrator (`type: "NARRATE"`) is reserved for atmospheric scene-setting and cozy bedtime sign-offs.
-2. **Strict Story Duration Enforcement**:
-   - Calibrated exact scene and beat targets to faithfully hit the user's chosen duration:
-     - **`< 1 min`**: Exactly 3 scenes, 2 beats each (6 beats total) &bull; ~50–65 seconds.
-     - **`1 - 2 mins`**: Exactly 4 to 5 scenes, 2 to 3 beats each (10 to 14 beats total) &bull; ~85–115 seconds (verified 84.2s runtime in live integration test).
-     - **`2 - 3 mins`**: Exactly 5 to 6 scenes, 3 to 4 beats each (16 to 22 beats total) &bull; ~135–170 seconds.
-3. **Pacing, Breathing Room & Director Polish**:
-   - In [`backend/app/stations/director.py`](file:///d:/VoxFable/backend/app/stations/director.py) and [`frontend/src/engine/resolveTimeline.ts`](file:///d:/VoxFable/frontend/src/engine/resolveTimeline.ts):
-     - Added natural post-speech padding (`speechDuration + 0.8s` with `min_duration >= max(5.0, speech + 1.2s)`).
-     - Dialogue no longer clips or rushes immediately into the next beat; characters finish gesturing, emoting, and sound effects play out naturally.
-4. **Resilience & Rate Limit Guarding**:
-   - Space scene directing calls by 1.0s and increased LLM adapter retries to 5 with dynamic retry-after parsing so complex multi-scene stories generate without hitting token-per-minute spikes.
-5. **Quality Verification**:
-   - All 43 pytest unit tests passing.
-   - All 38 frontend vitest tests passing.
-   - Backend live on `http://localhost:8000`, frontend live on `http://localhost:5173`.
+## ⚡ Recent Updates (Token Optimization & 2D Animation Polish)
+1. **LLM Token Optimization & Rate-Limit Shielding**:
+   - **Compressed Writer Prompts** ([`backend/app/stations/writer.py`](file:///d:/VoxFable/backend/app/stations/writer.py)):
+     - Converted verbose multi-line asset catalogs into compact comma-separated summaries (`Cast Candidates: ...`, `Backgrounds: ...`), reducing prompt overhead by ~250 tokens per generation call.
+   - **Compressed Director Prompts** ([`backend/app/prompts/director.md`](file:///d:/VoxFable/backend/app/prompts/director.md)):
+     - Condensed prompt instructions from 61 lines (~500 tokens) down to 7 lines (~65 tokens).
+     - Trimmed scene context payloads to essential IDs and tightened JSON schema formatting.
+   - **Autonomous Zero-Token Rule-Based Director**:
+     - Built `direct_scene_rule_based` in [`backend/app/stations/director.py`](file:///d:/VoxFable/backend/app/stations/director.py): An intelligent deterministic fallback that automatically assigns wide slow-push-in framing, ground band clamping, expressive character emote/pose transitions, and mood SFX/music with **0 API tokens spent**.
+     - Seamless fallback engages automatically if any LLM provider hits rate limits (HTTP 429) or connection hiccups.
+   - **Adaptive Groq Rate-Limiter Recovery**:
+     - Dynamic regex parsing for Groq's `try again in Xs` headers to prevent repeated failures during high-traffic bursts.
+
+2. **Studio-Grade 2D Canvas Animation Polish (Pure 2D, No Camera Moves)**:
+   - **Universal Squash & Stretch across All Characters**:
+     - Integrated vertical squash and stretch (`scale(stretchX, stretchY)`) into body loops across all 5 characters ([`rabbit.ts`](file:///d:/VoxFable/frontend/src/characters/rabbit.ts), [`fox.ts`](file:///d:/VoxFable/frontend/src/characters/fox.ts), [`turtle.ts`](file:///d:/VoxFable/frontend/src/characters/turtle.ts), [`owl.ts`](file:///d:/VoxFable/frontend/src/characters/owl.ts), [`kid.ts`](file:///d:/VoxFable/frontend/src/characters/kid.ts)). Characters organically compress when landing and stretch during hops and startled reactions.
+   - **Altitude-Reactive Contact Shadows**:
+     - All character ground shadows now receive dynamic `hopHeight`, shrinking (`scaleMod`) and diffusing (`alphaMod`) realistically as characters hop, jump, or react.
+   - **Animated Speech Lip-Sync**:
+     - Decoupled lip visemes from static pose restrictions in [`renderAt.ts`](file:///d:/VoxFable/frontend/src/engine/renderAt.ts). Characters actively animate mouth movement whenever speaking in a dialogue beat, matching phonemes and speech audio duration with graceful fallback.
+   - **Expressive Secondary Motion**:
+     - **Rusty the Fox**: Organic phase lag on tail wagging during walks and reactive hops.
+     - **Toby the Turtle**: Shell retract on react, subtle body waddle tilt during deliberate walking.
+     - **Pip the Owl**: Secondary wing fluttering during dialogue beats and react poses.
+     - **Mia the Kid**: Dynamic inertia hair bounce on the perky top tuft during jumps, walks, and speech.
+
+3. **Zero Token Verification & Reliability**:
+   - All 38 frontend vitest tests pass with 0 errors (`npm run typecheck` clean).
+   - All 43 backend pytest tests pass.
+   - Dev servers running live on `http://localhost:5173` and `http://localhost:8000`.
 1. **Resolved LLM Provider Failure & Safe Fallback**:
    - Diagnosed root cause of `"All LLM providers failed. Last error: All connection attempts failed"`:
      - Groq encountered a temporary connection timeout/rate limit.
