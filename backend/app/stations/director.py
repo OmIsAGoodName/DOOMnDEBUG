@@ -146,7 +146,9 @@ async def direct_episode(
 
     # Direct all scenes
     scenes: List[Scene] = []
-    for scene in draft.scenes:
+    for idx, scene in enumerate(draft.scenes):
+        if idx > 0:
+            await asyncio.sleep(1.0)
         sc = await direct_scene(scene, draft.cast, metadata, llm_fn=llm_fn)
         scenes.append(sc)
 
