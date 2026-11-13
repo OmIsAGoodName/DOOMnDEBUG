@@ -1,0 +1,12 @@
+[
+  { "id": "sfx_pop", "name": "Pop", "duration_s": 0.4, "licence": "TBD", "source_url": "" },
+  { "id": "sfx_whoosh", "name": "Whoosh", "duration_s": 0.6, "licence": "TBD", "source_url": "" },
+  { "id": "sfx_sparkle", "name": "Sparkle", "duration_s": 1.2, "licence": "TBD", "source_url": "" },
+  { "id": "sfx_door", "name": "Door Creak", "duration_s": 0.8, "licence": "TBD", "source_url": "" },
+  { "id": "sfx_giggle", "name": "Giggle", "duration_s": 0.9, "licence": "TBD", "source_url": "" },
+  { "id": "sfx_footsteps", "name": "Footsteps", "duration_s": 1.5, "licence": "TBD", "source_url": "" },
+  { "id": "sfx_ding", "name": "Ding", "duration_s": 0.5, "licence": "TBD", "source_url": "" },
+  { "id": "sfx_wind", "name": "Gentle Wind", "duration_s": 2.0, "licence": "TBD", "source_url": "" },
+  { "id": "sfx_birds", "name": "Chirping Birds", "duration_s": 2.5, "licence": "TBD", "source_url": "" },
+  { "id": "sfx_splash", "name": "Water Splash", "duration_s": 0.7, "licence": "TBD", "source_url": "" }
+]

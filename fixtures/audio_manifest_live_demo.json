@@ -1,0 +1,101 @@
+{
+  "episode_id": "ep_demo_live",
+  "lines": [
+    {
+      "line_id": "ep_demo_live:sc1:b1",
+      "scene_id": "sc1",
+      "beat_id": "b1",
+      "speaker": "narrator",
+      "url": "/demo/audio/ep_demo_live_sc1_b1.mp3",
+      "duration_ms": 3500,
+      "words": []
+    },
+    {
+      "line_id": "ep_demo_live:sc1:b2",
+      "scene_id": "sc1",
+      "beat_id": "b2",
+      "speaker": "pip_owl",
+      "url": "/demo/audio/ep_demo_live_sc1_b2.mp3",
+      "duration_ms": 3200,
+      "words": []
+    },
+    {
+      "line_id": "ep_demo_live:sc2a:b1",
+      "scene_id": "sc2a",
+      "beat_id": "b1",
+      "speaker": "narrator",
+      "url": "/demo/audio/ep_demo_live_sc2a_b1.mp3",
+      "duration_ms": 3000,
+      "words": []
+    },
+    {
+      "line_id": "ep_demo_live:sc2a:b2",
+      "scene_id": "sc2a",
+      "beat_id": "b2",
+      "speaker": "pip_owl",
+      "url": "/demo/audio/ep_demo_live_sc2a_b2.mp3",
+      "duration_ms": 3300,
+      "words": []
+    },
+    {
+      "line_id": "ep_demo_live:sc2b:b1",
+      "scene_id": "sc2b",
+      "beat_id": "b1",
+      "speaker": "narrator",
+      "url": "/demo/audio/ep_demo_live_sc2b_b1.mp3",
+      "duration_ms": 3400,
+      "words": []
+    },
+    {
+      "line_id": "ep_demo_live:sc2b:b2",
+      "scene_id": "sc2b",
+      "beat_id": "b2",
+      "speaker": "pip_owl",
+      "url": "/demo/audio/ep_demo_live_sc2b_b2.mp3",
+      "duration_ms": 3200,
+      "words": []
+    },
+    {
+      "line_id": "ep_demo_live:sc3:b1",
+      "scene_id": "sc3",
+      "beat_id": "b1",
+      "speaker": "rusty_fox",
+      "url": "/demo/audio/ep_demo_live_sc3_b1.mp3",
+      "duration_ms": 3100,
+      "words": []
+    },
+    {
+      "line_id": "ep_demo_live:sc3:b2",
+      "scene_id": "sc3",
+      "beat_id": "b2",
+      "speaker": "narrator",
+      "url": "/demo/audio/ep_demo_live_sc3_b2.mp3",
+      "duration_ms": 3700,
+      "words": []
+    }
+  ],
+  "music": [
+    {
+      "music_id": "music_calm",
+      "url": "/assets/audio/music/calm.mp3"
+    }
+  ],
+  "sfx": [
+    {
+      "sfx_id": "sfx_sparkle",
+      "url": "/assets/audio/sfx/sparkle.mp3"
+    },
+    {
+      "sfx_id": "sfx_ding",
+      "url": "/assets/audio/sfx/ding.mp3"
+    },
+    {
+      "sfx_id": "sfx_door",
+      "url": "/assets/audio/sfx/door.mp3"
+    },
+    {
+      "sfx_id": "sfx_pop",
+      "url": "/assets/audio/sfx/pop.mp3"
+    }
+  ]
+}

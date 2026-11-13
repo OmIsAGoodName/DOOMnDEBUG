@@ -1,0 +1,68 @@
+[
+  {
+    "id": "pip_owl",
+    "name": "Pip",
+    "type": "character",
+    "style": "cartoon2d",
+    "species": "owl",
+    "tags": ["child-friendly", "forest", "shy"],
+    "animations": ["idle", "walk", "talk", "wave", "laugh", "listen", "react", "point"],
+    "expressions": ["neutral", "happy", "sad", "surprised", "worried", "excited"],
+    "default_palette": {
+      "primary": "#8b5e3c",
+      "secondary": "#d9b38c",
+      "accent": "#f2a65a",
+      "outline": "#3b2a1e"
+    },
+    "default_voice": {
+      "engine_voice": "en-US-AnaNeural",
+      "rate": "+0%",
+      "pitch": "+0Hz"
+    },
+    "licence": "original"
+  },
+  {
+    "id": "rusty_fox",
+    "name": "Rusty",
+    "type": "character",
+    "style": "cartoon2d",
+    "species": "fox",
+    "tags": ["child-friendly", "forest", "cheeky"],
+    "animations": ["idle", "walk", "talk", "wave", "laugh", "listen", "react", "point"],
+    "expressions": ["neutral", "happy", "sad", "surprised", "worried", "excited"],
+    "default_palette": {
+      "primary": "#d95f32",
+      "secondary": "#f4c28d",
+      "accent": "#2f3e46",
+      "outline": "#2b1e1a"
+    },
+    "default_voice": {
+      "engine_voice": "en-US-GuyNeural",
+      "rate": "+0%",
+      "pitch": "+0Hz"
+    },
+    "licence": "original"
+  },
+  {
+    "id": "mia_kid",
+    "name": "Mia",
+    "type": "character",
+    "style": "cartoon2d",
+    "species": "kid",
+    "tags": ["child-friendly", "curious", "friendly"],
+    "animations": ["idle", "walk", "talk", "wave", "laugh", "listen", "react", "point"],
+    "expressions": ["neutral", "happy", "sad", "surprised", "worried", "excited"],
+    "default_palette": {
+      "primary": "#3a86ff",
+      "secondary": "#ffbe0b",
+      "accent": "#ff006e",
+      "outline": "#1e293b"
+    },
+    "default_voice": {
+      "engine_voice": "en-US-JennyNeural",
+      "rate": "+0%",
+      "pitch": "+0Hz"
+    },
+    "licence": "original"
+  }
+]

@@ -1,0 +1,10 @@
+[
+  { "id": "idle", "name": "Idle", "loop": true, "description": "Gentle breathing cycle" },
+  { "id": "walk", "name": "Walk", "loop": true, "description": "Bobbing walking cycle" },
+  { "id": "talk", "name": "Talk", "loop": true, "description": "Conversational gesturing" },
+  { "id": "wave", "name": "Wave", "loop": false, "description": "Friendly hand wave" },
+  { "id": "laugh", "name": "Laugh", "loop": false, "description": "Joyful head tilt and hop" },
+  { "id": "listen", "name": "Listen", "loop": true, "description": "Attentive listening pose" },
+  { "id": "react", "name": "React", "loop": false, "description": "Surprised or cheerful reaction" },
+  { "id": "point", "name": "Point", "loop": false, "description": "Pointing forward" }
+]

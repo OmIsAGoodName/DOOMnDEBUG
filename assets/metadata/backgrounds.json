@@ -1,0 +1,42 @@
+[
+  {
+    "id": "forest_day",
+    "name": "Sunny Forest",
+    "tags": ["nature", "trees", "day"],
+    "mood_hint": "day",
+    "ground_band": [0.62, 0.92],
+    "licence": "original"
+  },
+  {
+    "id": "forest_night",
+    "name": "Night Forest",
+    "tags": ["nature", "trees", "night", "stars"],
+    "mood_hint": "night",
+    "ground_band": [0.62, 0.92],
+    "licence": "original"
+  },
+  {
+    "id": "meadow_day",
+    "name": "Green Meadow",
+    "tags": ["grass", "flowers", "open"],
+    "mood_hint": "day",
+    "ground_band": [0.62, 0.92],
+    "licence": "original"
+  },
+  {
+    "id": "treehouse_interior",
+    "name": "Cozy Treehouse",
+    "tags": ["indoor", "wood", "cozy"],
+    "mood_hint": "cozy",
+    "ground_band": [0.62, 0.92],
+    "licence": "original"
+  },
+  {
+    "id": "village_street",
+    "name": "Village Street",
+    "tags": ["town", "houses", "path"],
+    "mood_hint": "day",
+    "ground_band": [0.62, 0.92],
+    "licence": "original"
+  }
+]

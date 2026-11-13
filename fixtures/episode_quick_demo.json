@@ -1,0 +1,292 @@
+{
+  "schema_version": "1.0",
+  "episode_id": "ep_demo_quick",
+  "series_id": null,
+  "age_band": "4-6",
+  "language": "en",
+  "title": "Pip Learns to Share",
+  "start_scene": "sc1",
+  "interactive": false,
+  "cast": [
+    {
+      "character_id": "pip_owl",
+      "name": "Pip",
+      "species": "owl",
+      "palette": {
+        "primary": "#8b5e3c",
+        "secondary": "#d9b38c",
+        "accent": "#f2a65a",
+        "outline": "#3b2a1e"
+      },
+      "accessories": ["scarf"],
+      "voice": {
+        "engine_voice": "en-US-AnaNeural",
+        "rate": "+0%",
+        "pitch": "+0Hz"
+      }
+    },
+    {
+      "character_id": "rusty_fox",
+      "name": "Rusty",
+      "species": "fox",
+      "palette": {
+        "primary": "#d95f32",
+        "secondary": "#f4c28d",
+        "accent": "#2f3e46",
+        "outline": "#2b1e1a"
+      },
+      "accessories": [],
+      "voice": {
+        "engine_voice": "en-US-GuyNeural",
+        "rate": "+0%",
+        "pitch": "+0Hz"
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "scene_id": "sc1",
+      "background_id": "forest_day",
+      "mood": "day",
+      "next_scene": "sc2",
+      "props": [
+        {
+          "prop_id": "flower",
+          "position": [0.65, 0.78]
+        }
+      ],
+      "characters": [
+        {
+          "character_id": "pip_owl",
+          "position": [0.3, 0.75],
+          "facing": "right",
+          "expression": "neutral",
+          "animation": "idle"
+        }
+      ],
+      "beats": [
+        {
+          "beat_id": "b1",
+          "speech": {
+            "type": "NARRATE",
+            "text": "Deep in the forest, Pip loved spending quiet days all alone."
+          },
+          "actions": [
+            {
+              "type": "SET_CAMERA",
+              "shot": "wide",
+              "movement": "slow_push_in",
+              "delay": 0,
+              "duration": 3.5
+            },
+            {
+              "type": "PLAY_MUSIC",
+              "music_id": "music_calm",
+              "volume": 0.3,
+              "fade": 1.0,
+              "delay": 0
+            }
+          ],
+          "min_duration": 3.5
+        },
+        {
+          "beat_id": "b2",
+          "speech": {
+            "type": "SPEAK",
+            "character_id": "pip_owl",
+            "text": "I found a pretty flower! It is mine.",
+            "expression": "happy"
+          },
+          "actions": [
+            {
+              "type": "MOVE_TO",
+              "character_id": "pip_owl",
+              "to": [0.55, 0.75],
+              "duration": 1.8,
+              "delay": 0
+            },
+            {
+              "type": "ATTACH_PROP",
+              "prop_id": "flower",
+              "character_id": "pip_owl",
+              "slot": "hand",
+              "delay": 1.9
+            },
+            {
+              "type": "PLAY_SFX",
+              "sfx_id": "sfx_sparkle",
+              "delay": 2.0
+            }
+          ],
+          "min_duration": 3.0
+        }
+      ]
+    },
+    {
+      "scene_id": "sc2",
+      "background_id": "meadow_day",
+      "mood": "sunset",
+      "next_scene": "sc3",
+      "props": [],
+      "characters": [
+        {
+          "character_id": "pip_owl",
+          "position": [0.25, 0.76],
+          "facing": "right",
+          "expression": "worried",
+          "animation": "idle"
+        },
+        {
+          "character_id": "rusty_fox",
+          "position": [0.8, 0.76],
+          "facing": "left",
+          "expression": "happy",
+          "animation": "idle"
+        }
+      ],
+      "beats": [
+        {
+          "beat_id": "b1",
+          "speech": {
+            "type": "SPEAK",
+            "character_id": "rusty_fox",
+            "text": "Hello Pip! That flower is lovely! Can we play together?",
+            "expression": "happy"
+          },
+          "actions": [
+            {
+              "type": "SET_MOOD",
+              "mood": "sunset",
+              "transition": 1.0,
+              "delay": 0
+            },
+            {
+              "type": "SET_CAMERA",
+              "shot": "medium",
+              "movement": "static",
+              "delay": 0
+            },
+            {
+              "type": "INTERACT",
+              "kind": "wave_at",
+              "character_id": "rusty_fox",
+              "target_id": "pip_owl",
+              "delay": 0.2
+            },
+            {
+              "type": "PLAY_SFX",
+              "sfx_id": "sfx_pop",
+              "delay": 0.5
+            }
+          ],
+          "min_duration": 3.5
+        },
+        {
+          "beat_id": "b2",
+          "speech": {
+            "type": "SPEAK",
+            "character_id": "pip_owl",
+            "text": "Oh, hello Rusty. I usually play alone, but maybe sharing is fun.",
+            "expression": "neutral"
+          },
+          "actions": [
+            {
+              "type": "SET_EXPRESSION",
+              "character_id": "pip_owl",
+              "expression": "happy",
+              "delay": 1.2
+            },
+            {
+              "type": "MOVE_TO",
+              "character_id": "pip_owl",
+              "to": [0.45, 0.76],
+              "duration": 1.5,
+              "delay": 0.5
+            }
+          ],
+          "min_duration": 3.5
+        }
+      ]
+    },
+    {
+      "scene_id": "sc3",
+      "background_id": "treehouse_interior",
+      "mood": "sunset",
+      "next_scene": null,
+      "props": [],
+      "characters": [
+        {
+          "character_id": "pip_owl",
+          "position": [0.35, 0.75],
+          "facing": "right",
+          "expression": "happy",
+          "animation": "idle"
+        },
+        {
+          "character_id": "rusty_fox",
+          "position": [0.65, 0.75],
+          "facing": "left",
+          "expression": "happy",
+          "animation": "idle"
+        }
+      ],
+      "beats": [
+        {
+          "beat_id": "b1",
+          "speech": {
+            "type": "SPEAK",
+            "character_id": "pip_owl",
+            "text": "Welcome to my treehouse, Rusty! We can both fit here.",
+            "expression": "excited"
+          },
+          "actions": [
+            {
+              "type": "SET_CAMERA",
+              "shot": "close",
+              "movement": "slow_pull_out",
+              "delay": 0,
+              "duration": 4.0
+            },
+            {
+              "type": "PLAY_SFX",
+              "sfx_id": "sfx_giggle",
+              "delay": 0.5
+            }
+          ],
+          "min_duration": 3.5
+        },
+        {
+          "beat_id": "b2",
+          "speech": {
+            "type": "NARRATE",
+            "text": "Pip learned that having a friend makes every story twice as joyful."
+          },
+          "actions": [
+            {
+              "type": "PLAY_ANIMATION",
+              "character_id": "rusty_fox",
+              "animation": "laugh",
+              "delay": 0.2
+            },
+            {
+              "type": "PLAY_ANIMATION",
+              "character_id": "pip_owl",
+              "animation": "wave",
+              "delay": 0.4
+            }
+          ],
+          "min_duration": 3.5
+        }
+      ]
+    }
+  ],
+  "safety": {
+    "age_fit": 1.0,
+    "scary": 0.0,
+    "verdict": "pass",
+    "notes": "Gentle theme of sharing and friendship."
+  },
+  "continuity": {
+    "violations": []
+  }
+}

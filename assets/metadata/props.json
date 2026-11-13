@@ -1,0 +1,14 @@
+[
+  { "id": "lantern", "name": "Lantern", "tags": ["light", "tool"], "default_slot": "hand", "licence": "original" },
+  { "id": "key", "name": "Golden Key", "tags": ["magic", "item"], "default_slot": "hand", "licence": "original" },
+  { "id": "treasure_chest", "name": "Treasure Chest", "tags": ["reward", "container"], "default_slot": "ground", "licence": "original" },
+  { "id": "book", "name": "Story Book", "tags": ["reading", "item"], "default_slot": "hand", "licence": "original" },
+  { "id": "apple", "name": "Red Apple", "tags": ["food", "nature"], "default_slot": "hand", "licence": "original" },
+  { "id": "basket", "name": "Picnic Basket", "tags": ["container", "picnic"], "default_slot": "hand", "licence": "original" },
+  { "id": "umbrella", "name": "Umbrella", "tags": ["weather", "held"], "default_slot": "hand", "licence": "original" },
+  { "id": "balloon", "name": "Balloon", "tags": ["toy", "party"], "default_slot": "hand", "licence": "original" },
+  { "id": "flower", "name": "Wildflower", "tags": ["nature", "gift"], "default_slot": "hand", "licence": "original" },
+  { "id": "glowing_door", "name": "Glowing Door", "tags": ["magic", "portal"], "default_slot": "ground", "licence": "original" },
+  { "id": "firefly_jar", "name": "Firefly Jar", "tags": ["light", "magic"], "default_slot": "hand", "licence": "original" },
+  { "id": "kite", "name": "Sky Kite", "tags": ["toy", "wind"], "default_slot": "hand", "licence": "original" }
+]
