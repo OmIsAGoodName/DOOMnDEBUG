@@ -36,6 +36,10 @@
     - Part 3 (`fbdc6a4`): Complete UI foundation kit (`frontend/src/ui/`), auth pages (`/login`, `/signup`), Quick Story creation flow (`/quick`), and Library/Episode player views (`/library`, `/episode/:id`).
     - Part 4 (`634c55b`): Studio mode (`/studio`), real-time canvas Character Builder (`CharacterBuilder.tsx`), Series Form (`SeriesForm.tsx`), and batch season generation grid with inline playback.
     - Part 5 (`06c6a88` & `d1204d8`): Pitch Deck Outline (`demo/DECK_OUTLINE.md`), rehearsed 3-minute Demo Script (`docs/DEMO.md`), Judge Q&A Guide (`demo/QA.md`), and comprehensive project documentation (`README.md`).
+- [x] **Post-Milestone UX & Pipeline Enhancements**:
+  - **Media Controls**: Integrated full video playback control bar in `EpisodeView.tsx` with Play/Pause, interactive timeline scrubber, elapsed/total duration, mute toggle, and fullscreen trigger.
+  - **Reliable Video Downloads**: Added client-side direct WebM fallback trigger, `/media` & `/api` proxy in `vite.config.ts`, and programmatic `<a download>` file downloads resolving 404 and pop-up issues.
+  - **Expanded Species & Dynamic Cast**: Added `rabbit` and `turtle` to `contracts/vocab.json`, created procedural vector art (`rabbit.ts`, `turtle.ts`) with full 8 poses / 6 expressions, updated `CharacterBuilder.tsx` and `ArtGallery.tsx`, registered `barnaby_rabbit` & `toby_turtle` in `assets/metadata/characters.json` and `assets/LICENSES.md`, and updated LLM Story Writer prompt to dynamically cast requested animals.
 - [x] **Full Green Verification**:
   - `npm run typecheck`: 0 TypeScript errors across the entire frontend.
   - `npm test`: 38 unit tests passing across 11 suites (vitest).

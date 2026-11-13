@@ -14,9 +14,10 @@ Your job is to craft an engaging, emotionally warm, and age-appropriate story ou
 - "6-8": Small adventures, clever problem-solving, mystery, team collaboration.
 
 ### Hard Constraints
-1. **Roster & Locations Only**:
-   - You MUST ONLY pick character IDs from the Available Characters list.
-   - You MUST ONLY pick background IDs from the Available Backgrounds list.
+1. **Characters & Locations**:
+   - Pick characters from the Available Characters list (`pip_owl`, `rusty_fox`, `mia_kid`, `barnaby_rabbit`, `toby_turtle`).
+   - If the user's story premise specifies animals or characters (e.g. "rabbit and turtle", "two friends", "a fast bunny"), you MUST select or include the characters that best match the requested species (e.g. use `barnaby_rabbit` for rabbit/bunny, `toby_turtle` for turtle/tortoise) rather than defaulting to unrelated characters.
+   - You MUST pick background IDs from the Available Backgrounds list.
 2. **Speech Length Limit**:
    - Every speech line (NARRATE or SPEAK) MUST be under 25 words. Short, punchy, child-friendly dialogue.
 3. **Scenes Count**:

@@ -3,12 +3,12 @@
  * Used by Quick Story (/quick) and Library Player (/episode/:id)
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import type { EpisodeRecord, EpisodePlayerHandle, EpisodePlan, AudioManifest } from '@contracts';
 import { EpisodePlayer } from '../engine';
 import { exportEpisode } from '../engine/exportFlow';
 import { LiveController } from '../live';
-import { api } from '../lib/api';
+import { api, triggerFileDownload } from '../lib/api';
 import { Button } from './Button';
 import { SafetyBadge, ContinuityBadge } from './Badge';
 
@@ -31,12 +31,13 @@ const DEFAULT_FALLBACK_PLAN: EpisodePlan = {
       scene_id: 'sc1',
       background_id: 'forest_day',
       mood: 'day',
-      characters: [],
-      props: [],
       beats: [
         {
           beat_id: 'b1',
-          speech: { type: 'NARRATE', text: 'Welcome to VoxFable!' },
+          speech: {
+            type: 'NARRATE',
+            text: 'Welcome to VoxFable! Creating your magical story...'
+          },
           actions: []
         }
       ]
@@ -46,8 +47,14 @@ const DEFAULT_FALLBACK_PLAN: EpisodePlan = {
 
 export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewProps) {
   const playerRef = useRef<EpisodePlayerHandle | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
   const [isLiveMode, setIsLiveMode] = useState<boolean>(false);
   const [hasStarted, setHasStarted] = useState<boolean>(false);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [duration, setDuration] = useState<number>(0);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [exportProgressText, setExportProgressText] = useState<string>('');
   const [downloadUrl, setDownloadUrl] = useState<string | null>(episode.video_url || null);
@@ -56,19 +63,75 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
   const audio: AudioManifest | null = episode.audio_manifest || null;
   const isInteractive = Boolean(plan.interactive);
 
+  // Poll player handle for time and duration while playing
+  useEffect(() => {
+    if (!hasStarted) return;
+    const interval = setInterval(() => {
+      if (playerRef.current) {
+        const t = playerRef.current.getTime();
+        const d = playerRef.current.getDuration();
+        setCurrentTime(t);
+        if (d > 0) setDuration(d);
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, [hasStarted]);
+
   const handleStartPlayback = () => {
     setHasStarted(true);
+    setIsPlaying(true);
     playerRef.current?.play();
   };
 
+  const handleTogglePlayPause = () => {
+    if (!playerRef.current) return;
+    if (isPlaying) {
+      playerRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      playerRef.current.play();
+      setIsPlaying(true);
+      setHasStarted(true);
+    }
+  };
+
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newT = parseFloat(e.target.value);
+    setCurrentTime(newT);
+    playerRef.current?.seek(newT);
+  };
+
   const handleReplay = () => {
+    setCurrentTime(0);
+    setIsPlaying(true);
+    setHasStarted(true);
     playerRef.current?.seek(0);
     playerRef.current?.play();
   };
 
+  const handleToggleMute = () => {
+    setIsMuted(!isMuted);
+  };
+
+  const handleToggleFullscreen = () => {
+    if (!containerRef.current) return;
+    if (!document.fullscreenElement) {
+      containerRef.current.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  };
+
+  const formatTime = (secs: number) => {
+    if (isNaN(secs) || secs < 0) return '0:00';
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
   const handleDownloadMp4 = async () => {
     if (downloadUrl) {
-      window.open(downloadUrl, '_blank');
+      triggerFileDownload(downloadUrl, `${plan.title || episode.title || 'episode'}.mp4`);
       return;
     }
 
@@ -78,13 +141,22 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
       setIsExporting(true);
       setExportProgressText('Recording canvas stream at 720p...');
 
+      let capturedBlob: Blob | null = null;
       const result = await exportEpisode({
         handle: playerRef.current,
         episodeId: episode.id,
         uploader: async (blob, epId) => {
+          capturedBlob = blob;
           setExportProgressText('Uploading WebM to server converter...');
-          const exp = await api.exportEpisode(epId, blob);
-          return { exportId: exp.export_id };
+          try {
+            const exp = await api.exportEpisode(epId, blob);
+            return { exportId: exp.export_id };
+          } catch (uploadErr) {
+            console.warn('[EpisodeView] Server upload failed, offering direct WebM download:', uploadErr);
+            triggerFileDownload(blob, `${plan.title || episode.title || 'episode'}.webm`);
+            setExportProgressText('Downloaded 720p WebM directly to your device!');
+            return { exportId: 'local_direct' };
+          }
         },
         onProgress: (p) => {
           if (p.stage === 'recording' && p.totalSeconds) {
@@ -96,6 +168,11 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
         }
       });
 
+      if (result.exportId === 'local_direct') {
+        setTimeout(() => setIsExporting(false), 3000);
+        return;
+      }
+
       setExportProgressText('Converting to high-compatibility MP4...');
       let attempts = 0;
       const pollInterval = setInterval(async () => {
@@ -106,15 +183,23 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
             clearInterval(pollInterval);
             setIsExporting(false);
             setDownloadUrl(status.mp4_url);
-            window.open(status.mp4_url, '_blank');
+            triggerFileDownload(status.mp4_url, `${plan.title || episode.title || 'episode'}.mp4`);
           } else if (status.status === 'failed' || attempts > 60) {
             clearInterval(pollInterval);
             setIsExporting(false);
-            alert('Export failed during MP4 conversion.');
+            if (capturedBlob) {
+              triggerFileDownload(capturedBlob, `${plan.title || episode.title || 'episode'}.webm`);
+              alert('MP4 conversion timed out. Direct WebM video downloaded instead!');
+            } else {
+              alert('Export failed during MP4 conversion.');
+            }
           }
         } catch {
           clearInterval(pollInterval);
           setIsExporting(false);
+          if (capturedBlob) {
+            triggerFileDownload(capturedBlob, `${plan.title || episode.title || 'episode'}.webm`);
+          }
         }
       }, 1500);
     } catch (err: any) {
@@ -158,8 +243,11 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
         </div>
       </div>
 
-      {/* Main Video Canvas Area */}
-      <div className="relative aspect-video rounded-3xl overflow-hidden bg-slate-950 shadow-2xl border-4 border-slate-800">
+      {/* Main Video Canvas Area & Media Container */}
+      <div
+        ref={containerRef}
+        className="relative aspect-video rounded-3xl overflow-hidden bg-slate-950 shadow-2xl border-4 border-slate-800 group"
+      >
         {isLiveMode ? (
           <LiveController plan={plan} audio={audio} className="h-full" />
         ) : (
@@ -170,9 +258,14 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
               audio={audio}
               mode="watch"
               captions={true}
-              onEnd={() => setHasStarted(false)}
+              muted={isMuted}
+              onEnd={() => {
+                setIsPlaying(false);
+                setHasStarted(false);
+              }}
             />
 
+            {/* Play Overlay */}
             {!hasStarted && (
               <div
                 onClick={handleStartPlayback}
@@ -187,6 +280,96 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
                   Tap to Start Story
                 </span>
                 <span className="text-slate-300 text-xs mt-1">Audio enabled</span>
+              </div>
+            )}
+
+            {/* In-Canvas Hover Media Controls Bar */}
+            {hasStarted && (
+              <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 flex flex-col gap-2 z-20 transition-opacity duration-300 opacity-90 group-hover:opacity-100">
+                {/* Timeline Scrubber */}
+                <div className="flex items-center gap-3 w-full">
+                  <input
+                    type="range"
+                    min={0}
+                    max={duration > 0 ? duration : 100}
+                    step={0.1}
+                    value={currentTime}
+                    onChange={handleSeek}
+                    className="w-full h-2 bg-slate-700/80 rounded-lg appearance-none cursor-pointer accent-amber-500 hover:accent-amber-400 transition-all"
+                  />
+                </div>
+
+                {/* Controls Row */}
+                <div className="flex items-center justify-between text-white text-xs font-semibold">
+                  <div className="flex items-center gap-3">
+                    {/* Play/Pause Button */}
+                    <button
+                      type="button"
+                      onClick={handleTogglePlayPause}
+                      className="p-1.5 rounded-full hover:bg-white/20 active:scale-95 transition-all text-white focus:outline-none"
+                      title={isPlaying ? 'Pause' : 'Play'}
+                    >
+                      {isPlaying ? (
+                        <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      )}
+                    </button>
+
+                    {/* Replay */}
+                    <button
+                      type="button"
+                      onClick={handleReplay}
+                      className="p-1.5 rounded-full hover:bg-white/20 active:scale-95 transition-all text-white focus:outline-none"
+                      title="Replay from start"
+                    >
+                      <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                        <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" />
+                      </svg>
+                    </button>
+
+                    {/* Time Counter */}
+                    <span className="font-mono text-slate-300">
+                      {formatTime(currentTime)} / {formatTime(duration)}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {/* Mute/Unmute */}
+                    <button
+                      type="button"
+                      onClick={handleToggleMute}
+                      className="p-1.5 rounded-full hover:bg-white/20 active:scale-95 transition-all text-white focus:outline-none"
+                      title={isMuted ? 'Unmute' : 'Mute'}
+                    >
+                      {isMuted ? (
+                        <svg className="w-5 h-5 fill-current text-rose-400" viewBox="0 0 24 24">
+                          <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                          <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                        </svg>
+                      )}
+                    </button>
+
+                    {/* Fullscreen Button */}
+                    <button
+                      type="button"
+                      onClick={handleToggleFullscreen}
+                      className="p-1.5 rounded-full hover:bg-white/20 active:scale-95 transition-all text-white focus:outline-none"
+                      title="Fullscreen"
+                    >
+                      <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                        <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </>

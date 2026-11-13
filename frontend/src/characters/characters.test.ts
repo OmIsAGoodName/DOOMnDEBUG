@@ -78,9 +78,9 @@ describe('Character & Background Art Contract Verification', () => {
     }
   });
 
-  it('drawCharacter dispatches all three registered species seamlessly', () => {
+  it('drawCharacter dispatches all registered species seamlessly', () => {
     const ctx = createMockContext();
-    for (const species of ['owl', 'fox', 'kid']) {
+    for (const species of ['owl', 'fox', 'kid', 'rabbit', 'turtle']) {
       const state: CharacterDrawState = {
         characterId: `char_${species}`,
         species,

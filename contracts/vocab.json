@@ -33,7 +33,7 @@
   },
   "interact_kinds": ["wave_at", "high_five", "hand_off", "hug"],
   "accessories": ["scarf", "glasses", "hat", "bow", "backpack", "cape"],
-  "species": ["owl", "fox", "kid"],
+  "species": ["owl", "fox", "kid", "rabbit", "turtle"],
   "palette_keys": ["primary", "secondary", "accent", "outline"],
   "age_bands": ["3-5", "4-6", "6-8"],
   "generation_stages": [

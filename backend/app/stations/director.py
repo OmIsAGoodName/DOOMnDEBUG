@@ -73,12 +73,31 @@ def assemble_cast_snapshots(cast_ids: List[str], metadata: Dict[str, Any]) -> Li
     cast = []
     for cid in cast_ids:
         meta = char_meta_map.get(cid, {})
-        palette_raw = meta.get("default_palette", {
-            "primary": "#8b5e3c",
-            "secondary": "#d9b38c",
-            "accent": "#f2a65a",
-            "outline": "#3b2a1e"
-        })
+        species = meta.get("species")
+        if not species:
+            cid_lower = cid.lower()
+            if "rabbit" in cid_lower or "bunny" in cid_lower:
+                species = "rabbit"
+            elif "turtle" in cid_lower or "tortoise" in cid_lower:
+                species = "turtle"
+            elif "fox" in cid_lower:
+                species = "fox"
+            elif "owl" in cid_lower:
+                species = "owl"
+            elif "kid" in cid_lower:
+                species = "kid"
+            else:
+                species = "friend"
+
+        palette_raw = meta.get("default_palette")
+        if not palette_raw:
+            if species == "rabbit":
+                palette_raw = {"primary": "#f3f4f6", "secondary": "#fbcfe8", "accent": "#60a5fa", "outline": "#1f2937"}
+            elif species == "turtle":
+                palette_raw = {"primary": "#15803d", "secondary": "#86efac", "accent": "#fef08a", "outline": "#14532d"}
+            else:
+                palette_raw = {"primary": "#8b5e3c", "secondary": "#d9b38c", "accent": "#f2a65a", "outline": "#3b2a1e"}
+
         voice_raw = meta.get("default_voice", {
             "engine_voice": "en-US-AnaNeural",
             "rate": "+0%",
@@ -86,8 +105,8 @@ def assemble_cast_snapshots(cast_ids: List[str], metadata: Dict[str, Any]) -> Li
         })
         cast.append(CastMember(
             character_id=cid,
-            name=meta.get("name", cid.capitalize()),
-            species=meta.get("species", "friend"),
+            name=meta.get("name", cid.replace("_", " ").title()),
+            species=species,
             palette=Palette(**palette_raw),
             accessories=meta.get("accessories", []),
             voice=VoiceConfig(**voice_raw)

@@ -73,5 +73,55 @@
       "pitch": "+0Hz"
     },
     "licence": "original"
+  },
+  {
+    "id": "barnaby_rabbit",
+    "name": "Barnaby",
+    "type": "character",
+    "style": "cartoon2d",
+    "species": "rabbit",
+    "status": "implemented",
+    "tags": ["child-friendly", "energetic", "quick", "meadow", "forest"],
+    "animations": ["idle", "walk", "talk", "wave", "laugh", "listen", "react", "point"],
+    "expressions": ["neutral", "happy", "sad", "surprised", "worried", "excited"],
+    "accessories": ["scarf", "glasses", "hat", "bow", "backpack", "cape"],
+    "mouths": ["closed", "half", "wide"],
+    "default_palette": {
+      "primary": "#f3f4f6",
+      "secondary": "#fbcfe8",
+      "accent": "#60a5fa",
+      "outline": "#1f2937"
+    },
+    "default_voice": {
+      "engine_voice": "en-US-AndrewNeural",
+      "rate": "+5%",
+      "pitch": "+2Hz"
+    },
+    "licence": "original"
+  },
+  {
+    "id": "toby_turtle",
+    "name": "Toby",
+    "type": "character",
+    "style": "cartoon2d",
+    "species": "turtle",
+    "status": "implemented",
+    "tags": ["child-friendly", "calm", "wise", "steady", "patient", "forest"],
+    "animations": ["idle", "walk", "talk", "wave", "laugh", "listen", "react", "point"],
+    "expressions": ["neutral", "happy", "sad", "surprised", "worried", "excited"],
+    "accessories": ["scarf", "glasses", "hat", "bow", "backpack", "cape"],
+    "mouths": ["closed", "half", "wide"],
+    "default_palette": {
+      "primary": "#15803d",
+      "secondary": "#86efac",
+      "accent": "#fef08a",
+      "outline": "#14532d"
+    },
+    "default_voice": {
+      "engine_voice": "en-US-BrianNeural",
+      "rate": "-5%",
+      "pitch": "-2Hz"
+    },
+    "licence": "original"
   }
 ]

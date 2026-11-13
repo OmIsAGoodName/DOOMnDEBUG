@@ -13,7 +13,9 @@ export interface CharacterBuilderProps {
 const DEFAULT_SPECIES_PALETTES: Record<string, Palette> = {
   owl: { primary: '#8b5e3c', secondary: '#d9b38c', accent: '#f2a65a', outline: '#3b2a1e' },
   fox: { primary: '#d95f32', secondary: '#f4c28d', accent: '#2f3e46', outline: '#2b1e1a' },
-  kid: { primary: '#3a86ff', secondary: '#ffbe0b', accent: '#ff006e', outline: '#1e293b' }
+  kid: { primary: '#3a86ff', secondary: '#ffbe0b', accent: '#ff006e', outline: '#1e293b' },
+  rabbit: { primary: '#f3f4f6', secondary: '#fbcfe8', accent: '#60a5fa', outline: '#1f2937' },
+  turtle: { primary: '#15803d', secondary: '#86efac', accent: '#fef08a', outline: '#14532d' }
 };
 
 const PERSONALITY_OPTIONS = ['shy', 'brave', 'curious', 'silly', 'kind', 'cheerful', 'clever'];
@@ -26,7 +28,7 @@ export function CharacterBuilder({
   seriesId
 }: CharacterBuilderProps) {
   const [name, setName] = useState(initialCharacter?.name || '');
-  const [species, setSpecies] = useState<'owl' | 'fox' | 'kid'>(
+  const [species, setSpecies] = useState<'owl' | 'fox' | 'kid' | 'rabbit' | 'turtle'>(
     (initialCharacter?.species as any) || 'owl'
   );
   const [palette, setPalette] = useState<Palette>(
@@ -93,7 +95,7 @@ export function CharacterBuilder({
     drawCharacter(ctx, drawState);
   }, [species, palette, accessories, previewExpression, time]);
 
-  const handleSpeciesChange = (newSpecies: 'owl' | 'fox' | 'kid') => {
+  const handleSpeciesChange = (newSpecies: 'owl' | 'fox' | 'kid' | 'rabbit' | 'turtle') => {
     setSpecies(newSpecies);
     setPalette(DEFAULT_SPECIES_PALETTES[newSpecies]);
   };
@@ -193,19 +195,19 @@ export function CharacterBuilder({
           <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
             Species
           </label>
-          <div className="grid grid-cols-3 gap-2">
-            {(['owl', 'fox', 'kid'] as const).map((s) => (
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+            {(['owl', 'fox', 'kid', 'rabbit', 'turtle'] as const).map((s) => (
               <button
                 key={s}
                 type="button"
                 onClick={() => handleSpeciesChange(s)}
-                className={`py-2 px-3 rounded-xl border text-sm font-bold capitalize transition-all ${
+                className={`py-2 px-2 rounded-xl border text-xs sm:text-sm font-bold capitalize transition-all ${
                   species === s
                     ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
                     : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
                 }`}
               >
-                {s === 'owl' ? '🦉 Owl' : s === 'fox' ? '🦊 Fox' : '🧒 Kid'}
+                {s === 'owl' ? '🦉 Owl' : s === 'fox' ? '🦊 Fox' : s === 'kid' ? '🧒 Kid' : s === 'rabbit' ? '🐰 Rabbit' : '🐢 Turtle'}
               </button>
             ))}
           </div>

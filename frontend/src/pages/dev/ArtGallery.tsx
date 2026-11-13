@@ -56,11 +56,23 @@ const DEFAULT_PALETTES: Record<string, Palette> = {
     secondary: '#ffbe0b',
     accent: '#ff006e',
     outline: '#1e293b'
+  },
+  rabbit: {
+    primary: '#f3f4f6',
+    secondary: '#fbcfe8',
+    accent: '#60a5fa',
+    outline: '#1f2937'
+  },
+  turtle: {
+    primary: '#15803d',
+    secondary: '#86efac',
+    accent: '#fef08a',
+    outline: '#14532d'
   }
 };
 
 export default function ArtGallery() {
-  const [species, setSpecies] = useState<'owl' | 'fox' | 'kid'>('owl');
+  const [species, setSpecies] = useState<'owl' | 'fox' | 'kid' | 'rabbit' | 'turtle'>('owl');
   const [backgroundId, setBackgroundId] = useState<string>('forest_day');
   const [selectedPose, setSelectedPose] = useState<string>('idle');
   const [selectedExpression, setSelectedExpression] = useState<string>('happy');
@@ -78,7 +90,7 @@ export default function ArtGallery() {
   const animFrameRef = useRef<number | null>(null);
   const lastTimestampRef = useRef<number | null>(null);
 
-  const handleSpeciesChange = (newSpecies: 'owl' | 'fox' | 'kid') => {
+  const handleSpeciesChange = (newSpecies: 'owl' | 'fox' | 'kid' | 'rabbit' | 'turtle') => {
     setSpecies(newSpecies);
     setPalette(DEFAULT_PALETTES[newSpecies] || DEFAULT_PALETTES.owl);
   };
@@ -290,18 +302,18 @@ export default function ArtGallery() {
 
           <div>
             <label className="block text-xs font-semibold text-slate-500 mb-1">SPECIES</label>
-            <div className="grid grid-cols-3 gap-2">
-              {(['owl', 'fox', 'kid'] as const).map((s) => (
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+              {(['owl', 'fox', 'kid', 'rabbit', 'turtle'] as const).map((s) => (
                 <button
                   key={s}
                   onClick={() => handleSpeciesChange(s)}
-                  className={`px-3 py-2 rounded-xl text-sm font-semibold capitalize transition-all ${
+                  className={`px-2 py-2 rounded-xl text-xs sm:text-sm font-semibold capitalize transition-all ${
                     species === s
                       ? 'bg-indigo-600 text-white shadow-sm'
                       : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                   }`}
                 >
-                  {s === 'owl' ? '🦉 Owl' : s === 'fox' ? '🦊 Fox' : '🧒 Kid'}
+                  {s === 'owl' ? '🦉 Owl' : s === 'fox' ? '🦊 Fox' : s === 'kid' ? '🧒 Kid' : s === 'rabbit' ? '🐰 Rabbit' : '🐢 Turtle'}
                 </button>
               ))}
             </div>

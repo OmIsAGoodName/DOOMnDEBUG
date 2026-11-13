@@ -163,9 +163,27 @@ export const api = {
   },
 
   getExportStatus: async (exportId: string): Promise<{ status: string; mp4_url?: string; error?: string }> => {
-    return request<{ status: string; mp4_url?: string; error?: string }>(`/api/exports/${exportId}`);
+    const res = await request<{ status: string; mp4_url?: string; error?: string }>(`/api/exports/${exportId}`);
+    if (res.mp4_url && res.mp4_url.startsWith('/')) {
+      res.mp4_url = `${config.apiBase}${res.mp4_url}`;
+    }
+    return res;
   },
 };
+
+export function triggerFileDownload(source: string | Blob, filename: string): void {
+  const url = typeof source === 'string' ? source : URL.createObjectURL(source);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.style.display = 'none';
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  if (typeof source !== 'string') {
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+  }
+}
 
 export function useGeneration(generationId?: string | null) {
   const [generation, setGeneration] = useState<GenerationStatusResponse | null>(null);

@@ -14,6 +14,8 @@ All visual art in VoxFable is procedurally rendered using Canvas 2D vector primi
 | `pip_owl` | Character | Shy brown woodland owl with ear tufts & golden beak | Nigel (VoxFable Team) | Original / Proprietary VoxFable | No |
 | `rusty_fox` | Character | Cheeky rust-orange fox with fluffy tail & white bib | Nigel (VoxFable Team) | Original / Proprietary VoxFable | No |
 | `mia_kid` | Character | Curious, friendly child with bright hair & t-shirt | Nigel (VoxFable Team) | Original / Proprietary VoxFable | No |
+| `barnaby_rabbit` | Character | Fluffy white rabbit with pink ear sways & twitchy nose | VoxFable Team | Original / Proprietary VoxFable | No |
+| `toby_turtle` | Character | Wise green turtle with patterned carapace & flipper feet | VoxFable Team | Original / Proprietary VoxFable | No |
 | `forest_day` | Background | Layered woodland scene with sunlit path & canopy | Nigel (VoxFable Team) | Original / Proprietary VoxFable | No |
 | `forest_night` | Background | Midnight forest with moon, stars & fireflies | Nigel (VoxFable Team) | Original / Proprietary VoxFable | No |
 | `meadow_day` | Background | Rolling green meadow with mountains & butterflies | Nigel (VoxFable Team) | Original / Proprietary VoxFable | No |
