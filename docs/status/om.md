@@ -7,9 +7,19 @@
 
 ---
 
-## ⚡ Recent Updates (Multi-Choice Long Interactive Trees, Choice Screens Selector & Provider Resilience)
+## ⚡ Recent Updates (Strict Gemini Enforcement for Multi-Choice Trees & Failover Guard)
 
-1. **Multi-Level Interactive Choice Trees & Choice Screens Selector**:
+1. **Strict Gemini Enforcement for Deep Multi-Choice Trees**:
+   - Implemented `strict_provider="gemini"` in [`backend/app/llm/adapter.py`](file:///d:/VoxFable/backend/app/llm/adapter.py) and [`backend/app/stations/writer.py`](file:///d:/VoxFable/backend/app/stations/writer.py):
+     - When generating interactive stories with more than 1 choice screen (`num_choices > 1` or `force_interactive_tree`), the pipeline strictly requires Google Gemini.
+     - Lower-context models (Groq) are prohibited from receiving complex 7+ scene trees to prevent degraded/truncated output.
+     - If Gemini is not configured or unavailable, the system halts with a clear user notice:
+       `"High-level model (Google Gemini) is not available for deep multi-choice tree generation. Please configure Gemini in Diagnostics or try generating a single-choice or non-interactive video."`
+   - **Quick Action Fallback Buttons**:
+     - In [`frontend/src/pages/Quick.tsx`](file:///d:/VoxFable/frontend/src/pages/Quick.tsx), whenever this occurs, provides 1-click buttons to **"🌿 Switch to 1 Choice Screen"**, **"🎬 Switch to Non-Interactive"**, or **"⚙️ Diagnostics / Gemini Key"**.
+     - Added a Gemini strict badge notice in the interactive choice screens panel.
+
+2. **Multi-Level Interactive Choice Trees & Choice Screens Selector**:
    - Upgraded [`backend/app/stations/writer.py`](file:///d:/VoxFable/backend/app/stations/writer.py) and [`backend/app/pipeline.py`](file:///d:/VoxFable/backend/app/pipeline.py) with dynamic `num_choices` and `force_interactive_tree`:
      - **1 Choice Screen**: 5 scenes total, 2 unique branching endings (~2 mins).
      - **2 Choice Screens (Deep Tree)**: 7 scenes total across 2 sequential decision screens, producing 4 completely distinct endings (`sc3a1`, `sc3a2`, `sc3b1`, `sc3b2`).

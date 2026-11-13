@@ -158,15 +158,39 @@ export default function Quick() {
           {errorMessage && (
             <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-xs font-semibold text-rose-700 dark:text-rose-300 text-left space-y-3">
               <p>{errorMessage}</p>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Button variant="danger" size="sm" onClick={handleReset}>
                   ↺ Try Again
                 </Button>
+                {errorMessage.includes('High-level model') && (
+                  <>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => {
+                        setNumChoices(1);
+                        handleReset();
+                      }}
+                    >
+                      🌿 Switch to 1 Choice Screen
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => {
+                        setIsInteractive(false);
+                        handleReset();
+                      }}
+                    >
+                      🎬 Switch to Non-Interactive
+                    </Button>
+                  </>
+                )}
                 <a
                   href="/debug"
                   className="px-3 py-1.5 rounded-lg bg-slate-900 text-white dark:bg-slate-800 text-xs font-bold hover:bg-slate-800 transition-colors"
                 >
-                  ⚙️ Diagnostics / Swap Key
+                  ⚙️ Diagnostics / Gemini Key
                 </a>
               </div>
             </div>
@@ -396,6 +420,22 @@ export default function Quick() {
                   </div>
                 </label>
               </div>
+
+              {/* Gemini Strict Requirement Notice */}
+              {numChoices > 1 && (
+                <div className="bg-indigo-100/70 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-900 rounded-xl p-2.5 flex items-center justify-between gap-2 text-[11px]">
+                  <div className="flex items-center gap-2 text-indigo-900 dark:text-indigo-200 font-medium">
+                    <span>💎</span>
+                    <span>Multi-choice trees strictly require <strong>Google Gemini</strong> for fast deep-tree synthesis.</span>
+                  </div>
+                  <a
+                    href="/debug"
+                    className="text-indigo-700 dark:text-indigo-300 font-bold hover:underline shrink-0 text-[10px]"
+                  >
+                    Check Gemini Status ↗
+                  </a>
+                </div>
+              )}
             </div>
           )}
 

@@ -205,11 +205,21 @@ async def write_story(
         force_interactive_tree=force_interactive_tree
     )
 
+    call_kwargs = {}
+    if interactive and (num_choices > 1 or force_interactive_tree):
+        # Strict requirement: deep multi-choice trees must be written by high-level Gemini model
+        try:
+            if "strict_provider" in getattr(llm_fn, "__code__", object()).co_varnames:
+                call_kwargs["strict_provider"] = "gemini"
+        except Exception:
+            pass
+
     data = await llm_fn(
         system=system_prompt,
         user=user_prompt,
         schema=StoryDraft,
-        temperature=0.7
+        temperature=0.7,
+        **call_kwargs
     )
     draft = StoryDraft.model_validate(data)
 

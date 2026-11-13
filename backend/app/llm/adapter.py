@@ -41,7 +41,8 @@ class LLMAdapter:
         schema: Union[Dict[str, Any], Type[BaseModel]],
         temperature: float = 0.7,
         max_retries: int = 2,
-        bypass_cache: bool = False
+        bypass_cache: bool = False,
+        strict_provider: Optional[str] = None
     ) -> Dict[str, Any]:
         schema_name = schema.__name__ if isinstance(schema, type) else "json_schema"
 
@@ -51,7 +52,10 @@ class LLMAdapter:
             if cached_result is not None:
                 return cached_result
 
-        provider_order = [p.strip().lower() for p in settings.LLM_PROVIDER_ORDER.split(",") if p.strip()]
+        if strict_provider:
+            provider_order = [strict_provider.lower()]
+        else:
+            provider_order = [p.strip().lower() for p in settings.LLM_PROVIDER_ORDER.split(",") if p.strip()]
         errors_by_provider: Dict[str, str] = {}
 
         for provider_name in provider_order:
@@ -95,6 +99,13 @@ class LLMAdapter:
                     else:
                         break # Unrecoverable provider error, switch provider
 
+        if strict_provider == "gemini":
+            gemini_err = errors_by_provider.get("gemini", "Gemini unavailable")
+            raise RuntimeError(
+                f"High-level model (Google Gemini) is not available for deep multi-choice tree generation ({gemini_err}). "
+                "Please configure Gemini in Diagnostics or try generating a single-choice or non-interactive video."
+            )
+
         formatted_errors = "; ".join(f"{p} ({err})" for p, err in errors_by_provider.items())
         raise RuntimeError(f"All LLM providers failed. Details: {formatted_errors}")
 
@@ -106,7 +117,8 @@ async def generate_json(
     schema: Union[Dict[str, Any], Type[BaseModel]],
     temperature: float = 0.7,
     max_retries: int = 2,
-    bypass_cache: bool = False
+    bypass_cache: bool = False,
+    strict_provider: Optional[str] = None
 ) -> Dict[str, Any]:
     return await llm_adapter.generate_json(
         system=system,
@@ -114,5 +126,6 @@ async def generate_json(
         schema=schema,
         temperature=temperature,
         max_retries=max_retries,
-        bypass_cache=bypass_cache
+        bypass_cache=bypass_cache,
+        strict_provider=strict_provider
     )
