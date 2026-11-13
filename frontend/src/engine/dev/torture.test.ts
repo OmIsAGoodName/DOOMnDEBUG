@@ -41,3 +41,4 @@ describe('Engine Robustness & Torture Plan', () => {
     expect(() => renderAt(fakeCtx, timeline, timeline.totalDuration)).not.toThrow();
   });
 });
+
