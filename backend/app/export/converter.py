@@ -17,6 +17,20 @@ def get_export_dirs() -> Tuple[Path, Path]:
     tmp_dir.mkdir(parents=True, exist_ok=True)
     return exports_dir, tmp_dir
 
+def get_ffmpeg_binary() -> str:
+    ffmpeg_bin = shutil.which("ffmpeg")
+    if not ffmpeg_bin:
+        local_app = os.environ.get("LOCALAPPDATA")
+        if local_app:
+            winget_path = Path(local_app) / "Microsoft" / "WinGet" / "Packages"
+            if winget_path.exists():
+                for p in winget_path.glob("Gyan.FFmpeg*/**/ffmpeg.exe"):
+                    ffmpeg_bin = str(p)
+                    break
+    if not ffmpeg_bin:
+        raise RuntimeError("ffmpeg executable not found on system PATH")
+    return os.path.normpath(ffmpeg_bin)
+
 async def convert_webm_to_mp4(
     export_id: str,
     episode_id: str,
@@ -35,20 +49,9 @@ async def convert_webm_to_mp4(
     }
 
     try:
-        ffmpeg_bin = shutil.which("ffmpeg")
-        if not ffmpeg_bin:
-            local_app = os.environ.get("LOCALAPPDATA")
-            if local_app:
-                winget_path = Path(local_app) / "Microsoft" / "WinGet" / "Packages"
-                if winget_path.exists():
-                    for p in winget_path.glob("Gyan.FFmpeg*/**/ffmpeg.exe"):
-                        ffmpeg_bin = str(p)
-                        break
+        ffmpeg_bin = get_ffmpeg_binary()
 
-        if not ffmpeg_bin:
-            raise RuntimeError("ffmpeg executable not found on system PATH")
-
-        # FFmpeg conversion arguments
+        # Standardized 720p H.264 + AAC MP4 conversion
         cmd = [
             ffmpeg_bin,
             "-y",
@@ -64,17 +67,15 @@ async def convert_webm_to_mp4(
             str(mp4_path)
         ]
 
-        # Execute conversion in a worker thread / subshell
-        process = await asyncio.create_subprocess_exec(
-            *cmd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        stdout, stderr = await process.communicate()
+        def run_conversion():
+            return subprocess.run(cmd, capture_output=True)
 
-        if process.returncode != 0:
-            err_text = stderr.decode(errors="ignore")[-400:]
-            raise RuntimeError(f"FFmpeg conversion failed: {err_text}")
+        # Use asyncio.to_thread for universal Windows SelectorEventLoop / ProactorEventLoop compatibility
+        result = await asyncio.to_thread(run_conversion)
+
+        if result.returncode != 0:
+            err_text = result.stderr.decode(errors="ignore")[-400:]
+            raise RuntimeError(f"FFmpeg conversion failed (code {result.returncode}): {err_text}")
 
         # Success: update repository and task status
         repo = get_repository()
@@ -93,7 +94,7 @@ async def convert_webm_to_mp4(
         export_tasks[export_id] = {
             "status": "failed",
             "mp4_url": None,
-            "error": f"{type(e).__name__}: {str(e)} | {tb}"
+            "error": f"{type(e).__name__}: {str(e)}"
         }
     finally:
         # Clean up temporary uploaded WebM file
