@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AudioManifest",
+  "type": "object",
+  "required": ["episode_id", "lines"],
+  "properties": {
+    "episode_id": { "type": "string" },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["line_id", "scene_id", "beat_id", "speaker", "url", "duration_ms"],
+        "properties": {
+          "line_id": { "type": "string" },
+          "scene_id": { "type": "string" },
+          "beat_id": { "type": "string" },
+          "speaker": { "type": "string" },
+          "url": { "type": "string" },
+          "duration_ms": { "type": "number" },
+          "words": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["text", "start_ms", "end_ms"],
+              "properties": {
+                "text": { "type": "string" },
+                "start_ms": { "type": "number" },
+                "end_ms": { "type": "number" }
+              }
+            },
+            "default": []
+          }
+        }
+      }
+    },
+    "music": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["music_id", "url"],
+        "properties": {
+          "music_id": { "type": "string" },
+          "url": { "type": "string" }
+        }
+      },
+      "default": []
+    },
+    "sfx": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["sfx_id", "url"],
+        "properties": {
+          "sfx_id": { "type": "string" },
+          "url": { "type": "string" }
+        }
+      },
+      "default": []
+    }
+  }
+}

@@ -1,0 +1,215 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EpisodePlan",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "episode_id",
+    "title",
+    "age_band",
+    "start_scene",
+    "interactive",
+    "cast",
+    "scenes"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "episode_id": { "type": "string" },
+    "series_id": { "type": ["string", "null"] },
+    "age_band": { "type": "string", "enum": ["3-5", "4-6", "6-8"] },
+    "language": { "type": "string", "default": "en" },
+    "title": { "type": "string" },
+    "start_scene": { "type": "string" },
+    "interactive": { "type": "boolean" },
+    "cast": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["character_id", "name", "species", "palette", "voice"],
+        "properties": {
+          "character_id": { "type": "string" },
+          "name": { "type": "string" },
+          "species": { "type": "string" },
+          "palette": {
+            "type": "object",
+            "required": ["primary", "secondary", "accent", "outline"],
+            "properties": {
+              "primary": { "type": "string" },
+              "secondary": { "type": "string" },
+              "accent": { "type": "string" },
+              "outline": { "type": "string" }
+            }
+          },
+          "accessories": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "voice": {
+            "type": "object",
+            "required": ["engine_voice"],
+            "properties": {
+              "engine_voice": { "type": "string" },
+              "rate": { "type": "string", "default": "+0%" },
+              "pitch": { "type": "string", "default": "+0Hz" }
+            }
+          }
+        }
+      }
+    },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["scene_id", "background_id", "mood", "beats"],
+        "properties": {
+          "scene_id": { "type": "string" },
+          "background_id": { "type": "string" },
+          "mood": { "type": "string" },
+          "next_scene": { "type": ["string", "null"] },
+          "props": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["prop_id", "position"],
+              "properties": {
+                "prop_id": { "type": "string" },
+                "position": {
+                  "type": "array",
+                  "items": { "type": "number" },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              }
+            }
+          },
+          "characters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["character_id", "position"],
+              "properties": {
+                "character_id": { "type": "string" },
+                "position": {
+                  "type": "array",
+                  "items": { "type": "number" },
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "facing": { "type": "string", "enum": ["left", "right"], "default": "right" },
+                "expression": { "type": "string", "default": "neutral" },
+                "animation": { "type": "string", "default": "idle" }
+              }
+            }
+          },
+          "beats": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["beat_id"],
+              "properties": {
+                "beat_id": { "type": "string" },
+                "speech": {
+                  "type": "object",
+                  "required": ["type", "text"],
+                  "properties": {
+                    "type": { "type": "string", "enum": ["NARRATE", "SPEAK"] },
+                    "character_id": { "type": "string" },
+                    "text": { "type": "string" },
+                    "expression": { "type": "string" }
+                  }
+                },
+                "actions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["type"],
+                    "properties": {
+                      "type": { "type": "string" },
+                      "delay": { "type": "number" },
+                      "duration": { "type": "number" },
+                      "character_id": { "type": "string" },
+                      "position": {
+                        "type": "array",
+                        "items": { "type": "number" },
+                        "minItems": 2,
+                        "maxItems": 2
+                      },
+                      "to": {
+                        "type": "array",
+                        "items": { "type": "number" },
+                        "minItems": 2,
+                        "maxItems": 2
+                      },
+                      "facing": { "type": "string", "enum": ["left", "right"] },
+                      "expression": { "type": "string" },
+                      "animation": { "type": "string" },
+                      "loop": { "type": "boolean" },
+                      "shot": { "type": "string" },
+                      "movement": { "type": "string" },
+                      "focus_character_id": { "type": "string" },
+                      "mood": { "type": "string" },
+                      "transition": { "type": "number" },
+                      "prop_id": { "type": "string" },
+                      "slot": { "type": "string", "enum": ["hand", "head", "ground"] },
+                      "remove": { "type": "boolean" },
+                      "kind": { "type": "string" },
+                      "target_id": { "type": "string" },
+                      "sfx_id": { "type": "string" },
+                      "music_id": { "type": ["string", "null"] },
+                      "volume": { "type": "number" },
+                      "fade": { "type": "number" },
+                      "entrance": { "type": "string", "enum": ["fade", "slide_left", "slide_right", "pop"] },
+                      "exit": { "type": "string", "enum": ["fade", "slide_left", "slide_right"] }
+                    }
+                  }
+                },
+                "choice": {
+                  "type": "object",
+                  "required": ["options", "default"],
+                  "properties": {
+                    "options": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "label", "next_scene"],
+                        "properties": {
+                          "id": { "type": "string" },
+                          "label": { "type": "string" },
+                          "keywords": {
+                            "type": "array",
+                            "items": { "type": "string" }
+                          },
+                          "next_scene": { "type": "string" }
+                        }
+                      }
+                    },
+                    "default": { "type": "string" }
+                  }
+                },
+                "min_duration": { "type": "number" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "properties": {
+        "age_fit": { "type": "number" },
+        "scary": { "type": "number" },
+        "verdict": { "type": "string" },
+        "notes": { "type": "string" }
+      }
+    },
+    "continuity": {
+      "type": "object",
+      "properties": {
+        "violations": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

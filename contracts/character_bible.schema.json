@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CharacterBible",
+  "type": "object",
+  "required": ["id", "name", "species", "personality", "voice", "look"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "species": { "type": "string" },
+    "personality": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "catchphrases": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "voice": {
+      "type": "object",
+      "required": ["engine_voice"],
+      "properties": {
+        "engine_voice": { "type": "string" },
+        "rate": { "type": "string", "default": "+0%" },
+        "pitch": { "type": "string", "default": "+0Hz" }
+      }
+    },
+    "look": {
+      "type": "object",
+      "required": ["palette"],
+      "properties": {
+        "palette": {
+          "type": "object",
+          "required": ["primary", "secondary", "accent", "outline"],
+          "properties": {
+            "primary": { "type": "string" },
+            "secondary": { "type": "string" },
+            "accent": { "type": "string" },
+            "outline": { "type": "string" }
+          }
+        },
+        "accessories": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        }
+      }
+    },
+    "rules": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "animations": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "expressions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    }
+  }
+}

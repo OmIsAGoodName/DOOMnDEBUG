@@ -1,0 +1,63 @@
+{
+  "commands": [
+    "SPAWN_CHARACTER",
+    "REMOVE_CHARACTER",
+    "MOVE_TO",
+    "PLAY_ANIMATION",
+    "SET_EXPRESSION",
+    "SET_CAMERA",
+    "SET_MOOD",
+    "ATTACH_PROP",
+    "INTERACT",
+    "PLAY_SFX",
+    "PLAY_MUSIC",
+    "WAIT"
+  ],
+  "speech_types": ["NARRATE", "SPEAK"],
+  "animations": ["idle", "walk", "talk", "wave", "laugh", "listen", "react", "point"],
+  "expressions": ["neutral", "happy", "sad", "surprised", "worried", "excited"],
+  "mouth_shapes": ["closed", "half", "wide"],
+  "facing": ["left", "right"],
+  "camera_shots": {
+    "wide": { "zoom": 1.0 },
+    "medium": { "zoom": 1.35 },
+    "close": { "zoom": 1.8 }
+  },
+  "camera_movements": ["static", "slow_push_in", "slow_pull_out", "pan_left", "pan_right"],
+  "moods": {
+    "day": { "color": "#000000", "opacity": 0.0 },
+    "sunset": { "color": "#ff9a4d", "opacity": 0.18 },
+    "night": { "color": "#1c2a5a", "opacity": 0.35 },
+    "cozy": { "color": "#ffb36b", "opacity": 0.12 },
+    "magical": { "color": "#9b6bff", "opacity": 0.15 }
+  },
+  "interact_kinds": ["wave_at", "high_five", "hand_off", "hug"],
+  "accessories": ["scarf", "glasses", "hat", "bow", "backpack", "cape"],
+  "species": ["owl", "fox", "kid"],
+  "palette_keys": ["primary", "secondary", "accent", "outline"],
+  "age_bands": ["3-5", "4-6", "6-8"],
+  "generation_stages": [
+    "understanding",
+    "writing",
+    "planning",
+    "preparing",
+    "checking",
+    "narration",
+    "ready",
+    "recording",
+    "converting",
+    "done"
+  ],
+  "stage_labels": {
+    "understanding": "Understanding your story",
+    "writing": "Writing the script",
+    "planning": "Planning the scenes",
+    "preparing": "Preparing characters and locations",
+    "checking": "Checking continuity and safety",
+    "narration": "Generating narration",
+    "ready": "Your episode is ready",
+    "recording": "Rendering video",
+    "converting": "Finalising",
+    "done": "Export complete"
+  }
+}
