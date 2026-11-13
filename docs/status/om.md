@@ -65,9 +65,10 @@ This automatically boots:
 
 1. **Full Media Controls (`frontend/src/ui/EpisodeView.tsx`)**:
    - Added in-canvas playback control bar: Play/Pause button (`▶` / `⏸`), interactive timeline seek bar (`<input type="range">`), elapsed and total duration counter (`mm:ss`), mute/unmute audio toggle, and full-screen button.
-2. **Reliable Video Downloads (`frontend/src/ui/EpisodeView.tsx`, `frontend/src/lib/api.ts`)**:
-   - Implemented direct programmatic download via `triggerFileDownload()` which avoids browser popup blockers.
-   - Added proxy routes in `frontend/vite.config.ts` for `/api` and `/media` forwarding to FastAPI (port 8000).
+2. **Reliable Video Downloads & MP4 Export (`frontend/src/ui/EpisodeView.tsx`, `backend/app/export/converter.py`)**:
+   - Resolved Windows `SelectorEventLoop` `NotImplementedError` by running FFmpeg via `asyncio.to_thread(subprocess.run)`, guaranteeing high-speed 720p H.264/AAC MP4 conversion.
+   - Fixed Web Audio recording routing: separated `localGain` from `masterGain` so `muteLocal: true` during canvas recording mutes local speakers while continuing to feed 100% full-volume speech, music, and SFX directly into the recording stream.
+   - Programmatic `<a download>` file trigger for converted `.mp4` files with fallback to direct `.webm`.
    - Added instant client-side WebM blob download fallback so users can always download recordings even if backend FFmpeg is slow or offline.
 3. **Expanded Character Species (Rabbit 🐰 & Turtle 🐢)**:
    - Added `rabbit` and `turtle` to `contracts/vocab.json`.
