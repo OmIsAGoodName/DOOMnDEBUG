@@ -32,7 +32,7 @@ export default function Episode() {
     return (
       <div className="py-24 flex flex-col items-center justify-center space-y-3">
         <Spinner size="lg" />
-        <p className="text-sm font-semibold text-slate-500">Loading animated episode...</p>
+        <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">Loading animated episode...</p>
       </div>
     );
   }
@@ -41,8 +41,8 @@ export default function Episode() {
     return (
       <div className="py-16 px-4 max-w-md mx-auto text-center space-y-4">
         <div className="text-5xl">⚠️</div>
-        <h2 className="text-2xl font-bold text-slate-800">Episode Not Found</h2>
-        <p className="text-sm text-slate-500">{error || 'This episode could not be retrieved.'}</p>
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Episode Not Found</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{error || 'This episode could not be retrieved.'}</p>
         <Link to="/library">
           <Button variant="secondary" size="md">
             &larr; Back to Library
@@ -57,7 +57,7 @@ export default function Episode() {
       <div className="max-w-4xl mx-auto mb-4">
         <Link
           to="/library"
-          className="text-xs font-bold text-slate-500 hover:text-indigo-600 flex items-center gap-1"
+          className="text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1"
         >
           &larr; Back to Library
         </Link>

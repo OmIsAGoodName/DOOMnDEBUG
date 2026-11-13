@@ -48,10 +48,10 @@ export default function App() {
                 type="button"
                 onClick={() => setIsDark((prev) => !prev)}
                 aria-label="Toggle dark mode"
-                className="ml-2 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                className="ml-2 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 transition-colors shadow-xs"
               >
-                <span>{isDark ? '🌙' : '☀️'}</span>
-                <span>{isDark ? 'Dark' : 'Light'}</span>
+                <span className="text-sm">{isDark ? '🌙' : '☀️'}</span>
+                <span>{isDark ? 'Dark Mode' : 'Light Mode'}</span>
               </button>
             </nav>
           </header>
