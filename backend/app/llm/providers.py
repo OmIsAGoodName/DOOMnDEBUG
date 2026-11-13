@@ -16,8 +16,8 @@ class GeminiProvider(BaseProvider):
         self.model = model or settings.GEMINI_MODEL
 
     async def call(self, system: str, user: str, temperature: float) -> str:
-        if not self.api_key:
-            raise ValueError("GEMINI_API_KEY not configured")
+        if not self.api_key or "your-gemini" in self.api_key.lower():
+            raise ValueError("GEMINI_API_KEY not configured or placeholder")
 
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent?key={self.api_key}"
         payload = {
@@ -34,7 +34,7 @@ class GeminiProvider(BaseProvider):
                 "parts": [{"text": system}]
             }
 
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with httpx.AsyncClient(timeout=60.0) as client:
             resp = await client.post(url, json=payload)
             if resp.status_code == 429:
                 raise RuntimeError(f"Gemini Rate Limit (429): {resp.text}")
@@ -82,7 +82,7 @@ class GroqProvider(BaseProvider):
             "temperature": temperature
         }
 
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with httpx.AsyncClient(timeout=60.0) as client:
             resp = await client.post(url, headers=headers, json=payload)
             if resp.status_code == 429:
                 raise RuntimeError(f"Groq Rate Limit (429): {resp.text}")

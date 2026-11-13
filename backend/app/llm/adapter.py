@@ -82,11 +82,11 @@ class LLMAdapter:
 
                 except Exception as e:
                     last_error = e
-                    # Backoff on rate-limits (429) or server errors
-                    err_msg = str(e)
-                    if "429" in err_msg or "500" in err_msg or "503" in err_msg:
-                        match = re.search(r"try again in (\d+\.?\d*)s", err_msg)
-                        wait_time = float(match.group(1)) + 0.5 if match else 2.5 * (2 ** attempt)
+                    # Backoff on rate-limits (429), timeouts, or server errors
+                    err_msg = str(e).lower()
+                    if "429" in err_msg or "500" in err_msg or "503" in err_msg or "timeout" in err_msg or "connection" in err_msg:
+                        match = re.search(r"try again in (\d+\.?\d*)s", str(e))
+                        wait_time = float(match.group(1)) + 0.5 if match else 2.0 * (attempt + 1)
                         await asyncio.sleep(wait_time)
                     else:
                         break # Unrecoverable provider error, switch provider
