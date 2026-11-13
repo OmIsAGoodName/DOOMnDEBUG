@@ -29,16 +29,17 @@
   - Merged & verified Maegan Parts 2-5 (`0264161` & `65080ad`): Zoom/pan camera, mood tinting, speech bubbles, dynamic branch re-resolution, interactive Live mode (`LiveController`, `matchChoice`, `useLiveChoices`), in-browser WebM recording & export pipeline (`recorder.ts`, `exportFlow.ts`).
   - Merged & verified Nigel Part 2 (`fced67d`): Full art suite for `rusty_fox`, `mia_kid`, remaining backgrounds (`forest_night`, `meadow_day`, `treehouse_interior`, `village_street`), 12 canvas props, and licensed audio assets (`assets/LICENSES.md`).
   - Merged & verified Nigel Part 3 (`fbdc6a4`): Complete UI foundation kit (`frontend/src/ui/`), auth pages (`/login`, `/signup`), Quick Story creation flow (`/quick`), and Library/Episode player views (`/library`, `/episode/:id`).
+  - Merged & verified Nigel Part 4 (`634c55b`): Studio mode (`/studio`), real-time canvas Character Builder (`CharacterBuilder.tsx`), Series Form (`SeriesForm.tsx`), and batch season generation grid with inline playback.
   - Added curated loopable audio assets (`74bd17d`): `assets/audio/music/` and `assets/audio/sfx/` populated and verified.
   - Full suite verification: 38/38 frontend tests pass, 43/43 backend tests pass, 0 TypeScript errors, 4/4 fixtures valid, preflight [READY].
 
 ## 2. In progress
-- Monitoring remote repository for Nigel's Part 4 (Studio mode, Series & Character builder, season generator) and Part 5 (Pitch deck & demo documentation).
+- Monitoring remote repository for Nigel's Part 5 (Pitch deck outline, demo script, Judge QA, and README documentation).
 
 ## 3. Next
-- Merge and verify Nigel's Part 4 as soon as pushed.
-- Monitor and verify Nigel's Part 5 (Pitch deck & demo documentation).
-- Final end-to-end rehearsal with `run_demo.bat`.
+- Merge and verify Nigel's Part 5 upon arrival.
+- Run complete preflight checks (`scripts/preflight.py` and `scripts/validate_fixtures.py`).
+- Finalize VoxFable Milestone 5 across all workstations.
 
 ## 4. Blockers
 - None.
