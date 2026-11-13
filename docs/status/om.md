@@ -7,9 +7,18 @@
 
 ---
 
-## ⚡ Recent Updates (Active Engine Hard-Switcher, Gemini Integration & Universal Position Resilience)
+## ⚡ Recent Updates (Per-Model Live Stats, Spotlight Metrics & Active Engine Hard-Switcher)
 
-1. **Active Generation Engine Hard Switcher (`/debug`)**:
+1. **Per-Model Live Stats & Spotlight Breakdown (`/debug`)**:
+   - Added granular, per-model telemetry tracking in [`backend/app/llm/providers.py`](file:///d:/VoxFable/backend/app/llm/providers.py) (`MODEL_STATS`, `record_model_call`, `record_model_result`) for all 7 candidate models across Groq and Gemini.
+   - Measures calls, successes, 429 rate-limit hits, general errors, and millisecond latency (`last_latency_ms`) individually per model.
+   - **Currently Selected Model Spotlight**:
+     - Added an active model card on [`frontend/src/pages/Debug.tsx`](file:///d:/VoxFable/frontend/src/pages/Debug.tsx) showing real-time metrics for whichever model is currently active.
+     - Fixed the Quota Health banner to accurately display the active model name and provider.
+   - **All Available Models Breakdown Table**:
+     - Comprehensive live table listing all Groq and Gemini models with real-time status badges (`HEALTHY`, `IDLE`, `RATE LIMITED`), call counts, success ratios, latency in ms, and a 1-click **"Select"** action button to hot-switch models on the fly.
+
+2. **Active Generation Engine Hard Switcher (`/debug`)**:
    - Built a dedicated **Active Story Generation Engine** switcher at the top of [`frontend/src/pages/Debug.tsx`](file:///d:/VoxFable/frontend/src/pages/Debug.tsx).
    - Allows 1-click hard-switching between **⚡ Groq Cloud** and **💎 Google Gemini** with live visual badges (`ACTIVE`), model selection dropdowns (`gemini-flash-lite-latest`, `gemini-flash-latest`, `gemini-pro-latest`, `openai/gpt-oss-120b`, `llama-3.3-70b-versatile`), and masked key status.
    - Added backend API endpoint `POST /api/system/active-provider` in [`backend/app/main.py`](file:///d:/VoxFable/backend/app/main.py) which reorders `settings.LLM_PROVIDER_ORDER`, sets the active model, clears `cache` (to guarantee fresh generation), and persists changes to `backend/.env`.

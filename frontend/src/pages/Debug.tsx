@@ -278,12 +278,12 @@ export default function Debug() {
                 Rate Limit Exceeded (Time for a Fresh API Key!)
               </h2>
               <p className="text-xs text-rose-700 dark:text-rose-300 mt-0.5">
-                Groq has hit its daily token allowance (TPD) or per-minute rate limit. Paste a fresh API key below to restore maximum studio story quality.
+                {stats?.active_provider?.toUpperCase()} has hit its daily token allowance (TPD) or per-minute rate limit. Paste a fresh API key below or switch models to restore maximum studio story quality.
               </p>
             </div>
           </div>
           <a
-            href="https://console.groq.com/keys"
+            href={stats?.active_provider === 'gemini' ? 'https://aistudio.google.com/app/apikey' : 'https://console.groq.com/keys'}
             target="_blank"
             rel="noopener noreferrer"
             className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow-md transition-all shrink-0"
@@ -297,15 +297,204 @@ export default function Debug() {
             ✨
           </div>
           <div>
-            <h2 className="text-sm font-bold text-emerald-900 dark:text-emerald-200">
-              LLM Provider Operational & Quota Healthy
+            <h2 className="text-sm font-bold text-emerald-900 dark:text-emerald-200 flex items-center gap-2">
+              <span>LLM Provider Operational & Quota Healthy</span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-600 text-white">
+                {stats?.active_provider || 'ACTIVE'}
+              </span>
             </h2>
             <p className="text-xs text-emerald-700 dark:text-emerald-400">
-              Active primary model: <strong className="underline">{groq?.model || 'openai/gpt-oss-120b'}</strong> with multi-tier failover.
+              Active primary model: <strong className="underline font-mono">{stats?.active_model || 'openai/gpt-oss-120b'}</strong> ({stats?.active_provider === 'gemini' ? 'Google Gemini AI Studio' : 'Groq Cloud LPU'}) with multi-tier failover.
             </p>
           </div>
         </div>
       )}
+
+      {/* Spotlight: Currently Active Model Live Stats */}
+      <Card padding="md" className="border-indigo-200 dark:border-indigo-900/60 shadow-sm bg-indigo-50/30 dark:bg-indigo-950/20 space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-indigo-100 dark:border-indigo-950 pb-2.5">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">🎯</span>
+            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100">
+              Currently Selected Model Live Stats:{' '}
+              <span className="font-mono text-indigo-600 dark:text-indigo-400 font-bold">
+                {stats?.active_model}
+              </span>
+            </h3>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
+              Provider: <strong className="uppercase">{stats?.active_provider}</strong>
+            </span>
+            <span
+              className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                stats?.active_model_stats?.last_status === 'healthy'
+                  ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300'
+                  : stats?.active_model_stats?.last_status === 'rate_limited'
+                  ? 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-300'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+              }`}
+            >
+              {stats?.active_model_stats?.last_status || 'idle'}
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div className="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700 shadow-2xs">
+            <span className="block text-[11px] text-slate-400 font-bold uppercase tracking-wider">
+              Total Calls
+            </span>
+            <strong className="text-xl font-black text-slate-800 dark:text-slate-100">
+              {stats?.active_model_stats?.calls || 0}
+            </strong>
+          </div>
+
+          <div className="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700 shadow-2xs">
+            <span className="block text-[11px] text-slate-400 font-bold uppercase tracking-wider">
+              Successes
+            </span>
+            <strong className="text-xl font-black text-emerald-600 dark:text-emerald-400">
+              {stats?.active_model_stats?.successes || 0}
+            </strong>
+          </div>
+
+          <div className="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700 shadow-2xs">
+            <span className="block text-[11px] text-slate-400 font-bold uppercase tracking-wider">
+              429 Rate Limits
+            </span>
+            <strong className="text-xl font-black text-amber-600 dark:text-amber-400">
+              {stats?.active_model_stats?.rate_limits || 0}
+            </strong>
+          </div>
+
+          <div className="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700 shadow-2xs">
+            <span className="block text-[11px] text-slate-400 font-bold uppercase tracking-wider">
+              Last Latency
+            </span>
+            <strong className="text-xl font-black text-indigo-600 dark:text-indigo-400 font-mono">
+              {stats?.active_model_stats?.last_latency_ms != null
+                ? `${stats.active_model_stats.last_latency_ms} ms`
+                : '—'}
+            </strong>
+          </div>
+        </div>
+      </Card>
+
+      {/* Comprehensive All Models Breakdown Table */}
+      <Card padding="lg" className="border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div>
+            <h2 className="text-base font-black text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <span>📊</span> All Available Models & Real-Time Stats
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Live statistics and 1-click model switching across all Groq and Gemini models.
+            </p>
+          </div>
+          <span className="text-xs text-slate-400 font-mono">
+            {Object.keys(stats?.models || {}).length} models tracked
+          </span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <th className="py-2.5 px-3">Model</th>
+                <th className="py-2.5 px-3">Provider</th>
+                <th className="py-2.5 px-3 text-center">Status</th>
+                <th className="py-2.5 px-3 text-center">Calls</th>
+                <th className="py-2.5 px-3 text-center">Success</th>
+                <th className="py-2.5 px-3 text-center">429 Hits</th>
+                <th className="py-2.5 px-3 text-center">Latency</th>
+                <th className="py-2.5 px-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              {Object.entries(stats?.models || {}).map(([modelId, mStats]) => {
+                const isActive = stats?.active_model === modelId;
+                const isGemini = mStats.provider === 'gemini';
+                return (
+                  <tr
+                    key={modelId}
+                    className={`transition-colors ${
+                      isActive
+                        ? 'bg-indigo-50/60 dark:bg-indigo-950/30 font-semibold'
+                        : 'hover:bg-slate-50 dark:hover:bg-slate-800/40'
+                    }`}
+                  >
+                    <td className="py-3 px-3">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100">
+                          {modelId}
+                        </span>
+                        {isActive && (
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-indigo-600 text-white">
+                            ACTIVE
+                          </span>
+                        )}
+                      </div>
+                      {mStats.description && (
+                        <p className="text-[11px] text-slate-400 font-normal mt-0.5">
+                          {mStats.description}
+                        </p>
+                      )}
+                    </td>
+                    <td className="py-3 px-3 whitespace-nowrap">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          isGemini
+                            ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
+                            : 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'
+                        }`}
+                      >
+                        {isGemini ? '💎 Gemini' : '⚡ Groq'}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3 text-center whitespace-nowrap">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                          mStats.last_status === 'healthy'
+                            ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                            : mStats.last_status === 'rate_limited'
+                            ? 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                        }`}
+                      >
+                        {mStats.last_status}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3 text-center font-mono font-bold text-slate-700 dark:text-slate-300">
+                      {mStats.calls}
+                    </td>
+                    <td className="py-3 px-3 text-center font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                      {mStats.successes}
+                    </td>
+                    <td className="py-3 px-3 text-center font-mono font-bold text-amber-600 dark:text-amber-400">
+                      {mStats.rate_limits}
+                    </td>
+                    <td className="py-3 px-3 text-center font-mono text-slate-600 dark:text-slate-400">
+                      {mStats.last_latency_ms != null ? `${mStats.last_latency_ms} ms` : '—'}
+                    </td>
+                    <td className="py-3 px-3 text-right whitespace-nowrap">
+                      <Button
+                        variant={isActive ? 'primary' : 'secondary'}
+                        size="sm"
+                        disabled={isActive || switchingProvider === modelId}
+                        loading={switchingProvider === modelId}
+                        onClick={() => handleSwitchActive(mStats.provider as any, modelId)}
+                      >
+                        {isActive ? '✓ Active' : 'Select'}
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </Card>
 
       {/* Hot-Swap API Key Card */}
       <Card padding="lg" className="border-slate-200 dark:border-slate-800 shadow-sm space-y-5">

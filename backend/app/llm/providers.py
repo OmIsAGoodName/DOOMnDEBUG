@@ -1,6 +1,7 @@
 import abc
 import datetime
 import json
+import time
 import httpx
 from typing import Optional, Dict, Any, List
 from ..config import settings
@@ -28,6 +29,118 @@ PROVIDER_STATS: Dict[str, Any] = {
         "needs_new_key": False
     }
 }
+
+MODEL_STATS: Dict[str, Dict[str, Any]] = {
+    # Groq Models
+    "openai/gpt-oss-120b": {
+        "provider": "groq",
+        "display_name": "GPT-OSS 120B",
+        "calls": 0,
+        "successes": 0,
+        "rate_limits": 0,
+        "errors": 0,
+        "last_latency_ms": None,
+        "last_status": "idle",
+        "description": "Premier Flagship: maximum narrative depth & rich dialogue",
+    },
+    "llama-3.3-70b-versatile": {
+        "provider": "groq",
+        "display_name": "Llama 3.3 70B",
+        "calls": 0,
+        "successes": 0,
+        "rate_limits": 0,
+        "errors": 0,
+        "last_latency_ms": None,
+        "last_status": "idle",
+        "description": "High Quality: highly balanced speed and storytelling",
+    },
+    "openai/gpt-oss-20b": {
+        "provider": "groq",
+        "display_name": "GPT-OSS 20B",
+        "calls": 0,
+        "successes": 0,
+        "rate_limits": 0,
+        "errors": 0,
+        "last_latency_ms": None,
+        "last_status": "idle",
+        "description": "Fast & Reliable: quick JSON structured generation",
+    },
+    "llama-3.1-8b-instant": {
+        "provider": "groq",
+        "display_name": "Llama 3.1 8B",
+        "calls": 0,
+        "successes": 0,
+        "rate_limits": 0,
+        "errors": 0,
+        "last_latency_ms": None,
+        "last_status": "idle",
+        "description": "Ultra-Fast: lowest latency fallback",
+    },
+    # Gemini Models
+    "gemini-flash-lite-latest": {
+        "provider": "gemini",
+        "display_name": "Gemini 2.5 Flash Lite",
+        "calls": 0,
+        "successes": 0,
+        "rate_limits": 0,
+        "errors": 0,
+        "last_latency_ms": None,
+        "last_status": "idle",
+        "description": "Recommended: instant response, generous rate limits",
+    },
+    "gemini-flash-latest": {
+        "provider": "gemini",
+        "display_name": "Gemini Flash Latest",
+        "calls": 0,
+        "successes": 0,
+        "rate_limits": 0,
+        "errors": 0,
+        "last_latency_ms": None,
+        "last_status": "idle",
+        "description": "Full Flash: high creativity multimodal model",
+    },
+    "gemini-pro-latest": {
+        "provider": "gemini",
+        "display_name": "Gemini Pro Latest",
+        "calls": 0,
+        "successes": 0,
+        "rate_limits": 0,
+        "errors": 0,
+        "last_latency_ms": None,
+        "last_status": "idle",
+        "description": "Pro Tier: deep reasoning and complex instruction following",
+    },
+}
+
+def record_model_call(model: str, provider: str = "unknown"):
+    if model not in MODEL_STATS:
+        MODEL_STATS[model] = {
+            "provider": provider,
+            "display_name": model,
+            "calls": 0,
+            "successes": 0,
+            "rate_limits": 0,
+            "errors": 0,
+            "last_latency_ms": None,
+            "last_status": "idle",
+            "description": "Custom Model"
+        }
+    MODEL_STATS[model]["calls"] += 1
+
+def record_model_result(model: str, status: str, latency_ms: Optional[int] = None):
+    if model not in MODEL_STATS:
+        return
+    if status == "success":
+        MODEL_STATS[model]["successes"] += 1
+        MODEL_STATS[model]["last_status"] = "healthy"
+        if latency_ms is not None:
+            MODEL_STATS[model]["last_latency_ms"] = latency_ms
+    elif status == "rate_limited":
+        MODEL_STATS[model]["rate_limits"] += 1
+        MODEL_STATS[model]["last_status"] = "rate_limited"
+    elif status == "error":
+        MODEL_STATS[model]["errors"] += 1
+        MODEL_STATS[model]["last_status"] = "error"
 
 class BaseProvider(abc.ABC):
     @abc.abstractmethod
@@ -89,10 +202,14 @@ class GeminiProvider(BaseProvider):
         async with httpx.AsyncClient(timeout=60.0) as client:
             for model_name in candidate_models:
                 clean_model = model_name.replace("models/", "")
+                record_model_call(clean_model, provider="gemini")
+                t0 = time.perf_counter()
                 url = f"https://generativelanguage.googleapis.com/v1beta/models/{clean_model}:generateContent?key={api_key}"
                 try:
                     resp = await client.post(url, json=payload)
+                    latency_ms = round((time.perf_counter() - t0) * 1000)
                     if resp.status_code == 429:
+                        record_model_result(clean_model, "rate_limited")
                         PROVIDER_STATS["gemini"]["rate_limits"] += 1
                         PROVIDER_STATS["gemini"]["last_status"] = "rate_limited"
                         PROVIDER_STATS["gemini"]["last_error"] = f"Rate limit on `{clean_model}`: {resp.text}"
@@ -100,6 +217,7 @@ class GeminiProvider(BaseProvider):
                         last_err = RuntimeError(f"Gemini Rate Limit (429) on model `{clean_model}`: {resp.text}")
                         continue
                     if resp.status_code != 200:
+                        record_model_result(clean_model, "error")
                         PROVIDER_STATS["gemini"]["errors"] += 1
                         PROVIDER_STATS["gemini"]["last_status"] = "error"
                         PROVIDER_STATS["gemini"]["last_error"] = f"Error ({resp.status_code}) on `{clean_model}`: {resp.text}"
@@ -110,20 +228,24 @@ class GeminiProvider(BaseProvider):
                     data = resp.json()
                     candidates = data.get("candidates", [])
                     if not candidates:
+                        record_model_result(clean_model, "error")
                         last_err = ValueError(f"No candidates returned by Gemini for `{clean_model}`: {data}")
                         continue
                     parts = candidates[0].get("content", {}).get("parts", [])
                     if not parts:
+                        record_model_result(clean_model, "error")
                         last_err = ValueError(f"Empty parts returned by Gemini for `{clean_model}`: {candidates[0]}")
                         continue
 
                     # Success!
+                    record_model_result(clean_model, "success", latency_ms=latency_ms)
                     PROVIDER_STATS["gemini"]["successes"] += 1
                     PROVIDER_STATS["gemini"]["last_status"] = "healthy"
                     PROVIDER_STATS["gemini"]["last_error"] = None
                     PROVIDER_STATS["gemini"]["needs_new_key"] = False
                     return parts[0].get("text", "")
                 except (httpx.TimeoutException, httpx.NetworkError) as net_err:
+                    record_model_result(clean_model, "error")
                     last_err = net_err
                     continue
 
@@ -188,6 +310,8 @@ class GroqProvider(BaseProvider):
         last_err = None
         async with httpx.AsyncClient(timeout=60.0) as client:
             for model_name in models_to_try:
+                record_model_call(model_name, provider="groq")
+                t0 = time.perf_counter()
                 payload = {
                     "model": model_name,
                     "messages": messages,
@@ -197,7 +321,9 @@ class GroqProvider(BaseProvider):
                 }
                 try:
                     resp = await client.post(url, headers=headers, json=payload)
+                    latency_ms = round((time.perf_counter() - t0) * 1000)
                     if resp.status_code == 429:
+                        record_model_result(model_name, "rate_limited")
                         PROVIDER_STATS["groq"]["rate_limits"] += 1
                         PROVIDER_STATS["groq"]["last_status"] = "rate_limited"
                         PROVIDER_STATS["groq"]["last_error"] = f"Rate limit on `{model_name}`: {resp.text}"
@@ -205,6 +331,7 @@ class GroqProvider(BaseProvider):
                         last_err = RuntimeError(f"Groq Rate Limit (429) on model `{model_name}`: {resp.text}")
                         continue
                     if resp.status_code != 200:
+                        record_model_result(model_name, "error")
                         PROVIDER_STATS["groq"]["errors"] += 1
                         PROVIDER_STATS["groq"]["last_status"] = "error"
                         PROVIDER_STATS["groq"]["last_error"] = f"Error ({resp.status_code}) on `{model_name}`: {resp.text}"
@@ -215,16 +342,19 @@ class GroqProvider(BaseProvider):
                     data = resp.json()
                     choices = data.get("choices", [])
                     if not choices:
+                        record_model_result(model_name, "error")
                         last_err = ValueError(f"No choices returned by Groq for `{model_name}`: {data}")
                         continue
 
                     # Success!
+                    record_model_result(model_name, "success", latency_ms=latency_ms)
                     PROVIDER_STATS["groq"]["successes"] += 1
                     PROVIDER_STATS["groq"]["last_status"] = "healthy"
                     PROVIDER_STATS["groq"]["last_model_used"] = model_name
                     PROVIDER_STATS["groq"]["needs_new_key"] = False
                     return choices[0].get("message", {}).get("content", "")
                 except (httpx.TimeoutException, httpx.NetworkError) as net_err:
+                    record_model_result(model_name, "error")
                     last_err = net_err
                     continue
 

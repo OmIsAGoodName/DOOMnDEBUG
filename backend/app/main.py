@@ -18,7 +18,7 @@ from .pipeline import run_quick_story_pipeline, generation_tasks
 from .stations.batch import run_batch_generation
 from .live.matcher import match_transcript, MatchOption
 from .export.converter import convert_webm_to_mp4, export_tasks, get_export_dirs
-from .llm.providers import PROVIDER_STATS
+from .llm.providers import PROVIDER_STATS, MODEL_STATS
 from .llm.cache import cache
 
 app = FastAPI(title="VoxFable API", version="0.1.0")
@@ -119,10 +119,23 @@ async def system_stats():
     else:
         active_model = settings.OLLAMA_MODEL
 
+    active_stats = MODEL_STATS.get(active_model) or {
+        "provider": active_prov,
+        "display_name": active_model,
+        "calls": 0,
+        "successes": 0,
+        "rate_limits": 0,
+        "errors": 0,
+        "last_latency_ms": None,
+        "last_status": "idle"
+    }
+
     return {
         "ok": True,
         "active_provider": active_prov,
         "active_model": active_model,
+        "active_model_stats": active_stats,
+        "models": MODEL_STATS,
         "provider_order": [p.strip().lower() for p in settings.LLM_PROVIDER_ORDER.split(",") if p.strip()],
         "providers": {
             "groq": {

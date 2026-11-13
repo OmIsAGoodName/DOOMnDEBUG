@@ -27,10 +27,24 @@ export interface LiveMatchResponse {
   method: 'keyword' | 'llm' | 'default';
 }
 
+export interface ModelStats {
+  provider: 'groq' | 'gemini' | string;
+  display_name: string;
+  calls: number;
+  successes: number;
+  rate_limits: number;
+  errors: number;
+  last_latency_ms: number | null;
+  last_status: 'idle' | 'healthy' | 'rate_limited' | 'error' | string;
+  description?: string;
+}
+
 export interface SystemStatsResponse {
   ok: boolean;
   active_provider: string;
   active_model: string;
+  active_model_stats?: ModelStats;
+  models?: Record<string, ModelStats>;
   provider_order: string[];
   providers: {
     groq: {
