@@ -23,6 +23,8 @@ export default function Quick() {
   const [prompt, setPrompt] = useState('');
   const [ageBand, setAgeBand] = useState<'3-5' | '4-6' | '6-8'>('4-6');
   const [isInteractive, setIsInteractive] = useState<boolean>(true);
+  const [numChoices, setNumChoices] = useState<number>(2);
+  const [forceInteractiveTree, setForceInteractiveTree] = useState<boolean>(true);
   const [duration, setDuration] = useState<'<1min' | '1-2mins' | '2-3mins'>('1-2mins');
   const [generateCharacters, setGenerateCharacters] = useState<boolean>(false);
 
@@ -77,7 +79,9 @@ export default function Quick() {
         age_band: ageBand,
         interactive: isInteractive,
         duration,
-        generate_characters: generateCharacters
+        generate_characters: generateCharacters,
+        num_choices: isInteractive ? numChoices : 1,
+        force_interactive_tree: isInteractive ? forceInteractiveTree : false
       });
 
       setGenerationId(res.generation_id);
@@ -286,6 +290,114 @@ export default function Quick() {
               </label>
             </div>
           </div>
+
+          {/* Interactive Choice Tree Configuration */}
+          {isInteractive && (
+            <div className="p-4 rounded-2xl border-2 border-indigo-200 dark:border-indigo-900/60 bg-gradient-to-br from-indigo-50/60 via-white to-purple-50/30 dark:from-indigo-950/30 dark:via-slate-900 dark:to-purple-950/20 space-y-3.5 shadow-xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-indigo-100 dark:border-indigo-950/80 pb-2.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">🌳</span>
+                  <div>
+                    <h3 className="text-xs font-black uppercase tracking-wider text-indigo-950 dark:text-indigo-200">
+                      Branching Choice Tree & Story Depth
+                    </h3>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Configure how many decision points and alternate branch endings to generate.
+                    </p>
+                  </div>
+                </div>
+
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-600 text-white shadow-2xs">
+                  {numChoices === 1
+                    ? '1 Choice (5 Scenes • 2 Endings)'
+                    : numChoices === 2
+                    ? '2 Choices (7 Scenes • 4 Endings)'
+                    : '3 Choices (9 Scenes • Epic Tree)'}
+                </span>
+              </div>
+
+              {/* Number of Choice Screens Selection */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">
+                  Number of Choice Screens:
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {[
+                    {
+                      val: 1,
+                      label: '1 Choice Screen',
+                      desc: '5 scenes, 2 branching endings (Fast)',
+                    },
+                    {
+                      val: 2,
+                      label: '2 Choice Screens',
+                      desc: '7 scenes, 4 unique endings (Recommended)',
+                      highlight: true,
+                    },
+                    {
+                      val: 3,
+                      label: '3 Choice Screens',
+                      desc: '9 scenes, 3-tier deep quest tree',
+                    },
+                  ].map((opt) => {
+                    const selected = numChoices === opt.val;
+                    return (
+                      <button
+                        type="button"
+                        key={opt.val}
+                        onClick={() => setNumChoices(opt.val)}
+                        className={`p-3 rounded-xl border text-left transition-all ${
+                          selected
+                            ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/70 dark:border-indigo-500 ring-2 ring-indigo-500/20 shadow-xs'
+                            : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 hover:border-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span
+                            className={`text-xs font-black ${
+                              selected
+                                ? 'text-indigo-600 dark:text-indigo-400'
+                                : 'text-slate-800 dark:text-slate-200'
+                            }`}
+                          >
+                            {opt.label}
+                          </span>
+                          {opt.highlight && (
+                            <span className="px-1.5 py-0.2 rounded text-[9px] font-black uppercase bg-emerald-500 text-white">
+                              HOT
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 leading-tight">
+                          {opt.desc}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Force Large Tree Toggle */}
+              <div className="pt-1 border-t border-indigo-100 dark:border-indigo-950/80">
+                <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={forceInteractiveTree}
+                    onChange={(e) => setForceInteractiveTree(e.target.checked)}
+                    className="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900"
+                  />
+                  <div className="space-y-0.2">
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                      <span>⚡</span> Force Large Long Tree (Deep Multi-Path Expansion)
+                    </span>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                      Instructs the writer to enforce completely separate backgrounds and distinct climax resolutions for all branches.
+                    </p>
+                  </div>
+                </label>
+              </div>
+            </div>
+          )}
 
           {/* Custom Character Generation Checkbox */}
           <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 space-y-1">

@@ -160,6 +160,8 @@ export const api = {
     interactive?: boolean;
     duration?: '<1min' | '1-2mins' | '2-3mins';
     generate_characters?: boolean;
+    num_choices?: number;
+    force_interactive_tree?: boolean;
   }): Promise<{ generation_id: string; status: string }> => {
     return request<{ generation_id: string; status: string }>('/api/generations', {
       method: 'POST',

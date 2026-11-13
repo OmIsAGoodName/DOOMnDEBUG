@@ -7,9 +7,23 @@
 
 ---
 
-## ⚡ Recent Updates (Per-Model Live Stats, Spotlight Metrics & Active Engine Hard-Switcher)
+## ⚡ Recent Updates (Multi-Choice Long Interactive Trees, Choice Screens Selector & Provider Resilience)
 
-1. **Per-Model Live Stats & Spotlight Breakdown (`/debug`)**:
+1. **Multi-Level Interactive Choice Trees & Choice Screens Selector**:
+   - Upgraded [`backend/app/stations/writer.py`](file:///d:/VoxFable/backend/app/stations/writer.py) and [`backend/app/pipeline.py`](file:///d:/VoxFable/backend/app/pipeline.py) with dynamic `num_choices` and `force_interactive_tree`:
+     - **1 Choice Screen**: 5 scenes total, 2 unique branching endings (~2 mins).
+     - **2 Choice Screens (Deep Tree)**: 7 scenes total across 2 sequential decision screens, producing 4 completely distinct endings (`sc3a1`, `sc3a2`, `sc3b1`, `sc3b2`).
+     - **3 Choice Screens (Epic Quest)**: 9+ scenes across an expansive multi-stage adventure quest.
+   - Enhanced [Quick Story (`frontend/src/pages/Quick.tsx`)](file:///d:/VoxFable/frontend/src/pages/Quick.tsx):
+     - Added an interactive configuration panel revealing choice screen selectors (`1 Choice Screen`, `2 Choice Screens (Recommended)`, `3 Choice Screens`).
+     - Added **"⚡ Force Large Long Tree (Deep Multi-Path Expansion)"** toggle.
+     - Verified end-to-end with Google Gemini: generates complete 7-scene 4-ending branching videos in under 10 seconds.
+
+2. **Resolved Groq & Gemini Provider Network/Attribute Failover**:
+   - Fixed `AttributeError: 'GroqProvider' object has no attribute 'model'` by adding property getters for `.model` and `.api_key` to both `GroqProvider` and `GeminiProvider`.
+   - Added automatic DNS/network connection retry backoff to `GeminiProvider.call` to transparently recover from transient `getaddrinfo` socket errors.
+
+3. **Per-Model Live Stats & Spotlight Breakdown (`/debug`)**:
    - Added granular, per-model telemetry tracking in [`backend/app/llm/providers.py`](file:///d:/VoxFable/backend/app/llm/providers.py) (`MODEL_STATS`, `record_model_call`, `record_model_result`) for all 7 candidate models across Groq and Gemini.
    - Measures calls, successes, 429 rate-limit hits, general errors, and millisecond latency (`last_latency_ms`) individually per model.
    - **Currently Selected Model Spotlight**:

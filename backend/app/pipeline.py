@@ -24,6 +24,8 @@ async def run_quick_story_pipeline(
     characters: Optional[List[Dict[str, Any]]] = None,
     duration: str = "1-2mins",
     generate_characters: bool = False,
+    num_choices: int = 1,
+    force_interactive_tree: bool = False,
     repo: Optional[Repository] = None
 ) -> str:
     repo = repo or get_repository()
@@ -60,7 +62,9 @@ async def run_quick_story_pipeline(
             series=series,
             characters=characters,
             duration=duration,
-            generate_characters=generate_characters
+            generate_characters=generate_characters,
+            num_choices=num_choices,
+            force_interactive_tree=force_interactive_tree
         )
         timings["writing"] = (time.perf_counter() - t0) * 1000
 

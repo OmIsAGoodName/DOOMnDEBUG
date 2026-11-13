@@ -309,6 +309,8 @@ class GenerationCreateRequest(BaseModel):
     interactive: Optional[bool] = False
     duration: Optional[str] = "1-2mins"
     generate_characters: Optional[bool] = False
+    num_choices: Optional[int] = 1
+    force_interactive_tree: Optional[bool] = False
 
 class LiveMatchApiRequest(BaseModel):
     prompt: str
@@ -356,6 +358,8 @@ async def create_generation(
             characters=req.characters,
             duration=req.duration or "1-2mins",
             generate_characters=req.generate_characters or False,
+            num_choices=req.num_choices or 1,
+            force_interactive_tree=req.force_interactive_tree or False,
             repo=repo
         ))
 

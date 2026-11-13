@@ -1,4 +1,5 @@
 import abc
+import asyncio
 import datetime
 import json
 import time
@@ -161,12 +162,20 @@ class GeminiProvider(BaseProvider):
         return self._api_key or settings.GEMINI_API_KEY or ""
 
     @property
+    def api_key(self) -> str:
+        return self.current_api_key
+
+    @property
     def current_model(self) -> str:
         m = self._model or settings.GEMINI_MODEL or "gemini-flash-lite-latest"
         # Sanitize if model had openai prefix or deprecated name
         if "openai" in m or "2.5-flash" in m or "2.0-flash" in m:
             return "gemini-flash-lite-latest"
         return m
+
+    @property
+    def model(self) -> str:
+        return self.current_model
 
     def is_configured(self) -> bool:
         k = self.current_api_key
@@ -206,7 +215,16 @@ class GeminiProvider(BaseProvider):
                 t0 = time.perf_counter()
                 url = f"https://generativelanguage.googleapis.com/v1beta/models/{clean_model}:generateContent?key={api_key}"
                 try:
-                    resp = await client.post(url, json=payload)
+                    resp = None
+                    for attempt in range(2):
+                        try:
+                            resp = await client.post(url, json=payload)
+                            break
+                        except (httpx.ConnectError, httpx.NetworkError) as net_err:
+                            if attempt == 0:
+                                await asyncio.sleep(0.6)
+                                continue
+                            raise net_err
                     latency_ms = round((time.perf_counter() - t0) * 1000)
                     if resp.status_code == 429:
                         record_model_result(clean_model, "rate_limited")
@@ -264,8 +282,16 @@ class GroqProvider(BaseProvider):
         return self._api_key or settings.GROQ_API_KEY or ""
 
     @property
+    def api_key(self) -> str:
+        return self.current_api_key
+
+    @property
     def current_model(self) -> str:
         return self._model or settings.GROQ_MODEL or "openai/gpt-oss-120b"
+
+    @property
+    def model(self) -> str:
+        return self.current_model
 
     def is_configured(self) -> bool:
         k = self.current_api_key

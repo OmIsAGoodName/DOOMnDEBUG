@@ -56,7 +56,9 @@ def build_writer_user_prompt(
     series: Optional[Dict[str, Any]] = None,
     characters: Optional[List[Dict[str, Any]]] = None,
     duration: str = "1-2mins",
-    generate_characters: bool = False
+    generate_characters: bool = False,
+    num_choices: int = 1,
+    force_interactive_tree: bool = False
 ) -> str:
     metadata = load_metadata()
 
@@ -91,7 +93,47 @@ def build_writer_user_prompt(
         )
 
     if interactive:
-        interactive_section = """- Interactive: YES (BRANCHING CHOICE TREE WITH MULTIPLE ENDINGS)
+        effective_choices = num_choices if num_choices > 1 else (2 if force_interactive_tree else 1)
+        if effective_choices == 2:
+            interactive_section = """- Interactive: YES (BRANCHING CHOICE TREE WITH MULTIPLE ENDINGS - 2 CONSECUTIVE CHOICE SCREENS)
+  * Construct a rich, expansive 2-tier decision tree with 2 sequential choice screens giving 4 distinct branch pathways and endings!
+  * Full Tree Architecture (Provide ALL 7 scenes in `scenes`):
+    - Scene 1 (The Initial Choice, "sc1"):
+      * Introduces the dilemma.
+      * Final beat MUST have a `choice` with 2 options:
+        - "opt_a" -> next_scene: "sc2a"
+        - "opt_b" -> next_scene: "sc2b"
+    - Tier-2 Branch A ("sc2a"):
+      * First branch exploration in a unique location (different background).
+      * Final beat MUST have a SECOND choice screen with 2 options:
+        - "opt_a1" -> next_scene: "sc3a1"
+        - "opt_a2" -> next_scene: "sc3a2"
+    - Tier-2 Branch B ("sc2b"):
+      * Second branch exploration in a completely different location.
+      * Final beat MUST have a SECOND choice screen with 2 options:
+        - "opt_b1" -> next_scene: "sc3b1"
+        - "opt_b2" -> next_scene: "sc3b2"
+    - 4 Unique Climax & Ending Scenes (next_scene: null for all 4 endings):
+      * Ending A1 ("sc3a1"): Warm resolution for choice Path A1. next_scene: null.
+      * Ending A2 ("sc3a2"): Warm resolution for choice Path A2. next_scene: null.
+      * Ending B1 ("sc3b1"): Warm resolution for choice Path B1. next_scene: null.
+      * Ending B2 ("sc3b2"): Warm resolution for choice Path B2. next_scene: null.
+  * Every scene must contain 2 to 3 beats. Total 7 scenes so any pathway can be explored!"""
+        elif effective_choices >= 3:
+            interactive_section = """- Interactive: YES (BRANCHING CHOICE TREE WITH MULTIPLE ENDINGS - 3 CHOICE SCREENS / EPIC QUEST)
+  * Construct an expansive multi-stage interactive journey with 3 distinct decision screens across the adventure!
+  * Full Tree Architecture (Provide ALL scenes in `scenes`):
+    - Scene 1 (Stage 1 Choice, "sc1"):
+      * Quest setup. Final beat choice leads to "sc2a" or "sc2b".
+    - Stage 2 Scenes ("sc2a", "sc2b"):
+      * Encountering obstacle. Final beat choice in each leads to "sc3a" or "sc3b".
+    - Stage 3 Scenes ("sc3a", "sc3b"):
+      * Climax decision point! Final beat choice in each leads to "sc4a" (Heroic resolution) or "sc4b" (Clever/Peaceful resolution).
+    - Stage 4 Endings ("sc4a", "sc4b"):
+      * Unique, heartwarming conclusions for each choice combination. next_scene: null.
+  * Total scenes: Provide all branch and ending scenes in `scenes`!"""
+        else:
+            interactive_section = """- Interactive: YES (BRANCHING CHOICE TREE WITH MULTIPLE ENDINGS)
   * Construct a genuine branching story tree so the user's choices lead to completely DIFFERENT adventures and MULTIPLE UNIQUE ENDINGS!
   * Structure:
     - Scene 1 (Opening Dilemma, e.g. "sc1"): Establishes the quest. Its FINAL beat MUST contain a `choice` with 2 distinct options:
@@ -145,6 +187,8 @@ async def write_story(
     characters: Optional[List[Dict[str, Any]]] = None,
     duration: str = "1-2mins",
     generate_characters: bool = False,
+    num_choices: int = 1,
+    force_interactive_tree: bool = False,
     llm_fn = generate_json
 ) -> StoryDraft:
     system_prompt = load_system_prompt()
@@ -156,7 +200,9 @@ async def write_story(
         series=series,
         characters=characters,
         duration=duration,
-        generate_characters=generate_characters
+        generate_characters=generate_characters,
+        num_choices=num_choices,
+        force_interactive_tree=force_interactive_tree
     )
 
     data = await llm_fn(
