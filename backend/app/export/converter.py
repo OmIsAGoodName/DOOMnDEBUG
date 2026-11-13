@@ -37,6 +37,15 @@ async def convert_webm_to_mp4(
     try:
         ffmpeg_bin = shutil.which("ffmpeg")
         if not ffmpeg_bin:
+            local_app = os.environ.get("LOCALAPPDATA")
+            if local_app:
+                winget_path = Path(local_app) / "Microsoft" / "WinGet" / "Packages"
+                if winget_path.exists():
+                    for p in winget_path.glob("Gyan.FFmpeg*/**/ffmpeg.exe"):
+                        ffmpeg_bin = str(p)
+                        break
+
+        if not ffmpeg_bin:
             raise RuntimeError("ffmpeg executable not found on system PATH")
 
         # FFmpeg conversion arguments

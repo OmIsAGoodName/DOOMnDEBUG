@@ -59,10 +59,19 @@ async def run_checks():
 
     # 2. FFmpeg + Codecs
     ffmpeg_bin = shutil.which("ffmpeg")
+    if not ffmpeg_bin:
+        local_app = os.environ.get("LOCALAPPDATA")
+        if local_app:
+            winget_path = Path(local_app) / "Microsoft" / "WinGet" / "Packages"
+            if winget_path.exists():
+                for p in winget_path.glob("Gyan.FFmpeg*/**/ffmpeg.exe"):
+                    ffmpeg_bin = str(p)
+                    break
+
     ffmpeg_ok = bool(ffmpeg_bin)
     codec_info = ""
     if ffmpeg_ok:
-        encoders = subprocess.getoutput("ffmpeg -encoders")
+        encoders = subprocess.getoutput(f'"{ffmpeg_bin}" -encoders')
         has_264 = "libx264" in encoders
         has_aac = "aac" in encoders
         ffmpeg_ok = has_264 and has_aac
