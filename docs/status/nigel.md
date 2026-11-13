@@ -1,8 +1,8 @@
 # Status: Nigel
 
-**Current Milestone**: Part 2 (Remaining Art, Props & Audio) Complete  
+**Current Milestone**: Part 4 (Studio Mode & Series Creation) Complete  
 **Date**: 2026-11-13  
-**Active Branch**: `nigel/art-setup` (Synced with `main` at `fced67d`)
+**Active Branch**: `nigel/art-setup` (Synced with `main` at `fbdc6a4`)
 
 ---
 
@@ -39,15 +39,30 @@
 - [x] **N2.5 Art Polish & Composite Performance Pass**:
   - Validated composite render performance (3 characters + background + 2 props) well under the 8 ms budget (< 3 ms in unit test).
   - All 27 frontend tests pass; TypeScript compiles with 0 errors.
+- [x] **N3.1 UI Foundation & Home (`frontend/src/ui/`, `pages/Home.tsx`)**:
+  - Reusable design system: Button, Card, Input, Textarea, Select, Chip, Badge, Stepper, Common (Spinner, EmptyState, VoxFableLogo), EpisodeView.
+  - Accessible, responsive Home page featuring hero banner, Quick vs Studio modes, recent episodes grid, safety callout.
+- [x] **N3.2 Auth Pages (`frontend/src/pages/auth/Login.tsx`, `Signup.tsx`)**:
+  - Form validation, demo mode one-click bypass, graceful Supabase error states.
+- [x] **N3.3 Quick Story Page (`frontend/src/pages/Quick.tsx`)**:
+  - Generator stepper with visual progress, character & background selector, Live Interactive Story mode toggle, export MP4 button, fallback fixture player.
+- [x] **N3.4 Library & Episode Pages (`frontend/src/pages/Library.tsx`, `pages/Episode.tsx`)**:
+  - Full catalog filtering, episode inspector with continuity badge, safety verdict, and replay controls.
+- [x] **N4.1 Character Builder (`frontend/src/studio/CharacterBuilder.tsx`)**:
+  - Real-time 60fps canvas preview with expression switcher, species picker, palette customizer, accessories, personality, catchphrase, rules.
+- [x] **N4.2 Series Form (`frontend/src/studio/SeriesForm.tsx`)**:
+  - Series title, target age band, default setting, tone chips, and world consistency rules list.
+- [x] **N4.3 Studio Mode Page (`frontend/src/pages/Studio.tsx`)**:
+  - Series selector, character roster cards with quick edit, batch season generation (N=1..5) with live progress bar and episode cards with Play buttons.
 
 ## In progress
-- PART 3: UI foundation, Auth pages, Quick Story (`/quick`), and Library (`/library`, `/episode/:id`).
+- PART 5: Pitch, Demo Script, QA, and README documentation.
 
 ## Next
-- N3.1: Create UI component library in `frontend/src/ui/` and modern Home page (`/`).
-- N3.2: Implement Auth pages (`/login`, `/signup`) using `useAuth()`.
-- N3.3: Implement Quick Story page (`/quick`) with generator stages, `<EpisodePlayer>`, Live Mode, and MP4 download.
-- N3.4: Implement Library & Episode pages.
+- N5.1: Write 3-minute pitch deck outline in `demo/DECK_OUTLINE.md` with speaker notes, backup slides, and uninvented claims verification table.
+- N5.2: Write rehearsed 3-minute demo script in `docs/DEMO.md` with stage cues, safety ladder fallbacks (Level B/C), 60s and 5min variants.
+- N5.3: Write comprehensive Judge Q&A answers in `demo/QA.md` covering GenAI legitimacy, character consistency, child safety, TTS licensing, and 24-hr scope honesty.
+- N5.4: Rewrite `README.md` with project architecture, tech stack, quickstart, demo safety ladder, team roles, and CC0/CC-BY license attributions.
 
 ## Blockers
 - None.
