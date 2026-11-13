@@ -56,20 +56,44 @@ def build_writer_user_prompt(
 
     avail_bgs = [f"- {b['id']}: {b['name']} (hint: {b.get('mood_hint', 'day')})" for b in metadata["backgrounds"]]
 
-    duration_guideline = {
-        "<1min": "Target length: short & snappy (2 scenes, ~45-60 seconds total).",
-        "1-2mins": "Target length: bedtime tale (3 to 4 scenes, ~90 seconds total).",
-        "2-3mins": "Target length: extended adventure (4 to 5 scenes, ~120-150 seconds total)."
-    }.get(duration, "Target length: bedtime tale (3 to 4 scenes).")
+    if duration == "<1min":
+        duration_req = (
+            "Target length: <1min (Snack Story)\n"
+            "- Exactly 3 scenes total.\n"
+            "- Each scene MUST have 2 beats (6 beats total across the story).\n"
+            "- Spoken runtime target: 50 to 65 seconds."
+        )
+    elif duration == "2-3mins":
+        duration_req = (
+            "Target length: 2-3mins (Extended Adventure)\n"
+            "- Exactly 5 or 6 scenes total.\n"
+            "- Each scene MUST have 3 to 4 beats (15 to 20 beats total across the story).\n"
+            "- Spoken runtime target: 135 to 165 seconds."
+        )
+    else:  # "1-2mins"
+        duration_req = (
+            "Target length: 1-2mins (Bedtime Tale - MUST BE BETWEEN 80 AND 120 SECONDS)\n"
+            "- Exactly 4 or 5 scenes total.\n"
+            "- Each scene MUST have 2 to 3 beats (10 to 14 beats total across the story).\n"
+            "- Spoken runtime target: 85 to 115 seconds."
+        )
 
     user_prompt = f"""
 STORY REQUEST:
 - User Premise: "{prompt}"
 - Target Age Band: {age_band}
 - Language: {language}
-- Target Duration: {duration} ({duration_guideline})
+- Target Duration Requirement:
+{duration_req}
+
 - Interactive: {"YES (2 choice points with reconverging branch)" if interactive else "NO (linear)"}
 {"- Character Creation: Try generating original, creative character designs suited to this story premise and include them in the cast list." if generate_characters else ""}
+
+STORYTELLING & PACING RULES:
+1. Multi-Beat Scenes: Do NOT write single-beat scenes! Every scene must have 2 to 4 beats so characters interact and dialogue flows naturally.
+2. Character Dialogue: Feature at least 2 characters having lively, sweet conversations (use type: "SPEAK" with character_id).
+3. Sensory Detail & Warmth: Include evocative, child-friendly details (glowing fireflies, crunchy clover, fluffy clouds, warm cups of tea).
+4. Speech Length: Each beat must be between 14 and 24 words to ensure proper cartoon timing and runtime.
 
 AVAILABLE ASSETS:
 Available Characters:
@@ -79,7 +103,6 @@ Available Backgrounds:
 {chr(10).join(avail_bgs)}
 
 Write a heartwarming, engaging StoryDraft JSON for this story.
-Ensure speech lines are concise (< 25 words).
 """
     if series:
         user_prompt += f"\nSeries Setting & Rules: {json.dumps(series.get('world', {}))}\n"
