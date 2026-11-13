@@ -1,34 +1,40 @@
-# Status: Om
+# Om's Status & Milestone Log
 
-## Done
-- Part 0.2: Repo skeleton, docs, and .gitignore
-- Part 0.3: AGENTS.md and Antigravity rules (.agents/rules/*.md)
-- Part 0.4: Contracts v0 (vocab.json, schemas, types.ts, pydantic models, validate_fixtures.py)
-- Part 0.5: Quick and Live demo fixtures, asset metadata stubs
-- Part 0.6: Frontend scaffold (Vite + React + TS + Tailwind + Vitest + routes + stubs in all folders)
-- Part 0.7: Push #1 (Initial scaffold published to GitHub)
-- Part 0.8: Supabase schema migration (0001_init.sql with RLS & trigger), SUPABASE.md, test_rls.py
-- Part 0.9: Backend skeleton (FastAPI, auth dependency, health check, repositories), frontend shared libraries (Push #2)
-- Part 1.1: LLM provider adapter (Gemini, Groq, Ollama) with retry, exponential backoff, rate limiter, and disk cache
-- Part 1.2: Story Writer station (narrative arc, 3-6 scenes, <25 words speech, Golden tests)
-- Part 1.3: Animation Director station (parallel scene direction, camera shots, coordinate constraints)
-- Part 1.4: Validator and Asset Resolver (fallback ladder, repair logs, 26 unit tests)
-- Part 1.5: Edge-TTS synthesis and audio manifest generator (word boundary events, real demo audio in frontend/public/demo)
-- Part 1.6: Generation pipeline and async Quick Story API endpoints (progress stages: understanding, writing, planning, preparing, checking, narration, ready)
+**Current Milestone**: Part 3 (Integration, Demo Net & Pre-flight) Complete  
+**Date**: 2026-11-13  
+**Active Branch**: `om/supabase-backend` (synced with `main` at `e8b16f8`)
 
-## In progress
-- Integration 1: Quick Story end-to-end integration
+---
 
-## Next
-- Part 2.1: Safety Gate (keyword blocklist, reading-level check, LLM judge)
-- Part 2.2: Continuity Supervisor
-- Part 2.3: Studio Mode batch generation
+## 1. Done
+- [x] **FFmpeg Installation**: Installed Gyan.FFmpeg v9.0.2 via `winget`; verified libx264 and aac encoders on PATH.
+- [x] **Part 2 Stations**:
+  - `safety.py`: Reading level scoring, blocklist checks, LLM safety judge.
+  - `continuity.py`: Character bible rule enforcement (Pip nocturnal flight fixed).
+  - `batch.py`: Showrunner batch generator with outline generation.
+  - `matcher.py`: Voice/text keyword overlap scoring with fallback ladder.
+  - `converter.py`: WebM to MP4 re-encoding with standardized 720p scaling.
+- [x] **Part 3 Integration & Pre-Flight**:
+  - `docs/TASKS.md`: Complete automated integration runner docs + manual demo checklist.
+  - `scripts/integration_check.py`: End-to-end integration test runner.
+  - `scripts/bake_demo_episode.py`: Offline fallback baker for Quick, Live, and Studio episodes.
+  - Baked 3 offline demo episodes under `frontend/public/demo/episodes/` with synthesized edge-tts audio and `index.json` manifest (total size: ~0.84 MB, well below the 30 MB budget).
+  - `frontend/src/lib/api.ts`: Static fallback detection so the frontend can play and download demo episodes even with backend stopped / offline.
+  - `scripts/preflight.py`: Pre-flight audit checking Python, Node, FFmpeg, ports 5173/8000, environment keys, baked episodes, disk space.
+  - `docs/PREFLIGHT.md`: Demo-day hardware, audio, presentation script, and speaker allocation.
+  - `scripts/run_demo.bat` & `scripts/run_demo.sh`: One-click simultaneous launcher for FastAPI and Vite.
 
-## Blockers
-- None
+## 2. In progress
+- Teammate support: Standing by for Maegan (Engine / Live Player) and Nigel (Art & UI) contract updates or requests.
 
-## Requests
-- None
+## 3. Next
+- Teammate contract proposals / review (Part 4.1).
+- Assist teammates on integrating real SVG character/background assets and canvas animation sync.
+- Verification of live WebM recording $\rightarrow$ MP4 export in browser once engine recording button is wired up.
 
-## Contract proposals
-- None
+## 4. Blockers
+- None.
+
+## 5. Requests / Notes for Team
+- Teammates can run `git pull --rebase origin main` to pull all backend stations, offline demo episodes, launchers, and updated contracts.
+- To run the full stack locally: double-click `scripts\run_demo.bat` (Windows) or execute `./scripts/run_demo.sh`.
