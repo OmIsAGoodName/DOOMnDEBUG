@@ -5,9 +5,12 @@
     "type": "character",
     "style": "cartoon2d",
     "species": "owl",
+    "status": "implemented",
     "tags": ["child-friendly", "forest", "shy"],
     "animations": ["idle", "walk", "talk", "wave", "laugh", "listen", "react", "point"],
     "expressions": ["neutral", "happy", "sad", "surprised", "worried", "excited"],
+    "accessories": ["scarf", "glasses", "hat", "bow", "backpack", "cape"],
+    "mouths": ["closed", "half", "wide"],
     "default_palette": {
       "primary": "#8b5e3c",
       "secondary": "#d9b38c",
@@ -27,9 +30,12 @@
     "type": "character",
     "style": "cartoon2d",
     "species": "fox",
+    "status": "planned_v1",
     "tags": ["child-friendly", "forest", "cheeky"],
     "animations": ["idle", "walk", "talk", "wave", "laugh", "listen", "react", "point"],
     "expressions": ["neutral", "happy", "sad", "surprised", "worried", "excited"],
+    "accessories": ["scarf", "glasses", "hat", "bow", "backpack", "cape"],
+    "mouths": ["closed", "half", "wide"],
     "default_palette": {
       "primary": "#d95f32",
       "secondary": "#f4c28d",
@@ -49,9 +55,12 @@
     "type": "character",
     "style": "cartoon2d",
     "species": "kid",
+    "status": "planned_v1",
     "tags": ["child-friendly", "curious", "friendly"],
     "animations": ["idle", "walk", "talk", "wave", "laugh", "listen", "react", "point"],
     "expressions": ["neutral", "happy", "sad", "surprised", "worried", "excited"],
+    "accessories": ["scarf", "glasses", "hat", "bow", "backpack", "cape"],
+    "mouths": ["closed", "half", "wide"],
     "default_palette": {
       "primary": "#3a86ff",
       "secondary": "#ffbe0b",
@@ -66,4 +75,3 @@
     "licence": "original"
   }
 ]
-
