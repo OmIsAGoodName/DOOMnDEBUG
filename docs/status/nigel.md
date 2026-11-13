@@ -1,12 +1,24 @@
 # Status: Nigel
 
-**Current Milestone**: All Parts (Part 0 through Part 5) 100% Complete & Synchronized  
-**Date**: 2026-11-13  
-**Active Branch**: `nigel/art-setup` (Synced with `main`)
+**Current Milestone**: Design Taste Refactor Pass Complete & Verified  
+**Date**: 2026-11-14  
+**Active Branch**: `nigel/art-setup` (Synced with `main`, local commits ahead of origin; NO push without explicit consent)
 
 ---
 
 ## Done
+- [x] **N8.0 Frontend Design Taste Refactor Pass**:
+  - Implemented cohesive Storybook Atelier art direction: deep velvety midnight palette (`#070a13`, `#0b101e`, `#151f38`), warm parchment light mode, and radiant lantern gold primary accents.
+  - Eliminated generic AI-slop anti-patterns: removed harsh purple/neon gradients, floating clapperboard emoji thumbnails, blinding un-themed white empty-state containers, and muddy disabled-looking buttons.
+  - Upgraded core primitives: `Button` (warm tactile lantern gold, crisp physical secondaries), `Card` (layered storybook surfaces with subtle highlight lines), `Badge` (quiet, high-contrast indicators), `Input`/`Textarea`/`Select` (sunken surfaces with warm focus rings), `Stepper`, and `Common`.
+  - Refactored page layouts:
+    - `Quick.tsx`: Storybook forge layout with ambient reading lamp spotlight, tactile duration chips, and radiant "Create Cartoon Story" button.
+    - `Studio.tsx`: Animation model sheet character cards with blueprint framing, eliminated blinding white empty state in dark mode, master deck season generator.
+    - `Library.tsx`: Replaced empty emoji rectangles with layered storybook scene cels, interactive overlays, and refined metadata cards.
+    - `EpisodeView.tsx` & `LiveController.tsx`: Cinema player styling, acoustic mic rings, tactile choice buttons.
+    - `App.tsx`: Translucent frosted glass navigation header with storybook display typography.
+  - Preserved 100% of business logic, contracts, and test contracts.
+  - Verified with `npm run typecheck` (0 errors) and `npm test` (all 11 suites, 38 unit tests passing).
 - [x] **N0.4 Art Style Guide (`docs/ART_STYLE.md`)**:
   - Full original art specification: color palettes, shape language, 300 px scale rules, outline standards, 8 poses, 6 expressions, 3 mouths, 6 accessories, background layering, and polish checklist.
 - [x] **N1.1 Scaffold Verification**:
