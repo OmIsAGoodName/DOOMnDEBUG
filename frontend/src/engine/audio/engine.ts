@@ -34,6 +34,7 @@ function resolveAudioUrl(url: string): string {
 export class AudioEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
+  private localGain: GainNode | null = null;
   private musicGain: GainNode | null = null;
   private speechGain: GainNode | null = null;
   private sfxGain: GainNode | null = null;
@@ -43,6 +44,7 @@ export class AudioEngine {
   private activeSources: ActiveSource[] = [];
   private activeSpeechTimers: number[] = [];
   private isMuted = false;
+  private isLocalMuted = false;
   private isLoaded = false;
   private loadPromise: Promise<void> | null = null;
 
@@ -59,6 +61,7 @@ export class AudioEngine {
         (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       this.ctx = new AudioCtx();
       this.masterGain = this.ctx.createGain();
+      this.localGain = this.ctx.createGain();
       this.musicGain = this.ctx.createGain();
       this.speechGain = this.ctx.createGain();
       this.sfxGain = this.ctx.createGain();
@@ -67,7 +70,11 @@ export class AudioEngine {
       this.sfxGain.connect(this.masterGain);
       this.musicGain.connect(this.masterGain);
 
-      this.masterGain.connect(this.ctx.destination);
+      // Connect local speakers via localGain (can be muted independently during export)
+      this.masterGain.connect(this.localGain);
+      this.localGain.connect(this.ctx.destination);
+
+      // Connect recording destination directly to masterGain (always gets audio during export)
       if (this.recordingDestination) {
         this.masterGain.connect(this.recordingDestination);
       }
@@ -111,8 +118,15 @@ export class AudioEngine {
 
   public setMuted(muted: boolean): void {
     this.isMuted = muted;
-    if (this.masterGain && this.ctx) {
-      this.masterGain.gain.setValueAtTime(muted ? 0 : 1, this.ctx.currentTime);
+    if (this.localGain && this.ctx) {
+      this.localGain.gain.setValueAtTime(muted ? 0 : 1, this.ctx.currentTime);
+    }
+  }
+
+  public setLocalMuted(muted: boolean): void {
+    this.isLocalMuted = muted;
+    if (this.localGain && this.ctx) {
+      this.localGain.gain.setValueAtTime(muted ? 0 : 1, this.ctx.currentTime);
     }
   }
 
@@ -237,7 +251,7 @@ export class AudioEngine {
   public syncPlayback(timeline: ResolvedTimeline, t: number, isPlaying: boolean): void {
     this.stopAll();
 
-    if (!isPlaying || !this.ctx || this.isMuted) return;
+    if (!isPlaying || !this.ctx) return;
 
     if (this.ctx.state === 'suspended') {
       this.ctx
@@ -254,7 +268,7 @@ export class AudioEngine {
   }
 
   private internalSchedule(timeline: ResolvedTimeline, t: number): void {
-    if (!this.ctx || this.ctx.state !== 'running' || this.isMuted) return;
+    if (!this.ctx || this.ctx.state !== 'running') return;
 
     // Clear previous sources before scheduling
     this.stopAll();
