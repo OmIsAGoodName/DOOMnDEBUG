@@ -132,7 +132,15 @@ export class AudioEngine {
         }
 
         try {
-          const res = await fetch(item.url);
+          let res = await fetch(item.url);
+          if (!res.ok && item.url.startsWith('/')) {
+            // Fallback for API media or local backend server
+            try {
+              res = await fetch(`http://localhost:8000${item.url}`);
+            } catch {
+              // keep original response
+            }
+          }
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const arrayBuffer = await res.arrayBuffer();
           const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
@@ -174,7 +182,7 @@ export class AudioEngine {
       (b) => b.speech && t >= b.startTime && t < b.endTime
     );
 
-    // 1. Music scheduling
+    // 1. Music scheduling (active or upcoming)
     const musicEvents = timeline.audioEvents.filter((e) => e.type === 'music');
     for (const ev of musicEvents) {
       const buf = this.bufferCache.get(ev.url);
@@ -199,10 +207,25 @@ export class AudioEngine {
 
         source.start(now, offset);
         this.activeSources.push({ node: source, gainNode, type: 'music', id: ev.id });
+      } else if (musicStart > t && musicStart < timeline.totalDuration) {
+        const delay = musicStart - t;
+        const source = this.ctx.createBufferSource();
+        source.buffer = buf;
+        source.loop = true;
+
+        const gainNode = this.ctx.createGain();
+        const baseVolume = ev.volume ?? 0.3;
+        gainNode.gain.setValueAtTime(baseVolume, now + delay);
+
+        source.connect(gainNode);
+        if (this.musicGain) gainNode.connect(this.musicGain);
+
+        source.start(now + delay, 0);
+        this.activeSources.push({ node: source, gainNode, type: 'music', id: ev.id });
       }
     }
 
-    // 2. Speech scheduling (current active line)
+    // 2. Speech scheduling (active line with offset, or upcoming lines along timeline)
     for (const beat of timeline.beats) {
       if (!beat.speech || !beat.lineId) continue;
       const audioEv = timeline.audioEvents.find((e) => e.id === beat.lineId);
@@ -226,16 +249,42 @@ export class AudioEngine {
           source.start(now, offset);
           this.activeSources.push({ node: source, gainNode, type: 'speech', id: beat.lineId });
         }
+      } else if (beat.startTime > t) {
+        const delay = beat.startTime - t;
+        const source = this.ctx.createBufferSource();
+        source.buffer = buf;
+
+        const gainNode = this.ctx.createGain();
+        gainNode.gain.setValueAtTime(1.0, now + delay);
+
+        source.connect(gainNode);
+        if (this.speechGain) gainNode.connect(this.speechGain);
+
+        source.start(now + delay, 0);
+        this.activeSources.push({ node: source, gainNode, type: 'speech', id: beat.lineId });
       }
     }
 
-    // 3. SFX (play if triggered within the last 100ms)
+    // 3. SFX scheduling (active or upcoming)
     const sfxEvents = timeline.audioEvents.filter((e) => e.type === 'sfx');
     for (const ev of sfxEvents) {
-      if (t >= ev.startTime && t <= ev.startTime + 0.1) {
-        const buf = this.bufferCache.get(ev.url);
-        if (!buf) continue;
+      const buf = this.bufferCache.get(ev.url);
+      if (!buf) continue;
 
+      if (ev.startTime >= t) {
+        const delay = ev.startTime - t;
+        const source = this.ctx.createBufferSource();
+        source.buffer = buf;
+
+        const gainNode = this.ctx.createGain();
+        gainNode.gain.setValueAtTime(ev.volume ?? 0.8, now + delay);
+
+        source.connect(gainNode);
+        if (this.sfxGain) gainNode.connect(this.sfxGain);
+
+        source.start(now + delay, 0);
+        this.activeSources.push({ node: source, gainNode, type: 'sfx', id: ev.id });
+      } else if (t >= ev.startTime && t <= ev.startTime + 0.1) {
         const offset = t - ev.startTime;
         const source = this.ctx.createBufferSource();
         source.buffer = buf;

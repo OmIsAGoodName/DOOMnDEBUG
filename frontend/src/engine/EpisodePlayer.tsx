@@ -106,7 +106,11 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
       try {
         const tl = resolveTimeline(plan, audio, choicePath || []);
         setTimeline(tl);
-        audioEngineRef.current?.loadManifest(audio).catch((err) => {
+        audioEngineRef.current?.loadManifest(audio).then(() => {
+          if (isPlayingRef.current) {
+            audioEngineRef.current?.syncPlayback(tl, timeRef.current, true);
+          }
+        }).catch((err) => {
           console.warn('[EpisodePlayer] Audio load error:', err);
         });
       } catch (err) {
@@ -224,7 +228,10 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
       setIsChoiceActive(false);
       lastTimestampRef.current = null;
 
-      audioEngineRef.current?.initContext();
+      const ctx = audioEngineRef.current?.initContext();
+      if (ctx && ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+      }
       audioEngineRef.current?.syncPlayback(timeline, timeRef.current, true);
 
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
