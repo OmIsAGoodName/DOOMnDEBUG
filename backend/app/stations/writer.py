@@ -27,6 +27,18 @@ def load_metadata() -> Dict[str, List[Dict[str, Any]]]:
                     result[key] = json.load(f)
             except Exception:
                 pass
+
+    # Merge custom user-created characters from media/data
+    custom_chars_path = BASE_DIR / "media" / "data" / "custom_characters.json"
+    if custom_chars_path.exists():
+        try:
+            with open(custom_chars_path, "r", encoding="utf-8") as f:
+                custom_list = json.load(f)
+                if isinstance(custom_list, list):
+                    result["characters"].extend(custom_list)
+        except Exception:
+            pass
+
     return result
 
 def load_system_prompt() -> str:

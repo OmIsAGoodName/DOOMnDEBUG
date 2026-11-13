@@ -36,7 +36,7 @@ class ActionSpawnCharacter(ActionBase):
 class ActionRemoveCharacter(ActionBase):
     type: Literal["REMOVE_CHARACTER"]
     character_id: str
-    exit: Optional[Literal["fade", "slide_left", "slide_right"]] = None
+    exit: Optional[Literal["fade", "slide_left", "slide_right", "fly_away"]] = None
 
 class ActionMoveTo(ActionBase):
     type: Literal["MOVE_TO"]

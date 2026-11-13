@@ -171,6 +171,36 @@ export const api = {
     }
     return res;
   },
+
+  getAssets: async (): Promise<{
+    characters: any[];
+    backgrounds: any[];
+    props: any[];
+    music: any[];
+    sfx: any[];
+  }> => {
+    return request<{
+      characters: any[];
+      backgrounds: any[];
+      props: any[];
+      music: any[];
+      sfx: any[];
+    }>('/api/assets');
+  },
+
+  createCharacter: async (params: {
+    name: string;
+    species: string;
+    personality?: string;
+    prompt?: string;
+    palette?: Record<string, string>;
+    voice?: Record<string, string>;
+  }): Promise<any> => {
+    return request<any>('/api/characters', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+  },
 };
 
 export function triggerFileDownload(source: string | Blob, filename: string): void {

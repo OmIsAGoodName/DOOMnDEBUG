@@ -387,9 +387,18 @@ export function evaluateCharacterState(
           if (remove.exit === 'fade') {
             alpha = 1 - p;
           } else if (remove.exit === 'slide_left') {
-            x -= p * 0.3;
+            x -= p * 0.35;
+            facing = 'left';
+            animation = 'walk';
           } else if (remove.exit === 'slide_right') {
-            x += p * 0.3;
+            x += p * 0.35;
+            facing = 'right';
+            animation = 'walk';
+          } else if (remove.exit === 'fly_away') {
+            y -= p * 0.7; // Soars up high into the sky!
+            x += (facing === 'right' ? 1 : -1) * p * 0.25;
+            alpha = Math.max(0, 1 - p * 0.85);
+            animation = 'talk'; // Flapping / dynamic flight motion
           }
         }
       } else if (a.type === 'MOVE_TO' && a.character_id === charId) {

@@ -1,13 +1,40 @@
 # Om's Status & Milestone Log
 
-**Current Milestone**: Multi-Model Failover, Local Auth Unblocking & Real Long-Form Story Generation Complete  
-**Date**: 2026-11-13  
+**Current Milestone**: Asset Catalog, In-Library Character Generator & Narrative Physical Actions Complete  
+**Date**: 2026-11-14  
 **Active Branch**: `main` (synced with `origin/main`)  
 **Repository**: `https://github.com/OmIsAGoodName/DOOMnDEBUG.git`  
 
 ---
 
-## ⚡ Recent Updates (Full End-to-End Generation & Duration Fix)
+## ⚡ Recent Updates (Physical Narrative Actions & Studio Asset Library)
+
+1. **Rich Narrative Action Parsing & Execution (Zero LLM Tokens)**:
+   - **Cinematic Flight Exit**:
+     - Extended `ActionRemoveCharacter.exit` in [`backend/app/models/episode_plan.py`](file:///d:/VoxFable/backend/app/models/episode_plan.py) to support `"fly_away"`.
+     - In [`frontend/src/engine/resolveTimeline.ts`](file:///d:/VoxFable/frontend/src/engine/resolveTimeline.ts), implemented smooth upward ascent into the sky with flapping wings, easing, and natural alpha fade.
+   - **Narrative-Driven Action Extraction** ([`backend/app/stations/director.py`](file:///d:/VoxFable/backend/app/stations/director.py)):
+     - Autonomous rule-based action parsing scans narrative dialogue & beat text for physical movement cues with 0 extra token overhead:
+       - Flight cues ("flew away", "soared", "flapped", "take off") $\rightarrow$ `REMOVE_CHARACTER(exit="fly_away")` + `PLAY_SFX("sparkle")`.
+       - Movement cues ("walked over", "ran to", "approached", "stepped closer") $\rightarrow$ `MOVE_TO(to=(0.46, 0.76))`.
+       - Greeting/parting cues ("waved", "waves", "goodbye") $\rightarrow$ `PLAY_ANIMATION("wave")`.
+       - Discovery cues ("pointed", "spotted", "look") $\rightarrow$ `PLAY_ANIMATION("point")`.
+       - Celebration cues ("jumped", "leaped", "cheered", "hooray") $\rightarrow$ `PLAY_ANIMATION("react")` + `PLAY_SFX("pop")`.
+       - Prop cues ("briefcase", "map", "flower", "lantern", "balloon") $\rightarrow$ `ATTACH_PROP`.
+
+2. **Studio Asset Catalog & In-Library Character Generator**:
+   - **Backend API Endpoints** ([`backend/app/main.py`](file:///d:/VoxFable/backend/app/main.py)):
+     - Added `GET /api/assets`: Returns complete catalog of all core and custom characters, backgrounds, props, music tracks, and sound effects.
+     - Added `POST /api/characters`: Allows generating and persisting custom character designs directly to `media/data/custom_characters.json`.
+     - Updated [`backend/app/stations/writer.py`](file:///d:/VoxFable/backend/app/stations/writer.py) to merge custom characters into story writer candidate cast pool automatically.
+   - **Interactive Studio Library UI** ([`frontend/src/pages/Library.tsx`](file:///d:/VoxFable/frontend/src/pages/Library.tsx)):
+     - Reorganized into 4 dedicated tabs:
+       - **🎬 Stories**: Full collection of user and demo episodes with safety badges, offline tags, and direct playback links.
+       - **✨ Characters & Cast**: Complete character roster with species badges, voice timbre/pitch tags, color swatches, and an inline **"✨ Generate Character Design Studio"** with real-time saving and feedback.
+       - **🎨 Backgrounds**: Visual stage catalog of all locations (`forest_day`, `forest_night`, `meadow_day`, `treehouse_interior`, `village_street`) with mood descriptors and ground band anchors.
+       - **🪄 Props & Audio**: Stage props inventory, background scores, and sound effects library.
+
+3. **Multi-Model Failover, Local Auth Unblocking & Real Long-Form Story Generation**:
 1. **Resolved 30-Second Video Issue (Eliminated Silent Demo Masking)**:
    - Diagnosed root cause of the previous 30s output:
      - Groq model `openai/gpt-oss-120b` had reached its 200,000 daily token limit (HTTP 429).

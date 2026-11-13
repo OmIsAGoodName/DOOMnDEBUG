@@ -101,12 +101,99 @@ def direct_scene_rule_based(
                 "character_id": speaker,
                 "expression": emotion
             })
-            if b_idx % 2 == 1:
-                actions.append({
-                    "type": "PLAY_SFX",
-                    "sfx_id": "chime",
-                    "volume": 0.5
-                })
+
+        text_lower = (b.speech.text or "").lower()
+
+        # 1. Flight / Flew Away
+        if any(w in text_lower for w in ["flew away", "flies away", "fly away", "soared", "takes flight", "took flight", "flapped his wings", "flapped her wings", "flew"]):
+            flying_char = "pip_owl" if "pip_owl" in cast_ids else (speaker or cast_ids[0])
+            actions.append({
+                "type": "REMOVE_CHARACTER",
+                "character_id": flying_char,
+                "exit": "fly_away",
+                "duration": 2.5,
+                "delay": max(0.5, round(est_speech * 0.4, 1))
+            })
+            actions.append({
+                "type": "PLAY_SFX",
+                "sfx_id": "sparkle",
+                "volume": 0.5,
+                "delay": max(0.5, round(est_speech * 0.4, 1))
+            })
+
+        # 2. Walked / Ran / Came Over / Approached
+        elif any(w in text_lower for w in ["walked over", "walks over", "ran to", "runs to", "hurried", "approached", "stepped closer", "came over"]):
+            moving_char = speaker or cast_ids[0]
+            actions.append({
+                "type": "MOVE_TO",
+                "character_id": moving_char,
+                "to": (0.46, 0.76),
+                "duration": 2.0,
+                "delay": 0.5
+            })
+
+        # 3. Waving Goodbye or Hello
+        elif any(w in text_lower for w in ["waved", "waves", "goodbye", "farewell", "hello", "greeted"]):
+            waving_char = speaker or cast_ids[0]
+            actions.append({
+                "type": "PLAY_ANIMATION",
+                "character_id": waving_char,
+                "animation": "wave",
+                "duration": 2.5,
+                "delay": 0.2
+            })
+
+        # 4. Pointing / Showing
+        elif any(w in text_lower for w in ["pointed", "points", "look there", "look at", "spotted", "showed"]):
+            pointing_char = speaker or cast_ids[0]
+            actions.append({
+                "type": "PLAY_ANIMATION",
+                "character_id": pointing_char,
+                "animation": "point",
+                "duration": 2.5,
+                "delay": 0.2
+            })
+
+        # 5. Jumping / Cheering / Laughing
+        elif any(w in text_lower for w in ["jumped", "leaped", "hopped", "cheered", "celebrated", "giggled", "hooray", "gasped"]):
+            react_char = speaker or cast_ids[0]
+            actions.append({
+                "type": "PLAY_ANIMATION",
+                "character_id": react_char,
+                "animation": "react",
+                "duration": 2.0,
+                "delay": 0.2
+            })
+            actions.append({
+                "type": "PLAY_SFX",
+                "sfx_id": "pop",
+                "volume": 0.5
+            })
+        elif b_idx % 2 == 1:
+            actions.append({
+                "type": "PLAY_SFX",
+                "sfx_id": "chime",
+                "volume": 0.5
+            })
+
+        # 6. Props Interaction
+        if any(w in text_lower for w in ["briefcase", "bag", "golden map", "map", "flower", "balloon", "lantern"]):
+            prop_id = "flower"
+            if "map" in text_lower:
+                prop_id = "golden_map"
+            elif "briefcase" in text_lower or "bag" in text_lower:
+                prop_id = "backpack"
+            elif "balloon" in text_lower:
+                prop_id = "balloon"
+            elif "lantern" in text_lower:
+                prop_id = "lantern"
+            prop_char = speaker or cast_ids[0]
+            actions.append({
+                "type": "ATTACH_PROP",
+                "prop_id": prop_id,
+                "character_id": prop_char,
+                "slot": "hand"
+            })
 
         beats_out.append({
             "beat_id": b.beat_id,

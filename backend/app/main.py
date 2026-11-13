@@ -289,3 +289,104 @@ async def get_export_status(
         "mp4_url": task.get("mp4_url"),
         "error": task.get("error")
     }
+
+# --- Asset Catalog & Custom Character Endpoints ---
+class CharacterCreateRequest(BaseModel):
+    name: str
+    species: str = "rabbit" # rabbit | turtle | fox | owl | kid
+    prompt: Optional[str] = None
+    personality: Optional[str] = "friendly"
+    palette: Optional[Dict[str, str]] = None
+    voice: Optional[Dict[str, str]] = None
+
+def get_custom_characters_file() -> Path:
+    p = Path(settings.MEDIA_DIR) / "data" / "custom_characters.json"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    if not p.exists():
+        with open(p, "w", encoding="utf-8") as f:
+            json.dump([], f)
+    return p
+
+def load_custom_characters() -> List[Dict[str, Any]]:
+    p = get_custom_characters_file()
+    try:
+        with open(p, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+def save_custom_character(char_data: Dict[str, Any]):
+    p = get_custom_characters_file()
+    chars = load_custom_characters()
+    chars.append(char_data)
+    with open(p, "w", encoding="utf-8") as f:
+        json.dump(chars, f, indent=2)
+
+@app.get("/api/assets")
+async def get_assets():
+    from .stations.writer import load_metadata
+    meta = load_metadata()
+    customs = load_custom_characters()
+    all_chars = meta.get("characters", []) + customs
+    return {
+        "characters": all_chars,
+        "backgrounds": meta.get("backgrounds", []),
+        "props": meta.get("props", []),
+        "music": meta.get("music", []),
+        "sfx": meta.get("sfx", [])
+    }
+
+@app.post("/api/characters")
+async def create_character(
+    req: CharacterCreateRequest,
+    user: Dict[str, Any] = Depends(get_current_user)
+):
+    clean_name = req.name.strip() or "New Friend"
+    char_id = f"custom_{clean_name.lower().replace(' ', '_')}_{uuid.uuid4().hex[:4]}"
+    species = req.species.lower()
+    if species not in ("rabbit", "turtle", "fox", "owl", "kid"):
+        species = "kid"
+
+    # Harmonious cartoon color palettes
+    palette = req.palette
+    if not palette:
+        if species == "rabbit":
+            palette = {"primary": "#e0e7ff", "secondary": "#fbcfe8", "accent": "#818cf8", "outline": "#1e1b4b"}
+        elif species == "turtle":
+            palette = {"primary": "#16a34a", "secondary": "#bbf7d0", "accent": "#fde047", "outline": "#14532d"}
+        elif species == "fox":
+            palette = {"primary": "#ea580c", "secondary": "#fed7aa", "accent": "#334155", "outline": "#1c1917"}
+        elif species == "owl":
+            palette = {"primary": "#78350f", "secondary": "#fde68a", "accent": "#f97316", "outline": "#451a03"}
+        else:
+            palette = {"primary": "#3b82f6", "secondary": "#fef08a", "accent": "#ec4899", "outline": "#0f172a"}
+
+    voice = req.voice
+    if not voice:
+        if species == "rabbit":
+            voice = {"engine_voice": "en-US-BrianMultilingualNeural", "rate": "+6%", "pitch": "+3Hz"}
+        elif species == "turtle":
+            voice = {"engine_voice": "en-US-ChristopherNeural", "rate": "-8%", "pitch": "-2Hz"}
+        elif species == "fox":
+            voice = {"engine_voice": "en-US-AndrewMultilingualNeural", "rate": "+4%", "pitch": "+0Hz"}
+        elif species == "owl":
+            voice = {"engine_voice": "en-US-EmmaNeural", "rate": "+2%", "pitch": "+1Hz"}
+        else:
+            voice = {"engine_voice": "en-US-AvaMultilingualNeural", "rate": "+3%", "pitch": "+2Hz"}
+
+    new_char = {
+        "id": char_id,
+        "name": clean_name,
+        "species": species,
+        "status": "implemented",
+        "tags": ["custom", req.personality or "friendly", species],
+        "animations": ["idle", "walk", "talk", "wave", "laugh", "listen", "react", "point"],
+        "expressions": ["neutral", "happy", "sad", "surprised", "worried", "excited"],
+        "accessories": ["scarf", "hat"],
+        "default_palette": palette,
+        "default_voice": voice,
+        "licence": "original"
+    }
+
+    save_custom_character(new_char)
+    return new_char
