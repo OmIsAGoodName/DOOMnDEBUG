@@ -215,19 +215,19 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
   return (
     <div className={`space-y-6 w-full max-w-4xl mx-auto ${className}`}>
       {/* Episode Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <h2 className="text-2xl font-black text-slate-900">{plan.title || episode.title}</h2>
+            <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">{plan.title || episode.title}</h2>
             {isInteractive && (
-              <span className="bg-amber-100 text-amber-800 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border border-amber-300">
+              <span className="bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border border-amber-300 dark:border-amber-800">
                 🎙 Interactive
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-500">
-            Age Band: <strong className="text-slate-700">{plan.age_band || '4-6'}</strong> &bull; Cast:{' '}
-            <strong className="text-slate-700">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Age Band: <strong className="text-slate-700 dark:text-slate-200">{plan.age_band || '4-6'}</strong> &bull; Cast:{' '}
+            <strong className="text-slate-700 dark:text-slate-200">
               {plan.cast?.map((c) => c.name).join(', ') || 'Pip the Owl'}
             </strong>
           </p>
@@ -381,14 +381,14 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
 
       {/* Export status bar */}
       {isExporting && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center space-y-2 animate-pulse">
-          <p className="text-sm font-bold text-amber-900">{exportProgressText}</p>
-          <p className="text-xs text-amber-700">Please keep this browser tab active during recording.</p>
+        <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-2xl p-4 text-center space-y-2 animate-pulse">
+          <p className="text-sm font-bold text-amber-900 dark:text-amber-300">{exportProgressText}</p>
+          <p className="text-xs text-amber-700 dark:text-amber-400">Please keep this browser tab active during recording.</p>
         </div>
       )}
 
       {/* Actions Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div className="flex items-center gap-2">
           {!isLiveMode && (
             <Button variant="secondary" size="md" onClick={handleReplay}>
