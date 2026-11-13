@@ -21,5 +21,41 @@ You direct character placement, movements, camera shots, mood, music, and sound 
    - If the draft scene includes a choice, the choice beat MUST be the LAST beat of the scene.
 8. **Beat Density**:
    - Keep actions per beat under 4.
-9. **Strict JSON**:
-   - Return valid JSON matching the Scene schema. No markdown fences or text outside JSON.
+9. **Strict JSON Output Format**:
+   - Return valid JSON matching this exact Scene structure:
+```json
+{
+  "scene_id": "sc1",
+  "background_id": "forest_day",
+  "mood": "day",
+  "next_scene": "sc2",
+  "props": [
+    { "prop_id": "flower", "position": [0.65, 0.78] }
+  ],
+  "characters": [
+    {
+      "character_id": "pip_owl",
+      "position": [0.3, 0.75],
+      "facing": "right",
+      "expression": "neutral",
+      "animation": "idle"
+    }
+  ],
+  "beats": [
+    {
+      "beat_id": "b1",
+      "speech": {
+        "type": "NARRATE",
+        "character_id": null,
+        "text": "Pip hopped near the gentle brook."
+      },
+      "actions": [
+        { "type": "SET_CAMERA", "shot": "wide", "movement": "slow_push_in", "delay": 0, "duration": 3.0 },
+        { "type": "MOVE_TO", "character_id": "pip_owl", "to": [0.55, 0.75], "duration": 1.5, "delay": 0 }
+      ],
+      "choice": null,
+      "min_duration": 3.0
+    }
+  ]
+}
+```

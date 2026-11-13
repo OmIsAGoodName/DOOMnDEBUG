@@ -66,9 +66,14 @@ class GroqProvider(BaseProvider):
             "Content-Type": "application/json"
         }
         messages = []
+        combined_text = (system or "") + " " + user
+        user_content = user
+        if "json" not in combined_text.lower():
+            user_content = f"{user}\n\nRespond strictly with valid JSON."
+
         if system:
             messages.append({"role": "system", "content": system})
-        messages.append({"role": "user", "content": user})
+        messages.append({"role": "user", "content": user_content})
 
         payload = {
             "model": self.model,
@@ -81,8 +86,8 @@ class GroqProvider(BaseProvider):
             resp = await client.post(url, headers=headers, json=payload)
             if resp.status_code == 429:
                 raise RuntimeError(f"Groq Rate Limit (429): {resp.text}")
-            if resp.status_code >= 500:
-                raise RuntimeError(f"Groq Server Error ({resp.status_code}): {resp.text}")
+            if resp.status_code != 200:
+                raise RuntimeError(f"Groq Error ({resp.status_code}): {resp.text}")
             resp.raise_for_status()
 
             data = resp.json()

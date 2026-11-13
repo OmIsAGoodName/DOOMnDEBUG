@@ -29,4 +29,36 @@ Your job is to craft an engaging, emotionally warm, and age-appropriate story ou
    - The choice beat MUST be the final beat of its scene.
    - Keywords MUST be simple words a 4-year-old would speak clearly (e.g. ["door", "open", "go"]).
 6. **Output Format**:
-   - Strictly valid JSON matching the StoryDraft schema. Never include code blocks, explanations, or Markdown outside the JSON.
+   - Strictly valid JSON matching this exact structure:
+```json
+{
+  "title": "Story Title",
+  "synopsis": "One sentence synopsis of the story.",
+  "cast": ["pip_owl", "rusty_fox"],
+  "age_band": "4-6",
+  "language": "en",
+  "interactive": false,
+  "main_path": ["sc1", "sc2", "sc3"],
+  "scenes": [
+    {
+      "scene_id": "sc1",
+      "background_id": "forest_day",
+      "mood": "day",
+      "summary": "Pip finds something special.",
+      "next_scene": "sc2",
+      "beats": [
+        {
+          "beat_id": "b1",
+          "speech": {
+            "type": "NARRATE",
+            "character_id": null,
+            "text": "In the sunny forest, Pip the owl hopped happily.",
+            "emotion": "happy"
+          },
+          "choice": null
+        }
+      ]
+    }
+  ]
+}
+```

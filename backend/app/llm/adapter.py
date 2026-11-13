@@ -85,7 +85,9 @@ class LLMAdapter:
                     # Backoff on rate-limits (429) or server errors
                     err_msg = str(e)
                     if "429" in err_msg or "500" in err_msg or "503" in err_msg:
-                        await asyncio.sleep(1.0 * (2 ** attempt))
+                        match = re.search(r"try again in (\d+\.?\d*)s", err_msg)
+                        wait_time = float(match.group(1)) + 0.5 if match else 2.5 * (2 ** attempt)
+                        await asyncio.sleep(wait_time)
                     else:
                         break # Unrecoverable provider error, switch provider
 

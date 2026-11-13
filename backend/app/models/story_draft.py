@@ -1,11 +1,18 @@
 from typing import List, Optional, Literal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 class DraftSpeech(BaseModel):
     type: Literal["NARRATE", "SPEAK"]
     character_id: Optional[str] = None
     text: str
     emotion: Optional[str] = "neutral"
+
+    @field_validator("type", mode="before")
+    @classmethod
+    def normalize_speech_type(cls, v):
+        if isinstance(v, str) and v.upper() in ("DIALOGUE", "SAY", "TALK"):
+            return "SPEAK"
+        return v
 
 class DraftChoiceOption(BaseModel):
     id: str

@@ -1,5 +1,5 @@
 from typing import List, Optional, Literal, Union, Tuple
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 class Palette(BaseModel):
     primary: str
@@ -126,6 +126,13 @@ class Speech(BaseModel):
     text: str
     character_id: Optional[str] = None
     expression: Optional[str] = None
+
+    @field_validator("type", mode="before")
+    @classmethod
+    def normalize_speech_type(cls, v):
+        if isinstance(v, str) and v.upper() in ("DIALOGUE", "SAY", "TALK"):
+            return "SPEAK"
+        return v
 
 class Beat(BaseModel):
     beat_id: str

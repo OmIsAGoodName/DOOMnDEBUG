@@ -102,12 +102,11 @@ async def direct_episode(
     metadata = load_metadata()
     ep_id = episode_id or f"ep_{uuid.uuid4().hex[:8]}"
 
-    # Direct all scenes in parallel
-    tasks = [
-        direct_scene(scene, draft.cast, metadata, llm_fn=llm_fn)
-        for scene in draft.scenes
-    ]
-    scenes: List[Scene] = await asyncio.gather(*tasks)
+    # Direct all scenes
+    scenes: List[Scene] = []
+    for scene in draft.scenes:
+        sc = await direct_scene(scene, draft.cast, metadata, llm_fn=llm_fn)
+        scenes.append(sc)
 
     # Stitch next_scene links from draft if not populated
     for i, sc in enumerate(scenes):
