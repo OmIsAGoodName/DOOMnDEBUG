@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Production build outputs
+dist/
+
+# Environments and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+backend/.venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Media and runtime outputs
+media/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Agent identity (local per developer)
+.agents/rules/99-identity.md
