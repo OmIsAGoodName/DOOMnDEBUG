@@ -47,8 +47,12 @@ Available Props: {', '.join(avail_props)}
 Available SFX: {', '.join(avail_sfx)}
 Available Music: {', '.join(avail_music)}
 
-Direct this scene into a complete 2D Canvas Scene JSON adhering to the Directing Rules.
-Ensure the first beat has a SET_CAMERA action.
+DIRECTING INSTRUCTIONS:
+1. Direct EVERY beat in the draft scene into a rich 2D Canvas Scene JSON adhering to the Directing Rules.
+2. Opening beat MUST have a SET_CAMERA action.
+3. Characters must move, animate, and emote: use MOVE_TO, PLAY_ANIMATION (hop, wave, talk, nod, jump), and SET_EXPRESSION.
+4. Set min_duration for each beat to 5.0 to 7.0 seconds so character speech, reactions, and sound effects have ample breathing room.
+5. Add PLAY_SFX and PLAY_MUSIC to create a warm, cinematic storybook atmosphere.
 """
 
 async def direct_scene(
@@ -66,7 +70,17 @@ async def direct_scene(
         schema=Scene,
         temperature=0.7
     )
-    return Scene.model_validate(data)
+    scene = Scene.model_validate(data)
+
+    # Ensure beats have healthy duration breathing room
+    for beat in scene.beats:
+        words_count = len(beat.speech.text.split()) if beat.speech and beat.speech.text else 0
+        est_speech = words_count / 2.4
+        calculated_min = max(5.0, round(est_speech + 1.2, 1))
+        if not beat.min_duration or beat.min_duration < calculated_min:
+            beat.min_duration = calculated_min
+
+    return scene
 
 def assemble_cast_snapshots(cast_ids: List[str], metadata: Dict[str, Any]) -> List[CastMember]:
     char_meta_map = {c["id"]: c for c in metadata.get("characters", [])}

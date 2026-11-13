@@ -177,10 +177,10 @@ export function resolveTimeline(
           }
         }
 
-        // Beat length = max(speech + 0.3s, latest action end, min_duration, 1.0s)
-        const speechWithPadding = speechDuration > 0 ? speechDuration + 0.3 : 0;
-        const minDur = beat.min_duration ?? 0;
-        const beatDuration = Math.max(speechWithPadding, latestActionEnd, minDur, 1.0);
+        // Beat length = max(speech + 0.8s, latest action end, min_duration, 3.5s)
+        const speechWithPadding = speechDuration > 0 ? speechDuration + 0.8 : 0;
+        const minDur = beat.min_duration ?? (speechDuration > 0 ? speechDuration + 0.8 : 4.0);
+        const beatDuration = Math.max(speechWithPadding, latestActionEnd, minDur, 3.5);
         const beatEndTime = beatStartTime + beatDuration;
 
         let listeningStart: number | undefined;
