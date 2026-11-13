@@ -42,7 +42,9 @@ def build_writer_user_prompt(
     language: str = "en",
     interactive: bool = False,
     series: Optional[Dict[str, Any]] = None,
-    characters: Optional[List[Dict[str, Any]]] = None
+    characters: Optional[List[Dict[str, Any]]] = None,
+    duration: str = "1-2mins",
+    generate_characters: bool = False
 ) -> str:
     metadata = load_metadata()
 
@@ -54,12 +56,20 @@ def build_writer_user_prompt(
 
     avail_bgs = [f"- {b['id']}: {b['name']} (hint: {b.get('mood_hint', 'day')})" for b in metadata["backgrounds"]]
 
+    duration_guideline = {
+        "<1min": "Target length: short & snappy (2 scenes, ~45-60 seconds total).",
+        "1-2mins": "Target length: bedtime tale (3 to 4 scenes, ~90 seconds total).",
+        "2-3mins": "Target length: extended adventure (4 to 5 scenes, ~120-150 seconds total)."
+    }.get(duration, "Target length: bedtime tale (3 to 4 scenes).")
+
     user_prompt = f"""
 STORY REQUEST:
 - User Premise: "{prompt}"
 - Target Age Band: {age_band}
 - Language: {language}
+- Target Duration: {duration} ({duration_guideline})
 - Interactive: {"YES (2 choice points with reconverging branch)" if interactive else "NO (linear)"}
+{"- Character Creation: Try generating original, creative character designs suited to this story premise and include them in the cast list." if generate_characters else ""}
 
 AVAILABLE ASSETS:
 Available Characters:
@@ -83,6 +93,8 @@ async def write_story(
     interactive: bool = False,
     series: Optional[Dict[str, Any]] = None,
     characters: Optional[List[Dict[str, Any]]] = None,
+    duration: str = "1-2mins",
+    generate_characters: bool = False,
     llm_fn = generate_json
 ) -> StoryDraft:
     system_prompt = load_system_prompt()
@@ -92,7 +104,9 @@ async def write_story(
         language=language,
         interactive=interactive,
         series=series,
-        characters=characters
+        characters=characters,
+        duration=duration,
+        generate_characters=generate_characters
     )
 
     data = await llm_fn(

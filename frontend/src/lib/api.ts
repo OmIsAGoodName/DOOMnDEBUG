@@ -80,6 +80,8 @@ export const api = {
     age_band?: string;
     language?: string;
     interactive?: boolean;
+    duration?: '<1min' | '1-2mins' | '2-3mins';
+    generate_characters?: boolean;
   }): Promise<{ generation_id: string; status: string }> => {
     return request<{ generation_id: string; status: string }>('/api/generations', {
       method: 'POST',

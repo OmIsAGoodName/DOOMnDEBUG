@@ -21,8 +21,8 @@ export const Card: React.FC<CardProps> = ({
 
   return (
     <div
-      className={`bg-white rounded-2xl border border-slate-200 shadow-sm transition-all ${
-        hoverEffect ? 'hover:shadow-md hover:border-slate-300' : ''
+      className={`bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all text-slate-900 dark:text-slate-100 ${
+        hoverEffect ? 'hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700' : ''
       } ${pad} ${className}`}
       {...props}
     >

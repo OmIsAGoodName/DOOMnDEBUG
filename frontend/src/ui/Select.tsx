@@ -25,16 +25,16 @@ export const Select: React.FC<SelectProps> = ({
   return (
     <div className="space-y-1.5 w-full">
       {label && (
-        <label htmlFor={selectId} className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+        <label htmlFor={selectId} className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
           {label}
         </label>
       )}
       <select
         id={selectId}
-        className={`w-full px-3.5 py-2.5 rounded-xl border text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 transition-all ${
+        className={`w-full px-3.5 py-2.5 rounded-xl border text-sm text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 transition-all ${
           error
             ? 'border-rose-400 focus:ring-rose-400 focus:border-rose-500'
-            : 'border-slate-300 focus:ring-indigo-500 focus:border-indigo-500'
+            : 'border-slate-300 dark:border-slate-700 focus:ring-indigo-500 focus:border-indigo-500'
         } ${className}`}
         {...props}
       >

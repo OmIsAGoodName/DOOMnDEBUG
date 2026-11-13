@@ -96,6 +96,8 @@ class GenerationCreateRequest(BaseModel):
     age_band: Optional[str] = "4-6"
     language: Optional[str] = "en"
     interactive: Optional[bool] = False
+    duration: Optional[str] = "1-2mins"
+    generate_characters: Optional[bool] = False
 
 class LiveMatchApiRequest(BaseModel):
     prompt: str
@@ -141,6 +143,8 @@ async def create_generation(
             interactive=req.interactive or False,
             series=req.series,
             characters=req.characters,
+            duration=req.duration or "1-2mins",
+            generate_characters=req.generate_characters or False,
             repo=repo
         ))
 

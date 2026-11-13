@@ -22,7 +22,7 @@ export const Chip: React.FC<ChipProps> = ({
       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all select-none ${
         selected
           ? 'bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-500/20'
-          : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+          : 'bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300'
       } ${className}`}
     >
       {icon}
