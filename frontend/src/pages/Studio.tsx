@@ -202,14 +202,14 @@ export default function Studio() {
   }
 
   return (
-    <div className="py-10 px-6 max-w-6xl mx-auto space-y-10 text-slate-800">
+    <div className="py-10 px-6 max-w-6xl mx-auto space-y-10 text-slate-800 dark:text-slate-200">
       {/* Studio Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+          <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-3">
             <span>🎨</span> VoxFable Studio Mode
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Series Showrunner &bull; Persistent Characters &bull; Multi-Episode Batch Generator
           </p>
         </div>
@@ -222,7 +222,7 @@ export default function Studio() {
               const selected = seriesList.find((s) => s.id === e.target.value);
               if (selected) setActiveSeries(selected);
             }}
-            className="px-3.5 py-2 rounded-xl border border-slate-300 text-sm font-bold bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm font-bold bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             {seriesList.map((s) => (
               <option key={s.id} value={s.id}>
@@ -238,12 +238,12 @@ export default function Studio() {
 
       {/* Series Edit Modal / Drawer */}
       {isEditingSeries && (
-        <Card padding="lg" className="border-indigo-200 bg-indigo-50/20 shadow-md">
-          <div className="flex items-center justify-between mb-4 border-b border-slate-200 pb-2">
-            <h2 className="text-xl font-bold text-slate-900">Series Configuration</h2>
+        <Card padding="lg" className="border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/20 dark:bg-indigo-950/20 shadow-md">
+          <div className="flex items-center justify-between mb-4 border-b border-slate-200 dark:border-slate-800 pb-2">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Series Configuration</h2>
             <button
               onClick={() => setIsEditingSeries(false)}
-              className="text-slate-400 hover:text-slate-600 font-bold"
+              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold"
             >
               &times;
             </button>
@@ -260,8 +260,8 @@ export default function Studio() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-slate-900">Character Roster</h2>
-            <p className="text-xs text-slate-500">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Character Roster</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Cast members retain consistent personalities, color palettes, and rules across episodes.
             </p>
           </div>
@@ -279,14 +279,14 @@ export default function Studio() {
 
         {/* Character Builder Modal */}
         {editingCharacter && (
-          <Card padding="lg" className="border-indigo-300 bg-indigo-50/30 shadow-lg">
-            <div className="flex items-center justify-between mb-4 border-b border-slate-200 pb-2">
-              <h2 className="text-xl font-bold text-slate-900">
+          <Card padding="lg" className="border-indigo-300 dark:border-indigo-800 bg-indigo-50/30 dark:bg-indigo-950/30 shadow-lg">
+            <div className="flex items-center justify-between mb-4 border-b border-slate-200 dark:border-slate-800 pb-2">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
                 {editingCharacter === 'new' ? 'Create New Character' : `Edit ${editingCharacter.name}`}
               </h2>
               <button
                 onClick={() => setEditingCharacter(null)}
-                className="text-slate-400 hover:text-slate-600 font-bold"
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold"
               >
                 &times;
               </button>
@@ -312,8 +312,8 @@ export default function Studio() {
           ))}
 
           {characters.length === 0 && (
-            <div className="col-span-3 text-center py-8 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-              <p className="text-sm font-semibold text-slate-500">No characters in this series yet.</p>
+            <div className="col-span-3 text-center py-8 bg-slate-50 dark:bg-slate-900 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+              <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">No characters in this series yet.</p>
               <Button
                 variant="primary"
                 size="sm"
@@ -328,22 +328,22 @@ export default function Studio() {
       </div>
 
       {/* Section 2: Season Batch Generator */}
-      <div className="space-y-6 pt-6 border-t border-slate-200">
+      <div className="space-y-6 pt-6 border-t border-slate-200 dark:border-slate-800">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-bold text-slate-900">Season Showrunner Generator</h2>
-            <p className="text-xs text-slate-500">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Season Showrunner Generator</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Batch generate connected episodes that enforce character continuity and world rules.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl px-3 py-1.5 shadow-xs">
-              <span className="text-xs font-bold text-slate-500">EPISODES:</span>
+            <div className="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 shadow-xs">
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">EPISODES:</span>
               <select
                 value={batchCount}
                 onChange={(e) => setBatchCount(parseInt(e.target.value, 10))}
-                className="text-sm font-bold text-slate-800 bg-transparent focus:outline-none"
+                className="text-sm font-bold text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
               >
                 {[1, 2, 3, 4, 5].map((n) => (
                   <option key={n} value={n}>
@@ -479,33 +479,33 @@ function CharacterCard({ character, onEdit, onDelete }: CharacterCardProps) {
   }, [character]);
 
   return (
-    <Card hoverEffect className="flex flex-col justify-between border-slate-200">
+    <Card hoverEffect className="flex flex-col justify-between border-slate-200 dark:border-slate-800">
       <div>
-        <div className="w-full aspect-square bg-slate-50 rounded-2xl flex items-center justify-center overflow-hidden border border-slate-100 mb-3">
+        <div className="w-full aspect-square bg-slate-50 dark:bg-slate-800/80 rounded-2xl flex items-center justify-center overflow-hidden border border-slate-100 dark:border-slate-700/60 mb-3">
           <canvas ref={canvasRef} width={180} height={200} className="w-full h-full object-contain" />
         </div>
 
         <div className="flex items-center justify-between">
-          <h3 className="font-extrabold text-base text-slate-900">{character.name}</h3>
-          <span className="text-xs uppercase font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+          <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100">{character.name}</h3>
+          <span className="text-xs uppercase font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
             {character.species}
           </span>
         </div>
 
         {character.bible?.personality && character.bible.personality.length > 0 && (
-          <p className="text-xs text-slate-500 mt-1 capitalize">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 capitalize">
             {character.bible.personality.join(', ')}
           </p>
         )}
 
         {character.bible?.rules && character.bible.rules.length > 0 && (
-          <p className="text-[11px] text-amber-800 bg-amber-50 p-1.5 rounded-lg border border-amber-200 mt-2 italic">
+          <p className="text-[11px] text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 p-1.5 rounded-lg border border-amber-200 dark:border-amber-800/60 mt-2 italic">
             Rule: {character.bible.rules[0]}
           </p>
         )}
       </div>
 
-      <div className="pt-4 flex items-center justify-between border-t border-slate-100 mt-4">
+      <div className="pt-4 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 mt-4">
         <Button variant="ghost" size="sm" onClick={onEdit}>
           Edit Look
         </Button>
