@@ -1,0 +1,597 @@
+{
+  "schema_version": "1.0",
+  "episode_id": "demo_owl",
+  "series_id": null,
+  "age_band": "6-8",
+  "language": "en",
+  "title": "Barnaby's Treehouse Dream",
+  "start_scene": "sc1",
+  "interactive": false,
+  "cast": [
+    {
+      "character_id": "pip_owl",
+      "name": "Pip",
+      "species": "owl",
+      "palette": {
+        "primary": "#8b5e3c",
+        "secondary": "#d9b38c",
+        "accent": "#f2a65a",
+        "outline": "#3b2a1e"
+      },
+      "accessories": [
+        "scarf",
+        "glasses",
+        "hat",
+        "bow",
+        "backpack",
+        "cape"
+      ],
+      "voice": {
+        "engine_voice": "en-US-EmmaNeural",
+        "rate": "+2%",
+        "pitch": "+1Hz"
+      }
+    },
+    {
+      "character_id": "barnaby_rabbit",
+      "name": "Barnaby",
+      "species": "rabbit",
+      "palette": {
+        "primary": "#f3f4f6",
+        "secondary": "#fbcfe8",
+        "accent": "#60a5fa",
+        "outline": "#1f2937"
+      },
+      "accessories": [
+        "scarf",
+        "glasses",
+        "hat",
+        "bow",
+        "backpack",
+        "cape"
+      ],
+      "voice": {
+        "engine_voice": "en-US-BrianMultilingualNeural",
+        "rate": "+6%",
+        "pitch": "+3Hz"
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "scene_id": "sc1",
+      "background_id": "forest_day",
+      "mood": "day",
+      "next_scene": "sc2",
+      "props": [
+        {
+          "prop_id": "flower",
+          "position": [
+            0.65,
+            0.78
+          ]
+        }
+      ],
+      "characters": [
+        {
+          "character_id": "pip_owl",
+          "position": [
+            0.3,
+            0.75
+          ],
+          "facing": "right",
+          "expression": "neutral",
+          "animation": "idle"
+        },
+        {
+          "character_id": "barnaby_rabbit",
+          "position": [
+            0.8,
+            0.78
+          ],
+          "facing": "left",
+          "expression": "neutral",
+          "animation": "idle"
+        }
+      ],
+      "beats": [
+        {
+          "beat_id": "b1",
+          "speech": {
+            "type": "NARRATE",
+            "text": "Sunlight streams through leaves as Pip the owl glides over a tall oak.",
+            "character_id": null,
+            "expression": null
+          },
+          "actions": [
+            {
+              "delay": 0.0,
+              "duration": 3.0,
+              "type": "SET_CAMERA",
+              "shot": "wide",
+              "movement": "slow_push_in",
+              "focus_character_id": null
+            },
+            {
+              "delay": 0.0,
+              "duration": null,
+              "type": "PLAY_MUSIC",
+              "music_id": "music_adventure",
+              "volume": 0.5,
+              "fade": 1.0
+            },
+            {
+              "delay": 0.0,
+              "duration": null,
+              "type": "PLAY_SFX",
+              "sfx_id": "sfx_birds",
+              "volume": 1.0
+            },
+            {
+              "delay": 0.0,
+              "duration": null,
+              "type": "SET_EXPRESSION",
+              "character_id": "pip_owl",
+              "expression": "happy"
+            }
+          ],
+          "choice": null,
+          "min_duration": 3.0
+        },
+        {
+          "beat_id": "b2",
+          "speech": {
+            "type": "SPEAK",
+            "text": "What a wonderful tree! It could be a home in the clouds.",
+            "character_id": "pip_owl",
+            "expression": null
+          },
+          "actions": [
+            {
+              "delay": 0.0,
+              "duration": null,
+              "type": "SET_EXPRESSION",
+              "character_id": "pip_owl",
+              "expression": "excited"
+            },
+            {
+              "delay": 0.0,
+              "duration": 1.5,
+              "type": "MOVE_TO",
+              "character_id": "pip_owl",
+              "to": [
+                0.55,
+                0.75
+              ]
+            }
+          ],
+          "choice": null,
+          "min_duration": 1.5
+        }
+      ]
+    },
+    {
+      "scene_id": "sc2",
+      "background_id": "forest_day",
+      "mood": "day",
+      "next_scene": "sc3",
+      "props": [
+        {
+          "prop_id": "basket",
+          "position": [
+            0.6,
+            0.78
+          ]
+        }
+      ],
+      "characters": [
+        {
+          "character_id": "pip_owl",
+          "position": [
+            0.25,
+            0.78
+          ],
+          "facing": "right",
+          "expression": "neutral",
+          "animation": "idle"
+        },
+        {
+          "character_id": "barnaby_rabbit",
+          "position": [
+            0.1,
+            0.78
+          ],
+          "facing": "right",
+          "expression": "excited",
+          "animation": "idle"
+        }
+      ],
+      "beats": [
+        {
+          "beat_id": "b1",
+          "speech": {
+            "type": "SPEAK",
+            "text": "Pip, let's build a treehouse together! I can gather twigs.",
+            "character_id": "barnaby_rabbit",
+            "expression": null
+          },
+          "actions": [
+            {
+              "delay": 0.0,
+              "duration": 2.5,
+              "type": "SET_CAMERA",
+              "shot": "medium",
+              "movement": "slow_push_in",
+              "focus_character_id": null
+            },
+            {
+              "delay": 0.0,
+              "duration": 1.0,
+              "type": "PLAY_MUSIC",
+              "music_id": "music_adventure",
+              "volume": 0.5,
+              "fade": 1.0
+            },
+            {
+              "delay": 0.0,
+              "duration": 0.5,
+              "type": "PLAY_SFX",
+              "sfx_id": "sfx_footsteps",
+              "volume": 1.0
+            },
+            {
+              "delay": 0.0,
+              "duration": 1.5,
+              "type": "MOVE_TO",
+              "character_id": "barnaby_rabbit",
+              "to": [
+                0.55,
+                0.78
+              ]
+            }
+          ],
+          "choice": null,
+          "min_duration": 2.5
+        },
+        {
+          "beat_id": "b2",
+          "speech": {
+            "type": "NARRATE",
+            "text": "Barnaby's ears twitch with excitement as they plan the project.",
+            "character_id": null,
+            "expression": null
+          },
+          "actions": [
+            {
+              "delay": 0.0,
+              "duration": 2.0,
+              "type": "SET_CAMERA",
+              "shot": "close",
+              "movement": "pan_right",
+              "focus_character_id": null
+            },
+            {
+              "delay": 0.0,
+              "duration": 0.5,
+              "type": "PLAY_SFX",
+              "sfx_id": "sfx_sparkle",
+              "volume": 1.0
+            }
+          ],
+          "choice": null,
+          "min_duration": 2.0
+        }
+      ]
+    },
+    {
+      "scene_id": "sc3",
+      "background_id": "forest_day",
+      "mood": "day",
+      "next_scene": "sc4",
+      "props": [],
+      "characters": [
+        {
+          "character_id": "pip_owl",
+          "position": [
+            0.3,
+            0.75
+          ],
+          "facing": "right",
+          "expression": "neutral",
+          "animation": "idle"
+        },
+        {
+          "character_id": "barnaby_rabbit",
+          "position": [
+            0.7,
+            0.75
+          ],
+          "facing": "left",
+          "expression": "neutral",
+          "animation": "idle"
+        }
+      ],
+      "beats": [
+        {
+          "beat_id": "b1",
+          "speech": {
+            "type": "NARRATE",
+            "text": "A thick branch lies across the trunk, too heavy for one friend alone.",
+            "character_id": null,
+            "expression": null
+          },
+          "actions": [
+            {
+              "delay": 0.0,
+              "duration": 3.0,
+              "type": "SET_CAMERA",
+              "shot": "wide",
+              "movement": "slow_push_in",
+              "focus_character_id": null
+            },
+            {
+              "delay": 0.0,
+              "duration": null,
+              "type": "PLAY_MUSIC",
+              "music_id": "music_adventure",
+              "volume": 0.8,
+              "fade": 1.0
+            },
+            {
+              "delay": 0.0,
+              "duration": null,
+              "type": "PLAY_SFX",
+              "sfx_id": "sfx_birds",
+              "volume": 0.6
+            }
+          ],
+          "choice": null,
+          "min_duration": 3.0
+        },
+        {
+          "beat_id": "b2",
+          "speech": {
+            "type": "SPEAK",
+            "text": "Hold on, Barnaby! I\u2019ll lift while you guide it sideways.",
+            "character_id": "pip_owl",
+            "expression": null
+          },
+          "actions": [
+            {
+              "delay": 0.0,
+              "duration": 2.0,
+              "type": "SET_CAMERA",
+              "shot": "medium",
+              "movement": "pan_right",
+              "focus_character_id": null
+            },
+            {
+              "delay": 0.0,
+              "duration": 1.5,
+              "type": "MOVE_TO",
+              "character_id": "pip_owl",
+              "to": [
+                0.45,
+                0.75
+              ]
+            },
+            {
+              "delay": 1.5,
+              "duration": null,
+              "type": "PLAY_SFX",
+              "sfx_id": "sfx_whoosh",
+              "volume": 0.7
+            }
+          ],
+          "choice": null,
+          "min_duration": 2.0
+        },
+        {
+          "beat_id": "b3",
+          "speech": {
+            "type": "SPEAK",
+            "text": "Together we can move it! One hop, one flap!",
+            "character_id": "barnaby_rabbit",
+            "expression": null
+          },
+          "actions": [
+            {
+              "delay": 0.0,
+              "duration": 2.5,
+              "type": "SET_CAMERA",
+              "shot": "close",
+              "movement": "slow_pull_out",
+              "focus_character_id": null
+            },
+            {
+              "delay": 0.0,
+              "duration": 1.5,
+              "type": "MOVE_TO",
+              "character_id": "barnaby_rabbit",
+              "to": [
+                0.55,
+                0.75
+              ]
+            },
+            {
+              "delay": 1.5,
+              "duration": null,
+              "type": "PLAY_SFX",
+              "sfx_id": "sfx_giggle",
+              "volume": 0.8
+            }
+          ],
+          "choice": null,
+          "min_duration": 2.5
+        }
+      ]
+    },
+    {
+      "scene_id": "sc4",
+      "background_id": "treehouse_interior",
+      "mood": "cozy",
+      "next_scene": null,
+      "props": [
+        {
+          "prop_id": "lantern",
+          "position": [
+            0.5,
+            0.68
+          ]
+        },
+        {
+          "prop_id": "firefly_jar",
+          "position": [
+            0.42,
+            0.78
+          ]
+        },
+        {
+          "prop_id": "book",
+          "position": [
+            0.58,
+            0.78
+          ]
+        },
+        {
+          "prop_id": "apple",
+          "position": [
+            0.55,
+            0.78
+          ]
+        }
+      ],
+      "characters": [
+        {
+          "character_id": "pip_owl",
+          "position": [
+            0.35,
+            0.78
+          ],
+          "facing": "right",
+          "expression": "neutral",
+          "animation": "idle"
+        },
+        {
+          "character_id": "barnaby_rabbit",
+          "position": [
+            0.65,
+            0.78
+          ],
+          "facing": "left",
+          "expression": "neutral",
+          "animation": "idle"
+        }
+      ],
+      "beats": [
+        {
+          "beat_id": "b1",
+          "speech": {
+            "type": "NARRATE",
+            "text": "Inside the snug treehouse, a gentle breeze carries laughter.",
+            "character_id": null,
+            "expression": null
+          },
+          "actions": [
+            {
+              "delay": 0.0,
+              "duration": 3.0,
+              "type": "SET_CAMERA",
+              "shot": "wide",
+              "movement": "slow_push_in",
+              "focus_character_id": null
+            },
+            {
+              "delay": 0.0,
+              "duration": 1.0,
+              "type": "PLAY_MUSIC",
+              "music_id": "music_calm",
+              "volume": 0.5,
+              "fade": 1.0
+            },
+            {
+              "delay": 0.5,
+              "duration": 1.0,
+              "type": "PLAY_SFX",
+              "sfx_id": "sfx_wind",
+              "volume": 1.0
+            }
+          ],
+          "choice": null,
+          "min_duration": 3.0
+        },
+        {
+          "beat_id": "b2",
+          "speech": {
+            "type": "SPEAK",
+            "text": "We built it together, Pip! This is our special place.",
+            "character_id": "barnaby_rabbit",
+            "expression": null
+          },
+          "actions": [
+            {
+              "delay": 0.0,
+              "duration": 2.0,
+              "type": "SET_CAMERA",
+              "shot": "medium",
+              "movement": "static",
+              "focus_character_id": null
+            },
+            {
+              "delay": 0.0,
+              "duration": 1.0,
+              "type": "MOVE_TO",
+              "character_id": "barnaby_rabbit",
+              "to": [
+                0.6,
+                0.78
+              ]
+            },
+            {
+              "delay": 0.0,
+              "duration": 1.0,
+              "type": "PLAY_SFX",
+              "sfx_id": "sfx_giggle",
+              "volume": 1.0
+            }
+          ],
+          "choice": null,
+          "min_duration": 2.0
+        },
+        {
+          "beat_id": "b3",
+          "speech": {
+            "type": "SPEAK",
+            "text": "Friendship makes any house feel like home.",
+            "character_id": "pip_owl",
+            "expression": null
+          },
+          "actions": [
+            {
+              "delay": 0.0,
+              "duration": 1.5,
+              "type": "SET_CAMERA",
+              "shot": "close",
+              "movement": "static",
+              "focus_character_id": null
+            },
+            {
+              "delay": 0.0,
+              "duration": 1.0,
+              "type": "MOVE_TO",
+              "character_id": "pip_owl",
+              "to": [
+                0.4,
+                0.78
+              ]
+            }
+          ],
+          "choice": null,
+          "min_duration": 1.5
+        }
+      ]
+    }
+  ],
+  "safety": null,
+  "continuity": null
+}

@@ -1,0 +1,131 @@
+{
+  "episode_id": "demo_owl",
+  "lines": [
+    {
+      "line_id": "demo_owl:sc1:b1",
+      "scene_id": "sc1",
+      "beat_id": "b1",
+      "speaker": "narrator",
+      "url": "/demo/episodes/demo_owl/audio/091f5c8a7a80c4bbe0fddc0f304e3a018cdd343ddda9245fc65c57401770c74d.mp3",
+      "duration_ms": 4368,
+      "words": []
+    },
+    {
+      "line_id": "demo_owl:sc1:b2",
+      "scene_id": "sc1",
+      "beat_id": "b2",
+      "speaker": "pip_owl",
+      "url": "/demo/episodes/demo_owl/audio/e30c78dfb05749358cfe4872b73af335f842ec6c2475ec0785abf9100e470671.mp3",
+      "duration_ms": 3576,
+      "words": []
+    },
+    {
+      "line_id": "demo_owl:sc2:b1",
+      "scene_id": "sc2",
+      "beat_id": "b1",
+      "speaker": "barnaby_rabbit",
+      "url": "/demo/episodes/demo_owl/audio/ec18ec3481dd27e0ddb325a7974351274acd14fc0ec259487ac1603d44108463.mp3",
+      "duration_ms": 4200,
+      "words": []
+    },
+    {
+      "line_id": "demo_owl:sc2:b2",
+      "scene_id": "sc2",
+      "beat_id": "b2",
+      "speaker": "narrator",
+      "url": "/demo/episodes/demo_owl/audio/fdfbe385ad8a1890c18c08febf6e9be667ad236352b5a7c37bd5e92753c691b3.mp3",
+      "duration_ms": 4296,
+      "words": []
+    },
+    {
+      "line_id": "demo_owl:sc3:b1",
+      "scene_id": "sc3",
+      "beat_id": "b1",
+      "speaker": "narrator",
+      "url": "/demo/episodes/demo_owl/audio/9bbe4671f8ff0442f35961be390f81f4dcbd2909fb1bccf5190701f4d0543753.mp3",
+      "duration_ms": 5016,
+      "words": []
+    },
+    {
+      "line_id": "demo_owl:sc3:b2",
+      "scene_id": "sc3",
+      "beat_id": "b2",
+      "speaker": "pip_owl",
+      "url": "/demo/episodes/demo_owl/audio/9597574a6d2adc8c56b68bffb6eed6d959c12baa437ca22809518b09a5ab2d12.mp3",
+      "duration_ms": 3744,
+      "words": []
+    },
+    {
+      "line_id": "demo_owl:sc3:b3",
+      "scene_id": "sc3",
+      "beat_id": "b3",
+      "speaker": "barnaby_rabbit",
+      "url": "/demo/episodes/demo_owl/audio/f5e709362663443c0c25c03478cec573e62a1007506a4e76407a81eeca454af5.mp3",
+      "duration_ms": 3768,
+      "words": []
+    },
+    {
+      "line_id": "demo_owl:sc4:b1",
+      "scene_id": "sc4",
+      "beat_id": "b1",
+      "speaker": "narrator",
+      "url": "/demo/episodes/demo_owl/audio/3b4ad1deaaa4e9db8eb2d05f2d01501e55d96c9df3ea83f06c67edfeb76d4fb5.mp3",
+      "duration_ms": 4296,
+      "words": []
+    },
+    {
+      "line_id": "demo_owl:sc4:b2",
+      "scene_id": "sc4",
+      "beat_id": "b2",
+      "speaker": "barnaby_rabbit",
+      "url": "/demo/episodes/demo_owl/audio/46a43469b495479e5efb464a141ee1a0563a8005779195529c93bec801bc9455.mp3",
+      "duration_ms": 3624,
+      "words": []
+    },
+    {
+      "line_id": "demo_owl:sc4:b3",
+      "scene_id": "sc4",
+      "beat_id": "b3",
+      "speaker": "pip_owl",
+      "url": "/demo/episodes/demo_owl/audio/2751c220becd9058140ff203fc7f273f2ffcf53bf90c7bfeddda3e54c2520b83.mp3",
+      "duration_ms": 2568,
+      "words": []
+    }
+  ],
+  "music": [
+    {
+      "music_id": "music_adventure",
+      "url": "/assets/audio/music/adventure.mp3"
+    },
+    {
+      "music_id": "music_calm",
+      "url": "/assets/audio/music/calm.mp3"
+    }
+  ],
+  "sfx": [
+    {
+      "sfx_id": "sfx_birds",
+      "url": "/assets/audio/sfx/birds.mp3"
+    },
+    {
+      "sfx_id": "sfx_footsteps",
+      "url": "/assets/audio/sfx/footsteps.mp3"
+    },
+    {
+      "sfx_id": "sfx_giggle",
+      "url": "/assets/audio/sfx/giggle.mp3"
+    },
+    {
+      "sfx_id": "sfx_sparkle",
+      "url": "/assets/audio/sfx/sparkle.mp3"
+    },
+    {
+      "sfx_id": "sfx_whoosh",
+      "url": "/assets/audio/sfx/whoosh.mp3"
+    },
+    {
+      "sfx_id": "sfx_wind",
+      "url": "/assets/audio/sfx/wind.mp3"
+    }
+  ]
+}

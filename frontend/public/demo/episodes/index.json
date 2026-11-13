@@ -19,5 +19,12 @@
     "interactive": false,
     "has_video": false,
     "video_url": "/demo/episodes/demo_studio/video.mp4"
+  },
+  {
+    "id": "demo_owl",
+    "title": "Barnaby's Treehouse Dream",
+    "interactive": false,
+    "has_video": false,
+    "video_url": "/demo/episodes/demo_owl/video.mp4"
   }
 ]
