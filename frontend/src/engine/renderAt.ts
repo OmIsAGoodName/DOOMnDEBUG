@@ -220,7 +220,8 @@ export function renderAt(
     if (opts?.mouthOverride) {
       mouth = opts.mouthOverride;
     } else if (currentBeat?.speech && currentBeat.speech.character_id === charId) {
-      const isSpeakingWindow = t >= currentBeat.startTime && t <= currentBeat.startTime + currentBeat.speechDuration;
+      const speechDur = currentBeat.speechDuration ?? 2.5;
+      const isSpeakingWindow = t >= currentBeat.startTime && t <= currentBeat.startTime + speechDur;
       if (isSpeakingWindow) {
         const lineId = currentBeat.lineId;
         if (lineId && !currentBeat.estimatedSpeech) {
