@@ -7,6 +7,11 @@
 ---
 
 ## Done
+- [x] **N8.7 Fluid Apple-Style Motion & Transitions on Navbar (`frontend/src/App.tsx`)**:
+  - Implemented Apple-grade fluid spring motion curve `cubic-bezier(0.16, 1, 0.3, 1)` across all navbar elements.
+  - Replaced hard DOM unmount of the companion search pod with a smooth morphing capsule animation: smoothly expands from `w-10` circular pod to `w-72` search bar with fade-in and auto-focus.
+  - Added instant tactile press feedback (`active:scale-[0.94]` within 75ms) and smooth hover elevations with ambient gold glow.
+  - Added bouncy rotational micro-physics (`cubic-bezier(0.34, 1.56, 0.64, 1)`) to Dark Mode icon and Sparkle brand mark.
 - [x] **N8.6 Floating Capsule Dock Navbar & Live Asset Library Search (`frontend/src/App.tsx`, `pages/Library.tsx`)**:
   - Redesigned the top navigation header into a floating capsule dock inspired by the pill aesthetic in Image 1 while incorporating both icons and section names:
     - `🏠 Home`, `🌙 Quick Story`, `🎬 Studio`, `📚 Library`, and `⚙️ Diagnostics`.
