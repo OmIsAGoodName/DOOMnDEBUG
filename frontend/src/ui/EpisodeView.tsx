@@ -246,19 +246,19 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
   return (
     <div className={`space-y-6 w-full max-w-4xl mx-auto ${className}`}>
       {/* Episode Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/95 dark:bg-midnight-800/95 backdrop-blur-md p-5 rounded-3xl border border-stone-200/90 dark:border-midnight-700/80 shadow-storybook-sm">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">{plan.title || episode.title}</h2>
+          <div className="flex items-center gap-2.5 mb-1.5">
+            <h2 className="text-2xl font-bold font-display text-stone-900 dark:text-slate-100">{plan.title || episode.title}</h2>
             {isInteractive && (
-              <span className="bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border border-amber-300 dark:border-amber-800">
+              <span className="bg-amber-500/15 text-amber-800 dark:text-amber-300 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-amber-500/25">
                 🎙 Interactive
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Age Band: <strong className="text-slate-700 dark:text-slate-200">{plan.age_band || '4-6'}</strong> &bull; Cast:{' '}
-            <strong className="text-slate-700 dark:text-slate-200">
+          <p className="text-xs text-stone-500 dark:text-slate-400">
+            Age Band: <strong className="text-stone-700 dark:text-slate-200 font-semibold">{plan.age_band || '4-6'}</strong> &bull; Cast:{' '}
+            <strong className="text-stone-700 dark:text-slate-200 font-semibold">
               {plan.cast?.map((c) => c.name).join(', ') || 'Pip the Owl'}
             </strong>
           </p>
@@ -512,14 +512,14 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
 
       {/* Export status bar */}
       {isExporting && (
-        <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-2xl p-4 text-center space-y-2 animate-pulse">
+        <div className="bg-amber-500/10 dark:bg-amber-950/40 border border-amber-500/25 dark:border-amber-800/60 rounded-2xl p-4 text-center space-y-1.5 animate-pulse">
           <p className="text-sm font-bold text-amber-900 dark:text-amber-300">{exportProgressText}</p>
-          <p className="text-xs text-amber-700 dark:text-amber-400">Please keep this browser tab active during recording.</p>
+          <p className="text-xs text-amber-700 dark:text-amber-400">Keep this browser tab active during recording.</p>
         </div>
       )}
 
       {/* Actions Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white/95 dark:bg-midnight-800/95 backdrop-blur-md p-4 rounded-3xl border border-stone-200/90 dark:border-midnight-700/80 shadow-storybook-sm">
         <div className="flex items-center gap-2">
           <Button variant="secondary" size="md" onClick={handleReplay}>
             ↺ Replay Story

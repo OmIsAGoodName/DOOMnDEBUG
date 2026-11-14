@@ -153,18 +153,18 @@ export function CharacterBuilder({
     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-12 gap-8">
       {/* Left Column: Live Character Preview */}
       <div className="md:col-span-5 flex flex-col items-center space-y-4">
-        <div className="w-full aspect-[4/5] bg-gradient-to-b from-slate-100 to-indigo-50/40 rounded-3xl border-2 border-indigo-200 overflow-hidden flex items-center justify-center shadow-inner relative">
-          <canvas ref={canvasRef} width={260} height={320} className="w-full h-full object-contain" />
+        <div className="w-full aspect-[4/5] bg-gradient-to-b from-stone-100 to-stone-50 dark:from-midnight-900 dark:to-midnight-950 rounded-3xl border border-stone-200/90 dark:border-midnight-700/80 overflow-hidden flex items-center justify-center shadow-inner relative">
+          <canvas ref={canvasRef} width={260} height={320} className="w-full h-full object-contain drop-shadow-sm" />
 
           {/* Live Preview Badge */}
-          <span className="absolute top-3 right-3 bg-white/90 backdrop-blur-xs text-indigo-700 text-[10px] font-black uppercase px-2 py-0.5 rounded-full border border-indigo-200 shadow-xs">
+          <span className="absolute top-3 right-3 bg-white/90 dark:bg-midnight-800/90 backdrop-blur-xs text-amber-700 dark:text-amber-300 text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border border-stone-200/80 dark:border-midnight-700/80 shadow-xs">
             Live Preview
           </span>
         </div>
 
         {/* Expression selector for preview */}
-        <div className="w-full space-y-1">
-          <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+        <div className="w-full space-y-1.5">
+          <label className="text-[11px] font-semibold text-stone-600 dark:text-slate-300 uppercase tracking-wider">
             Preview Expression:
           </label>
           <div className="flex flex-wrap gap-1">
@@ -192,7 +192,7 @@ export function CharacterBuilder({
 
         {/* Species selector */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+          <label className="block text-xs font-semibold uppercase tracking-wider text-stone-600 dark:text-slate-300">
             Species
           </label>
           <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
@@ -201,10 +201,10 @@ export function CharacterBuilder({
                 key={s}
                 type="button"
                 onClick={() => handleSpeciesChange(s)}
-                className={`py-2 px-2 rounded-xl border text-xs sm:text-sm font-bold capitalize transition-all ${
+                className={`py-2 px-2 rounded-xl border text-xs sm:text-sm font-semibold capitalize transition-all duration-150 active:scale-95 ${
                   species === s
-                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                    ? 'bg-amber-500 text-slate-950 border-amber-400 font-bold shadow-storybook-sm'
+                    : 'bg-stone-50 dark:bg-midnight-900 hover:bg-stone-100 dark:hover:bg-midnight-750 text-stone-700 dark:text-slate-300 border-stone-200 dark:border-midnight-700'
                 }`}
               >
                 {s === 'owl' ? '🦉 Owl' : s === 'fox' ? '🦊 Fox' : s === 'kid' ? '🧒 Kid' : s === 'rabbit' ? '🐰 Rabbit' : '🐢 Turtle'}
@@ -215,7 +215,7 @@ export function CharacterBuilder({
 
         {/* Accessories */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+          <label className="block text-xs font-semibold uppercase tracking-wider text-stone-600 dark:text-slate-300">
             Accessories
           </label>
           <div className="flex flex-wrap gap-1.5">
@@ -226,10 +226,10 @@ export function CharacterBuilder({
                   key={acc}
                   type="button"
                   onClick={() => toggleAccessory(acc)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-colors capitalize ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all capitalize active:scale-95 ${
                     active
-                      ? 'bg-amber-100 border-amber-400 text-amber-900 shadow-xs'
-                      : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                      ? 'bg-amber-500/15 border-amber-500/40 text-amber-900 dark:text-amber-200 font-bold shadow-xs'
+                      : 'bg-stone-50 dark:bg-midnight-900 border-stone-200 dark:border-midnight-700 text-stone-600 dark:text-slate-300 hover:bg-stone-100 dark:hover:bg-midnight-750'
                   }`}
                 >
                   {active ? '✓ ' : '+ '}
@@ -242,21 +242,21 @@ export function CharacterBuilder({
 
         {/* Palette Swatches */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+          <label className="block text-xs font-semibold uppercase tracking-wider text-stone-600 dark:text-slate-300">
             Color Palette
           </label>
           <div className="grid grid-cols-2 gap-2">
             {(['primary', 'secondary', 'accent', 'outline'] as const).map((key) => (
-              <div key={key} className="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
+              <div key={key} className="flex items-center gap-2.5 bg-stone-50 dark:bg-midnight-900/60 p-2 rounded-xl border border-stone-200 dark:border-midnight-700">
                 <input
                   type="color"
                   value={palette[key]}
                   onChange={(e) =>
                     setPalette((prev) => ({ ...prev, [key]: e.target.value }))
                   }
-                  className="w-7 h-7 rounded border border-slate-300 cursor-pointer"
+                  className="w-7 h-7 rounded border border-stone-300 dark:border-midnight-600 cursor-pointer"
                 />
-                <span className="text-xs font-bold capitalize text-slate-700">{key}</span>
+                <span className="text-xs font-semibold capitalize text-stone-700 dark:text-slate-200">{key}</span>
               </div>
             ))}
           </div>

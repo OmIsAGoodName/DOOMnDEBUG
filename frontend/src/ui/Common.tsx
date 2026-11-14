@@ -7,15 +7,15 @@ export interface SpinnerProps {
 
 export const Spinner: React.FC<SpinnerProps> = ({ size = 'md', className = '' }) => {
   const sizeClass = {
-    sm: 'h-4 w-4',
-    md: 'h-8 w-8',
-    lg: 'h-12 w-12'
+    sm: 'h-4 w-4 border-2',
+    md: 'h-8 w-8 border-3',
+    lg: 'h-12 w-12 border-4'
   }[size];
 
   return (
     <div className={`flex justify-center items-center ${className}`}>
       <div
-        className={`${sizeClass} animate-spin rounded-full border-4 border-slate-200 border-t-indigo-600`}
+        className={`${sizeClass} animate-spin rounded-full border-stone-200 dark:border-midnight-700 border-t-amber-500 dark:border-t-amber-400`}
       />
     </div>
   );
@@ -35,10 +35,12 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   icon = '📖'
 }) => {
   return (
-    <div className="text-center py-12 px-4 max-w-sm mx-auto space-y-3">
-      <div className="text-5xl select-none">{icon}</div>
-      <h3 className="text-lg font-bold text-slate-800">{title}</h3>
-      <p className="text-sm text-slate-500">{description}</p>
+    <div className="text-center py-12 px-6 max-w-md mx-auto space-y-3.5">
+      <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-500/10 dark:bg-amber-400/10 border border-amber-500/20 dark:border-amber-400/20 flex items-center justify-center text-3xl select-none shadow-storybook-sm">
+        {icon}
+      </div>
+      <h3 className="text-lg font-bold font-display text-stone-900 dark:text-slate-100">{title}</h3>
+      <p className="text-sm text-stone-600 dark:text-slate-300 leading-relaxed">{description}</p>
       {action && <div className="pt-2">{action}</div>}
     </div>
   );

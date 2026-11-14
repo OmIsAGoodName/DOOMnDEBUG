@@ -24,15 +24,15 @@ export const Stepper: React.FC<StepperProps> = ({ currentStage = 'understanding'
   return (
     <div className="w-full space-y-4">
       {progress != null && progress > 0 && (
-        <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+        <div className="w-full bg-stone-100 dark:bg-midnight-900 rounded-full h-2 overflow-hidden border border-stone-200/60 dark:border-midnight-700/60">
           <div
-            className="bg-indigo-600 h-2.5 rounded-full transition-all duration-300"
+            className="bg-gradient-to-r from-amber-400 to-amber-500 h-2 rounded-full transition-all duration-300 shadow-lantern-glow-sm"
             style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
           />
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         {STAGES.map((stage, idx) => {
           const isDone = idx < currentIndex;
           const isCurrent = idx === currentIndex;
@@ -42,10 +42,10 @@ export const Stepper: React.FC<StepperProps> = ({ currentStage = 'understanding'
               <div
                 className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
                   isDone
-                    ? 'bg-emerald-500 text-white'
+                    ? 'bg-meadow-500 text-white shadow-storybook-sm'
                     : isCurrent
-                    ? 'bg-indigo-600 text-white ring-4 ring-indigo-100 dark:ring-indigo-950 animate-pulse'
-                    : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                    ? 'bg-amber-500 text-slate-950 ring-4 ring-amber-500/25 dark:ring-amber-400/20 shadow-lantern-glow-sm font-extrabold'
+                    : 'bg-stone-200 dark:bg-midnight-800 text-stone-500 dark:text-slate-400'
                 }`}
               >
                 {isDone ? '✓' : idx + 1}
@@ -53,10 +53,10 @@ export const Stepper: React.FC<StepperProps> = ({ currentStage = 'understanding'
               <span
                 className={`text-sm ${
                   isCurrent
-                    ? 'font-bold text-slate-900 dark:text-slate-100'
+                    ? 'font-bold text-stone-900 dark:text-slate-100'
                     : isDone
-                    ? 'font-medium text-slate-600 dark:text-slate-300'
-                    : 'text-slate-400 dark:text-slate-500'
+                    ? 'font-medium text-stone-600 dark:text-slate-300'
+                    : 'text-stone-400 dark:text-slate-400'
                 }`}
               >
                 {stage.label}

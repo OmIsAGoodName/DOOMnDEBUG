@@ -202,27 +202,31 @@ export default function Studio() {
   }
 
   return (
-    <div className="py-10 px-6 max-w-6xl mx-auto space-y-10 text-slate-800 dark:text-slate-200">
+    <div className="py-10 px-6 max-w-6xl mx-auto space-y-10 text-stone-800 dark:text-slate-200">
       {/* Studio Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-stone-200/90 dark:border-midnight-700/80 pb-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-3">
-            <span>🎨</span> VoxFable Studio Mode
+          <div className="inline-flex items-center gap-2 bg-amber-500/10 dark:bg-amber-400/10 text-amber-900 dark:text-amber-300 border border-amber-500/25 dark:border-amber-400/20 px-3 py-0.5 rounded-full text-xs font-semibold tracking-wide mb-2">
+            <span>🎬</span>
+            <span>Animation Workbench</span>
+          </div>
+          <h1 className="text-3xl font-bold font-display text-stone-900 dark:text-slate-100 tracking-tight">
+            VoxFable Studio
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Series Showrunner &bull; Persistent Characters &bull; Multi-Episode Batch Generator
+          <p className="text-sm text-stone-600 dark:text-slate-300 mt-1">
+            Series Showrunner &bull; Persistent Character Bibles &bull; Multi-Episode Batch Production
           </p>
         </div>
 
         {/* Series Selector */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <select
             value={activeSeries?.id || ''}
             onChange={(e) => {
               const selected = seriesList.find((s) => s.id === e.target.value);
               if (selected) setActiveSeries(selected);
             }}
-            className="px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm font-bold bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="px-3.5 py-2.5 rounded-xl border border-stone-300 dark:border-midnight-700 text-sm font-semibold bg-white dark:bg-midnight-900 text-stone-900 dark:text-slate-100 shadow-storybook-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30"
           >
             {seriesList.map((s) => (
               <option key={s.id} value={s.id}>
@@ -238,12 +242,12 @@ export default function Studio() {
 
       {/* Series Edit Modal / Drawer */}
       {isEditingSeries && (
-        <Card padding="lg" className="border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/20 dark:bg-indigo-950/20 shadow-md">
-          <div className="flex items-center justify-between mb-4 border-b border-slate-200 dark:border-slate-800 pb-2">
-            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Series Configuration</h2>
+        <Card padding="lg" className="border-amber-500/30 dark:border-midnight-600 bg-white dark:bg-midnight-800 shadow-storybook">
+          <div className="flex items-center justify-between mb-4 border-b border-stone-200 dark:border-midnight-700 pb-2">
+            <h2 className="text-xl font-bold font-display text-stone-900 dark:text-slate-100">Series Configuration</h2>
             <button
               onClick={() => setIsEditingSeries(false)}
-              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold"
+              className="text-stone-400 hover:text-stone-600 dark:hover:text-slate-200 font-bold p-1 text-lg"
             >
               &times;
             </button>
@@ -260,8 +264,8 @@ export default function Studio() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Character Roster</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <h2 className="text-xl font-bold font-display text-stone-900 dark:text-slate-100">Character Roster</h2>
+            <p className="text-xs text-stone-600 dark:text-slate-300">
               Cast members retain consistent personalities, color palettes, and rules across episodes.
             </p>
           </div>
@@ -279,14 +283,14 @@ export default function Studio() {
 
         {/* Character Builder Modal */}
         {editingCharacter && (
-          <Card padding="lg" className="border-indigo-300 dark:border-indigo-800 bg-indigo-50/30 dark:bg-indigo-950/30 shadow-lg">
-            <div className="flex items-center justify-between mb-4 border-b border-slate-200 dark:border-slate-800 pb-2">
-              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+          <Card padding="lg" className="border-amber-500/30 dark:border-midnight-600 bg-white dark:bg-midnight-800 shadow-storybook">
+            <div className="flex items-center justify-between mb-4 border-b border-stone-200 dark:border-midnight-700 pb-2">
+              <h2 className="text-xl font-bold font-display text-stone-900 dark:text-slate-100">
                 {editingCharacter === 'new' ? 'Create New Character' : `Edit ${editingCharacter.name}`}
               </h2>
               <button
                 onClick={() => setEditingCharacter(null)}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold"
+                className="text-stone-400 hover:text-stone-600 dark:hover:text-slate-200 font-bold p-1 text-lg"
               >
                 &times;
               </button>
@@ -312,8 +316,8 @@ export default function Studio() {
           ))}
 
           {characters.length === 0 && (
-            <div className="col-span-3 text-center py-8 bg-slate-50 dark:bg-slate-900 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800">
-              <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">No characters in this series yet.</p>
+            <div className="col-span-3 text-center py-10 bg-stone-50/80 dark:bg-midnight-900/60 rounded-2xl border-2 border-dashed border-stone-200 dark:border-midnight-700">
+              <p className="text-sm font-semibold text-stone-500 dark:text-slate-400">No characters in this series yet.</p>
               <Button
                 variant="primary"
                 size="sm"
@@ -328,22 +332,22 @@ export default function Studio() {
       </div>
 
       {/* Section 2: Season Batch Generator */}
-      <div className="space-y-6 pt-6 border-t border-slate-200 dark:border-slate-800">
+      <div className="space-y-6 pt-6 border-t border-stone-200/90 dark:border-midnight-700/80">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Season Showrunner Generator</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <h2 className="text-xl font-bold font-display text-stone-900 dark:text-slate-100">Season Showrunner Generator</h2>
+            <p className="text-xs text-stone-600 dark:text-slate-300">
               Batch generate connected episodes that enforce character continuity and world rules.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 shadow-xs">
-              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">EPISODES:</span>
+            <div className="flex items-center gap-1.5 bg-white dark:bg-midnight-900 border border-stone-200 dark:border-midnight-700 rounded-xl px-3 py-1.5 shadow-storybook-sm">
+              <span className="text-xs font-semibold text-stone-600 dark:text-slate-300">EPISODES:</span>
               <select
                 value={batchCount}
                 onChange={(e) => setBatchCount(parseInt(e.target.value, 10))}
-                className="text-sm font-bold text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
+                className="text-sm font-semibold text-stone-800 dark:text-slate-200 bg-transparent focus:outline-none cursor-pointer"
               >
                 {[1, 2, 3, 4, 5].map((n) => (
                   <option key={n} value={n}>
@@ -367,20 +371,20 @@ export default function Studio() {
 
         {/* Generation Progress Bar */}
         {isGenerating && (
-          <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 space-y-3">
-            <div className="flex items-center justify-between text-xs font-bold text-indigo-900">
+          <div className="bg-amber-500/10 dark:bg-midnight-800/90 border border-amber-500/30 dark:border-midnight-650 rounded-2xl p-5 space-y-3 shadow-storybook">
+            <div className="flex items-center justify-between text-xs font-bold text-amber-900 dark:text-amber-300">
               <span>Season Generation in Progress... ({seasonEpisodes.length}/{batchCount} Ready)</span>
               <span>Stage: {generation?.stage || 'writing'}</span>
             </div>
-            <div className="w-full bg-indigo-100 rounded-full h-3 overflow-hidden">
+            <div className="w-full bg-stone-200 dark:bg-midnight-900 rounded-full h-2.5 overflow-hidden">
               <div
-                className="bg-indigo-600 h-3 rounded-full transition-all duration-500"
+                className="bg-gradient-to-r from-amber-400 to-amber-500 h-2.5 rounded-full transition-all duration-500 shadow-lantern-glow-sm"
                 style={{
                   width: `${Math.max(10, Math.round((seasonEpisodes.length / batchCount) * 100))}%`
                 }}
               />
             </div>
-            <p className="text-[11px] text-indigo-700 italic">
+            <p className="text-[11px] text-amber-800 dark:text-amber-400 italic">
               Writing script, applying continuity fixes, generating voices and rendering canvas scenes...
             </p>
           </div>
@@ -388,33 +392,33 @@ export default function Studio() {
 
         {/* Season Episodes Grid */}
         <div className="space-y-4">
-          <h3 className="text-lg font-bold text-slate-800">
+          <h3 className="text-lg font-bold font-display text-stone-900 dark:text-slate-100">
             Season Episodes {seasonEpisodes.length > 0 && `(${seasonEpisodes.length})`}
           </h3>
 
           {seasonEpisodes.length === 0 && !isGenerating && (
-            <div className="text-center py-12 bg-slate-50 rounded-2xl border border-slate-200 text-slate-500 text-sm">
-              Click <strong>Generate Season</strong> above to write and direct episodes with your cast!
+            <div className="text-center py-12 px-6 bg-stone-50/80 dark:bg-midnight-900/60 rounded-2xl border-2 border-dashed border-stone-200 dark:border-midnight-700/80 text-stone-500 dark:text-slate-400 text-sm">
+              Click <strong className="text-stone-800 dark:text-slate-200">Generate Season</strong> above to write and direct episodes with your cast!
             </div>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {seasonEpisodes.map((ep, idx) => (
-              <Card key={ep.id || idx} hoverEffect className="flex flex-col justify-between border-slate-200 space-y-4">
+              <Card key={ep.id || idx} hoverEffect className="flex flex-col justify-between border-stone-200/90 dark:border-midnight-700/80 space-y-4 bg-white dark:bg-midnight-800/90 shadow-storybook-sm">
                 <div>
-                  <div className="flex items-center justify-between text-xs font-bold text-slate-400 mb-1">
+                  <div className="flex items-center justify-between text-xs font-bold text-stone-400 dark:text-slate-500 mb-1">
                     <span>EPISODE #{idx + 1}</span>
-                    <span className="text-indigo-600">{ep.plan?.age_band || '4-6'}</span>
+                    <span className="text-amber-600 dark:text-amber-400 font-semibold">{ep.plan?.age_band || '4-6'}</span>
                   </div>
-                  <h4 className="font-bold text-base text-slate-900 line-clamp-1">
+                  <h4 className="font-bold text-base text-stone-900 dark:text-slate-100 line-clamp-1">
                     {ep.title || `Episode ${idx + 1}`}
                   </h4>
-                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">
+                  <p className="text-xs text-stone-600 dark:text-slate-300 mt-1 line-clamp-2">
                     {ep.plan?.scenes?.[0]?.beats?.[0]?.speech?.text || 'A heartwarming bedtime tale.'}
                   </p>
                 </div>
 
-                <div className="space-y-2 pt-2 border-t border-slate-100">
+                <div className="space-y-2 pt-2 border-t border-stone-100 dark:border-midnight-700">
                   <div className="flex flex-wrap items-center gap-1.5">
                     <SafetyBadge status={ep.safety?.verdict || 'pass'} />
                     <ContinuityBadge violations={ep.continuity?.violations || []} />
@@ -479,39 +483,42 @@ function CharacterCard({ character, onEdit, onDelete }: CharacterCardProps) {
   }, [character]);
 
   return (
-    <Card hoverEffect className="flex flex-col justify-between border-slate-200 dark:border-slate-800">
+    <Card hoverEffect className="flex flex-col justify-between border-stone-200/90 dark:border-midnight-700/80 bg-white dark:bg-midnight-800/90 shadow-storybook-sm">
       <div>
-        <div className="w-full aspect-square bg-slate-50 dark:bg-slate-800/80 rounded-2xl flex items-center justify-center overflow-hidden border border-slate-100 dark:border-slate-700/60 mb-3">
-          <canvas ref={canvasRef} width={180} height={200} className="w-full h-full object-contain" />
+        <div className="w-full aspect-square bg-gradient-to-b from-stone-100 to-stone-50 dark:from-midnight-900/90 dark:to-midnight-950 rounded-2xl flex items-center justify-center overflow-hidden border border-stone-200/80 dark:border-midnight-700/80 mb-3 shadow-inner relative group">
+          <canvas ref={canvasRef} width={180} height={200} className="w-full h-full object-contain drop-shadow-sm" />
+          <span className="absolute bottom-2 right-2 text-[10px] font-mono uppercase tracking-wider text-stone-600 dark:text-slate-300 bg-white/80 dark:bg-midnight-800/80 px-1.5 py-0.5 rounded border border-stone-200/60 dark:border-midnight-700/60">
+            Model Cel
+          </span>
         </div>
 
         <div className="flex items-center justify-between">
-          <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100">{character.name}</h3>
-          <span className="text-xs uppercase font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+          <h3 className="font-bold font-display text-base text-stone-900 dark:text-slate-100">{character.name}</h3>
+          <span className="text-[11px] uppercase font-semibold px-2 py-0.5 rounded-full bg-stone-100 dark:bg-midnight-750 text-stone-600 dark:text-slate-300 border border-stone-200/60 dark:border-midnight-700/60">
             {character.species}
           </span>
         </div>
 
         {character.bible?.personality && character.bible.personality.length > 0 && (
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 capitalize">
+          <p className="text-xs text-stone-500 dark:text-slate-400 mt-1 capitalize">
             {character.bible.personality.join(', ')}
           </p>
         )}
 
         {character.bible?.rules && character.bible.rules.length > 0 && (
-          <p className="text-[11px] text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 p-1.5 rounded-lg border border-amber-200 dark:border-amber-800/60 mt-2 italic">
+          <p className="text-[11px] text-amber-900 dark:text-amber-300 bg-amber-500/10 dark:bg-amber-400/10 p-2 rounded-xl border border-amber-500/20 dark:border-amber-400/20 mt-2.5 italic leading-relaxed">
             Rule: {character.bible.rules[0]}
           </p>
         )}
       </div>
 
-      <div className="pt-4 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 mt-4">
+      <div className="pt-4 flex items-center justify-between border-t border-stone-100 dark:border-midnight-700 mt-4">
         <Button variant="ghost" size="sm" onClick={onEdit}>
           Edit Look
         </Button>
         <button
           onClick={onDelete}
-          className="text-xs font-bold text-slate-400 hover:text-rose-600 transition-colors"
+          className="text-xs font-semibold text-stone-600 hover:text-rose-600 dark:text-slate-300 dark:hover:text-rose-400 transition-colors p-1"
         >
           Delete
         </button>

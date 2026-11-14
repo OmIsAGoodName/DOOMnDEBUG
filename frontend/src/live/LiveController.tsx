@@ -66,16 +66,16 @@ export function LiveController({
 
       {/* Choice & Speech Interaction Panel */}
       {activeChoiceInfo && (
-        <div className="w-full bg-slate-900 border-2 border-amber-500/70 rounded-2xl p-5 shadow-2xl space-y-4 animate-in fade-in slide-in-from-bottom duration-300">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+        <div className="w-full bg-midnight-850/95 backdrop-blur-md border border-amber-500/40 rounded-3xl p-6 shadow-storybook-hover space-y-4 animate-in fade-in duration-200">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-midnight-700/80 pb-3">
             <div className="flex items-center gap-3">
               {/* Mic Status Ring */}
               <div className="relative flex items-center justify-center">
                 <div
                   className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
                     isListening
-                      ? 'bg-rose-500 text-white shadow-lg animate-pulse ring-4 ring-rose-500/40'
-                      : 'bg-slate-800 text-slate-400'
+                      ? 'bg-rose-500 text-white shadow-storybook-sm ring-4 ring-rose-500/30 animate-pulse'
+                      : 'bg-midnight-750 text-slate-400 border border-midnight-700'
                   }`}
                 >
                   <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
@@ -86,13 +86,13 @@ export function LiveController({
               </div>
 
               <div>
-                <p className="font-extrabold text-amber-400 text-base sm:text-lg">
-                  {isThinking ? 'Listening to you...' : 'What should happen next?'}
+                <p className="font-bold font-display text-amber-400 text-base sm:text-lg tracking-tight">
+                  {isThinking ? 'Listening...' : 'What should happen next?'}
                 </p>
                 <p className="text-xs text-slate-400">
                   {hasMicSupport
-                    ? 'Say your choice into your microphone, or tap below!'
-                    : 'Tap a button below to choose!'}
+                    ? 'Speak your choice or tap an option below.'
+                    : 'Select an option below.'}
                 </p>
               </div>
             </div>
@@ -104,7 +104,7 @@ export function LiveController({
                 {chosenHistory.map((ch, idx) => (
                   <span
                     key={idx}
-                    className="w-3 h-3 rounded-full bg-amber-400 shadow-sm"
+                    className="w-3 h-3 rounded-full bg-amber-400 shadow-lantern-glow-sm"
                     title={`Choice ${idx + 1}: ${ch}`}
                   />
                 ))}
@@ -114,9 +114,9 @@ export function LiveController({
 
           {/* Heard Transcript Speech Bubble */}
           {transcript && (
-            <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-2.5 flex items-center gap-2">
-              <span className="text-amber-400 font-bold text-xs uppercase tracking-wide">
-                I heard:
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl px-4 py-2.5 flex items-center gap-2">
+              <span className="text-amber-400 font-bold text-xs uppercase tracking-wider">
+                Heard:
               </span>
               <span className="text-white font-medium text-sm italic">
                 "{transcript}"
@@ -137,14 +137,14 @@ export function LiveController({
               <button
                 key={opt.id}
                 onClick={() => handleResolveOption(opt.id, 'tap')}
-                className={`min-h-[64px] px-6 py-4 rounded-xl font-black text-base sm:text-lg tracking-wide shadow-xl flex items-center justify-between gap-3 text-left transition-all transform hover:scale-[1.02] active:scale-[0.98] ${
+                className={`min-h-[64px] px-6 py-4 rounded-2xl font-bold font-display text-base sm:text-lg tracking-tight shadow-storybook flex items-center justify-between gap-3 text-left transition-all duration-150 active:scale-[0.98] select-none border-t border-white/30 ${
                   i === 0
-                    ? 'bg-amber-500 hover:bg-amber-400 text-slate-950 focus:ring-4 focus:ring-amber-300'
-                    : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 focus:ring-4 focus:ring-emerald-300'
+                    ? 'bg-gradient-to-b from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 focus:outline-none focus:ring-4 focus:ring-amber-300/40 shadow-lantern-glow-sm hover:shadow-lantern-glow'
+                    : 'bg-gradient-to-b from-meadow-400 to-meadow-500 hover:from-meadow-300 hover:to-meadow-400 text-slate-950 focus:outline-none focus:ring-4 focus:ring-meadow-300/40'
                 }`}
               >
                 <span>{opt.label}</span>
-                <span className="text-xl">
+                <span className="text-xl select-none">
                   {i === 0 ? '✨' : '🚪'}
                 </span>
               </button>

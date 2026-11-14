@@ -34,15 +34,16 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
-          <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-3 flex items-center justify-between">
-            <Link to="/" className="text-xl font-bold tracking-tight text-slate-800 dark:text-slate-100 flex items-center gap-2">
-              <span>✨</span> VoxFable
+        <div className="min-h-screen bg-parchment-50 dark:bg-midnight-950 text-stone-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
+          <header className="sticky top-0 z-40 bg-white/90 dark:bg-midnight-900/90 backdrop-blur-md border-b border-stone-200/80 dark:border-midnight-700/70 px-6 py-3 flex items-center justify-between shadow-storybook-sm">
+            <Link to="/" className="text-xl font-bold font-display tracking-tight text-stone-900 dark:text-slate-100 flex items-center gap-2.5">
+              <span className="w-7 h-7 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-500 text-xs shadow-storybook-sm">✨</span>
+              <span>VoxFable</span>
             </Link>
-            <nav className="flex items-center gap-4 text-sm font-medium text-slate-600 dark:text-slate-300">
-              <Link to="/quick" className="hover:text-slate-900 dark:hover:text-white transition-colors">Quick Story</Link>
-              <Link to="/studio" className="hover:text-slate-900 dark:hover:text-white transition-colors">Studio</Link>
-              <Link to="/library" className="hover:text-slate-900 dark:hover:text-white transition-colors">Library</Link>
+            <nav className="flex items-center gap-4 text-sm font-semibold text-stone-600 dark:text-slate-300">
+              <Link to="/quick" className="hover:text-stone-900 dark:hover:text-amber-300 transition-colors">Quick Story</Link>
+              <Link to="/studio" className="hover:text-stone-900 dark:hover:text-amber-300 transition-colors">Studio</Link>
+              <Link to="/library" className="hover:text-stone-900 dark:hover:text-amber-300 transition-colors">Library</Link>
               <Link to="/debug" className="hover:text-amber-500 dark:hover:text-amber-400 font-bold transition-colors">⚙️ Diagnostics</Link>
 
               {/* Dark Mode Toggle */}
@@ -50,9 +51,9 @@ export default function App() {
                 type="button"
                 onClick={() => setIsDark((prev) => !prev)}
                 aria-label="Toggle dark mode"
-                className="ml-2 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 transition-colors shadow-xs"
+                className="ml-2 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border border-stone-200/90 dark:border-midnight-700/80 bg-stone-100/90 hover:bg-stone-200 dark:bg-midnight-800 dark:hover:bg-midnight-750 text-stone-800 dark:text-slate-200 transition-all shadow-storybook-sm active:scale-95"
               >
-                <span className="text-sm">{isDark ? '🌙' : '☀️'}</span>
+                <span className="text-xs">{isDark ? '🌙' : '☀️'}</span>
                 <span>{isDark ? 'Dark Mode' : 'Light Mode'}</span>
               </button>
             </nav>

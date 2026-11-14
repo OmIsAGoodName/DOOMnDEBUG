@@ -45,14 +45,14 @@ export default function Signup() {
           <div className="flex justify-center">
             <VoxFableLogo size={48} />
           </div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Create an Account</h1>
-          <p className="text-sm text-slate-500">Join VoxFable to make children's cartoons</p>
+          <h1 className="text-3xl font-bold font-display text-stone-900 dark:text-slate-100 tracking-tight">Create an Account</h1>
+          <p className="text-sm text-stone-600 dark:text-slate-300">Join VoxFable to make children's cartoons</p>
         </div>
 
-        <Card padding="lg" className="border-slate-200 shadow-md">
+        <Card padding="lg" className="border-stone-200/90 dark:border-midnight-700/80 shadow-storybook bg-white dark:bg-midnight-800 rounded-3xl">
           <form onSubmit={handleSubmit} className="space-y-4">
             {errorMessage && (
-              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-700">
+              <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-xs font-semibold text-rose-700 dark:text-rose-300">
                 {errorMessage}
               </div>
             )}
@@ -86,7 +86,7 @@ export default function Signup() {
 
             {/* Account Type Selection */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-stone-600 dark:text-slate-300">
                 Account Type
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -101,10 +101,10 @@ export default function Signup() {
                     key={t.key}
                     type="button"
                     onClick={() => setAccountType(t.key)}
-                    className={`p-2.5 rounded-xl border text-xs font-bold transition-all ${
+                    className={`p-2.5 rounded-xl border text-xs font-semibold transition-all duration-150 active:scale-95 ${
                       accountType === t.key
-                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                        ? 'bg-amber-500 text-slate-950 border-amber-400 font-bold shadow-storybook-sm'
+                        : 'bg-stone-50 dark:bg-midnight-900 hover:bg-stone-100 dark:hover:bg-midnight-750 text-stone-700 dark:text-slate-300 border-stone-200 dark:border-midnight-700'
                     }`}
                   >
                     {t.label}
@@ -124,17 +124,17 @@ export default function Signup() {
             </Button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-slate-100 space-y-4">
+          <div className="mt-6 pt-6 border-t border-stone-100 dark:border-midnight-700 space-y-3">
             <Button
               type="button"
               variant="secondary"
               size="md"
-              className="w-full font-bold text-slate-700 bg-amber-50 hover:bg-amber-100 border border-amber-200"
+              className="w-full font-semibold text-amber-950 dark:text-amber-200 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/25"
               onClick={handleDemoMode}
             >
               ⚡ Continue in Demo Mode
             </Button>
-            <p className="text-[11px] text-center text-slate-400">
+            <p className="text-xs text-center text-stone-500 dark:text-slate-400">
               Skip login & explore sample episodes offline
             </p>
           </div>

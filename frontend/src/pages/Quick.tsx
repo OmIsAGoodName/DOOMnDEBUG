@@ -154,20 +154,21 @@ export default function Quick() {
   // 2. Generating / Pipeline Stage State
   if (generationId && !episode) {
     return (
-      <div className="py-16 px-4 max-w-lg mx-auto space-y-6">
-        <Card padding="lg" className="text-center space-y-6 shadow-md border-slate-200 dark:border-slate-800">
+      <div className="py-16 px-4 max-w-lg mx-auto space-y-6 relative">
+        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-72 h-72 bg-amber-500/10 dark:bg-amber-400/5 blur-3xl pointer-events-none rounded-full" />
+        <Card padding="lg" className="text-center space-y-6 relative z-10 border-stone-200/90 dark:border-midnight-700/80 shadow-storybook bg-white dark:bg-midnight-800/95 rounded-3xl">
           <div className="flex justify-center">
-            <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 rounded-3xl flex items-center justify-center animate-bounce shadow-inner">
+            <div className="w-16 h-16 bg-amber-500/10 dark:bg-amber-400/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 rounded-2xl flex items-center justify-center text-2xl shadow-storybook-sm animate-pulse">
               ✨
             </div>
           </div>
 
-          <div className="space-y-1">
-            <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">Crafting Your Story...</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 italic">"{prompt}"</p>
+          <div className="space-y-1.5">
+            <h2 className="text-2xl font-bold font-display text-stone-900 dark:text-slate-100">Crafting Your Story...</h2>
+            <p className="text-xs text-stone-500 dark:text-slate-400 italic max-w-sm mx-auto line-clamp-2">"{prompt}"</p>
           </div>
 
-          <div className="text-left bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-100 dark:border-slate-800">
+          <div className="text-left bg-stone-50/80 dark:bg-midnight-900/70 p-5 rounded-2xl border border-stone-200/70 dark:border-midnight-700/70">
             <Stepper
               currentStage={generation?.stage || 'understanding'}
               progress={generation?.progress}
@@ -175,14 +176,14 @@ export default function Quick() {
           </div>
 
           {loadingEpisode && (
-            <div className="flex items-center justify-center gap-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+            <div className="flex items-center justify-center gap-2 text-xs font-semibold text-amber-600 dark:text-amber-400">
               <Spinner size="sm" />
               <span>Loading animation assets into player...</span>
             </div>
           )}
 
           {errorMessage && (
-            <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-xs font-semibold text-rose-700 dark:text-rose-300 text-left space-y-3">
+            <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-xs font-semibold text-rose-700 dark:text-rose-300 text-left space-y-3">
               <p>{errorMessage}</p>
               <div className="flex flex-wrap items-center gap-2">
                 <Button variant="danger" size="sm" onClick={handleReset}>
@@ -228,24 +229,26 @@ export default function Quick() {
 
   // 3. Prompt Input Form
   return (
-    <div className="py-10 px-4 max-w-2xl mx-auto space-y-8">
+    <div className="py-10 px-4 max-w-2xl mx-auto space-y-8 relative">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-amber-500/10 dark:bg-amber-400/5 blur-3xl pointer-events-none rounded-full" />
       {/* Page Title */}
-      <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 bg-amber-100 dark:bg-amber-950/70 text-amber-900 dark:text-amber-300 border border-amber-300/40 px-3 py-1 rounded-full text-xs font-extrabold uppercase">
-          <span>⚡</span> Quick Bedtime Story
+      <div className="text-center space-y-3 relative z-10">
+        <div className="inline-flex items-center gap-2 bg-amber-500/10 dark:bg-amber-400/10 text-amber-900 dark:text-amber-300 border border-amber-500/25 dark:border-amber-400/20 px-3.5 py-1 rounded-full text-xs font-semibold tracking-wide">
+          <span>🌙</span>
+          <span>Bedtime Story Atelier</span>
         </div>
-        <h1 className="text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-bold font-display text-stone-900 dark:text-slate-100 tracking-tight">
           What story shall we tell tonight?
         </h1>
-        <p className="text-slate-500 dark:text-slate-400 text-sm">
-          Type an idea or pick an example below. VoxFable writes, directs, and animates it in seconds.
+        <p className="text-stone-600 dark:text-slate-300 text-sm max-w-md mx-auto leading-relaxed">
+          Type an idea or choose a prompt below. VoxFable writes, directs, and animates it with full voiceover.
         </p>
       </div>
 
-      <Card padding="lg" className="border-slate-200 dark:border-slate-800 shadow-md">
+      <Card padding="lg" className="relative z-10 border-stone-200/90 dark:border-midnight-700/80 shadow-storybook dark:shadow-storybook-hover bg-white/95 dark:bg-midnight-800/95 backdrop-blur-md rounded-3xl">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Prompt Textarea */}
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             <Textarea
               label="Story Idea"
               rows={3}
@@ -256,8 +259,8 @@ export default function Quick() {
             />
 
             {/* Example Prompt Chips */}
-            <div className="space-y-1">
-              <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+            <div className="space-y-1.5 pt-1">
+              <span className="text-[11px] font-semibold text-stone-600 dark:text-slate-300 uppercase tracking-wider">
                 Or try an idea:
               </span>
               <div className="flex flex-wrap gap-1.5">
@@ -275,10 +278,10 @@ export default function Quick() {
 
           {/* Duration Selector Buttons */}
           <div className="space-y-2">
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-stone-600 dark:text-slate-300">
               Story Duration
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-2.5">
               {[
                 { id: '<1min', label: '< 1 min', desc: 'Snack Story (2 scenes)' },
                 { id: '1-2mins', label: '1 - 2 mins', desc: 'Bedtime Tale (3-4 scenes)' },
@@ -290,16 +293,16 @@ export default function Quick() {
                     key={opt.id}
                     type="button"
                     onClick={() => setDuration(opt.id as any)}
-                    className={`p-3 rounded-xl border text-center transition-all ${
+                    className={`p-3.5 rounded-2xl border text-center transition-all duration-150 active:scale-[0.98] ${
                       selected
-                        ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/60 dark:border-indigo-500 shadow-sm ring-1 ring-indigo-500'
-                        : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        ? 'border-amber-500 bg-amber-500/10 dark:bg-amber-400/10 shadow-storybook-sm ring-1 ring-amber-500/30'
+                        : 'border-stone-200/80 dark:border-midnight-700/70 bg-stone-50/80 dark:bg-midnight-900/60 hover:bg-stone-100 dark:hover:bg-midnight-750'
                     }`}
                   >
-                    <div className={`text-sm font-extrabold ${selected ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-800 dark:text-slate-200'}`}>
+                    <div className={`text-sm font-bold ${selected ? 'text-amber-700 dark:text-amber-300' : 'text-stone-800 dark:text-slate-200'}`}>
                       {opt.label}
                     </div>
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    <div className="text-[11px] text-stone-500 dark:text-slate-400 mt-0.5">
                       {opt.desc}
                     </div>
                   </button>
@@ -324,17 +327,17 @@ export default function Quick() {
 
             {/* Live Interactive Toggle */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-stone-600 dark:text-slate-300">
                 Interactive Voice Choices
               </label>
-              <label className="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+              <label className="flex items-center gap-3 p-2.5 min-h-[44px] rounded-xl border border-stone-200/80 dark:border-midnight-700/70 bg-stone-50/80 dark:bg-midnight-900/60 cursor-pointer hover:bg-stone-100 dark:hover:bg-midnight-750 transition-colors">
                 <input
                   type="checkbox"
                   checked={isInteractive}
                   onChange={(e) => setIsInteractive(e.target.checked)}
-                  className="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4"
+                  className="rounded text-amber-500 focus:ring-amber-400 h-4 w-4 accent-amber-500"
                 />
-                <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                <span className="text-xs font-semibold text-stone-800 dark:text-slate-200">
                   🎙 Let cartoon listen (Live Mode)
                 </span>
               </label>
@@ -466,19 +469,19 @@ export default function Quick() {
           )}
 
           {/* Custom Character Generation Checkbox */}
-          <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 space-y-1">
+          <div className="p-3.5 rounded-2xl border border-stone-200/80 dark:border-midnight-700/70 bg-stone-50/80 dark:bg-midnight-900/60 space-y-1">
             <label className="flex items-start gap-3 cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={generateCharacters}
                 onChange={(e) => setGenerateCharacters(e.target.checked)}
-                className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900"
+                className="mt-0.5 rounded text-amber-500 focus:ring-amber-400 h-4 w-4 border-stone-300 dark:border-midnight-700 bg-white dark:bg-midnight-900 accent-amber-500"
               />
               <div className="space-y-0.5">
-                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                <span className="text-xs font-semibold text-stone-800 dark:text-slate-200 flex items-center gap-1.5">
                   <span>🎨</span> Try generating new character designs for this story
                 </span>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+                <p className="text-[11px] text-stone-500 dark:text-slate-400 leading-snug">
                   Newly generated characters will be added to your Library. <span className="font-semibold text-amber-600 dark:text-amber-400">(Note: this takes ~15–20s longer)</span>
                 </p>
               </div>
@@ -489,7 +492,7 @@ export default function Quick() {
           <Button
             type="submit"
             variant="big-kid"
-            className="w-full"
+            className="w-full text-slate-950 font-extrabold text-base sm:text-lg shadow-lantern-glow-sm hover:shadow-lantern-glow"
             loading={isSubmitting}
             disabled={!prompt.trim()}
           >

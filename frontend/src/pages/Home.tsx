@@ -4,39 +4,40 @@ import { Card, VoxFableLogo } from '../ui';
 
 export default function Home() {
   return (
-    <div className="py-12 px-6 max-w-5xl mx-auto space-y-12 text-slate-800 dark:text-slate-200">
+    <div className="py-12 px-6 max-w-5xl mx-auto space-y-12 text-stone-800 dark:text-slate-200 relative">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[32rem] h-[32rem] bg-amber-500/10 dark:bg-amber-400/5 blur-3xl pointer-events-none rounded-full" />
       {/* Hero Banner */}
-      <div className="text-center space-y-4 max-w-2xl mx-auto">
+      <div className="text-center space-y-4 max-w-2xl mx-auto relative z-10">
         <div className="flex justify-center">
           <VoxFableLogo size={64} className="drop-shadow-md" />
         </div>
-        <h1 className="text-5xl font-black tracking-tight text-slate-900 dark:text-slate-100">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold font-display tracking-tight text-stone-900 dark:text-slate-100">
           Where Bedtime Stories <br />
-          <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-amber-500 bg-clip-text text-transparent">
+          <span className="text-amber-500 dark:text-amber-400">
             Come to Life
           </span>
         </h1>
-        <p className="text-lg text-slate-600 dark:text-slate-400 font-medium">
+        <p className="text-base sm:text-lg text-stone-600 dark:text-slate-300 font-medium max-w-xl mx-auto leading-relaxed">
           Original, child-safe interactive cartoon engine. Turn any bedtime prompt into an animated story where kids can talk back to the characters.
         </p>
       </div>
 
       {/* Main 3 Modes */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
         {/* Quick Story */}
         <Link to="/quick" className="group">
           <Card
             hoverEffect
-            className="h-full flex flex-col justify-between border-2 border-amber-200 dark:border-amber-800/50 bg-gradient-to-b from-amber-50/50 to-white dark:from-amber-950/20 dark:to-slate-900 hover:border-amber-400 group-hover:-translate-y-1"
+            className="h-full flex flex-col justify-between border-stone-200/90 dark:border-midnight-700/80 bg-white/95 dark:bg-midnight-800/95 hover:border-amber-400/80 dark:hover:border-amber-400/60 shadow-storybook-sm group-hover:shadow-storybook transition-all"
           >
             <div className="space-y-3">
-              <div className="w-14 h-14 bg-amber-500 text-white rounded-2xl flex items-center justify-center text-2xl shadow-md">
-                ⚡
+              <div className="w-13 h-13 bg-amber-500/15 border border-amber-500/30 text-amber-500 rounded-2xl flex items-center justify-center text-2xl shadow-storybook-sm">
+                🌙
               </div>
-              <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100 group-hover:text-amber-600 transition-colors">
+              <h2 className="text-2xl font-bold font-display text-stone-900 dark:text-slate-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                 Quick Story
               </h2>
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+              <p className="text-sm text-stone-600 dark:text-slate-300 leading-relaxed">
                 Generate an animated episode from a single sentence prompt. Includes live interactive voice choices and instant playback.
               </p>
             </div>
@@ -51,16 +52,16 @@ export default function Home() {
         <Link to="/studio" className="group">
           <Card
             hoverEffect
-            className="h-full flex flex-col justify-between border-2 border-indigo-200 dark:border-indigo-800/50 bg-gradient-to-b from-indigo-50/50 to-white dark:from-indigo-950/20 dark:to-slate-900 hover:border-indigo-400 group-hover:-translate-y-1"
+            className="h-full flex flex-col justify-between border-stone-200/90 dark:border-midnight-700/80 bg-white/95 dark:bg-midnight-800/95 hover:border-amber-400/80 dark:hover:border-amber-400/60 shadow-storybook-sm group-hover:shadow-storybook transition-all"
           >
             <div className="space-y-3">
-              <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center text-2xl shadow-md">
-                🎨
+              <div className="w-13 h-13 bg-indigo-500/15 border border-indigo-500/30 text-indigo-500 rounded-2xl flex items-center justify-center text-2xl shadow-storybook-sm">
+                🎬
               </div>
-              <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 transition-colors">
+              <h2 className="text-2xl font-bold font-display text-stone-900 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                 Studio Mode
               </h2>
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+              <p className="text-sm text-stone-600 dark:text-slate-300 leading-relaxed">
                 Create persistent series worlds, customize characters with accessories and color palettes, and generate complete seasons.
               </p>
             </div>
@@ -75,20 +76,20 @@ export default function Home() {
         <Link to="/library" className="group">
           <Card
             hoverEffect
-            className="h-full flex flex-col justify-between border-2 border-emerald-200 dark:border-emerald-800/50 bg-gradient-to-b from-emerald-50/50 to-white dark:from-emerald-950/20 dark:to-slate-900 hover:border-emerald-400 group-hover:-translate-y-1"
+            className="h-full flex flex-col justify-between border-stone-200/90 dark:border-midnight-700/80 bg-white/95 dark:bg-midnight-800/95 hover:border-amber-400/80 dark:hover:border-amber-400/60 shadow-storybook-sm group-hover:shadow-storybook transition-all"
           >
             <div className="space-y-3">
-              <div className="w-14 h-14 bg-emerald-600 text-white rounded-2xl flex items-center justify-center text-2xl shadow-md">
+              <div className="w-13 h-13 bg-meadow-500/15 border border-meadow-500/30 text-meadow-500 rounded-2xl flex items-center justify-center text-2xl shadow-storybook-sm">
                 📚
               </div>
-              <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 transition-colors">
+              <h2 className="text-2xl font-bold font-display text-stone-900 dark:text-slate-100 group-hover:text-meadow-600 dark:group-hover:text-meadow-400 transition-colors">
                 Episode Library
               </h2>
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+              <p className="text-sm text-stone-600 dark:text-slate-300 leading-relaxed">
                 Browse your saved episodes, replay offline bundled adventures, inspect safety badges, and export to 720p MP4.
               </p>
             </div>
-            <div className="mt-6 flex items-center gap-2 text-sm font-bold text-emerald-600 dark:text-emerald-400">
+            <div className="mt-6 flex items-center gap-2 text-sm font-bold text-meadow-600 dark:text-meadow-400">
               <span>View Library</span>
               <span>&rarr;</span>
             </div>

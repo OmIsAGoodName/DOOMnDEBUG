@@ -57,7 +57,7 @@ export default function Episode() {
       <div className="max-w-4xl mx-auto mb-4">
         <Link
           to="/library"
-          className="text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1"
+          className="text-xs font-semibold text-stone-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 flex items-center gap-1.5 transition-colors"
         >
           &larr; Back to Library
         </Link>

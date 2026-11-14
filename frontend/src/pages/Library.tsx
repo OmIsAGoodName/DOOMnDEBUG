@@ -179,12 +179,16 @@ export default function Library() {
   return (
     <div className="py-10 px-6 max-w-6xl mx-auto space-y-8">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-200/90 dark:border-midnight-700/80 pb-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2">
-            <span>📚</span> Studio Asset Library
+          <div className="inline-flex items-center gap-2 bg-amber-500/10 dark:bg-amber-400/10 text-amber-900 dark:text-amber-300 border border-amber-500/25 dark:border-amber-400/20 px-3 py-0.5 rounded-full text-xs font-semibold tracking-wide mb-2">
+            <span>📚</span>
+            <span>Studio Catalog</span>
+          </div>
+          <h1 className="text-3xl font-bold font-display text-stone-900 dark:text-slate-100 tracking-tight">
+            Asset Library
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-sm text-stone-600 dark:text-slate-300 mt-1">
             Browse episodes, character rosters, backgrounds, and generate custom character designs.
           </p>
         </div>
@@ -198,7 +202,7 @@ export default function Library() {
               setShowCreator(true);
             }}
           >
-            ✨ New Character
+            + New Character
           </Button>
 
           <Link to="/quick">
@@ -210,7 +214,7 @@ export default function Library() {
       </div>
 
       {createSuccess && (
-        <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs font-bold text-emerald-800 dark:text-emerald-300 animate-fadeIn">
+        <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs font-bold text-emerald-800 dark:text-emerald-300">
           {createSuccess}
         </div>
       )}
@@ -222,13 +226,13 @@ export default function Library() {
       )}
 
       {/* Library Navigation Tabs */}
-      <div className="flex border-b border-slate-200 dark:border-slate-800 gap-2">
+      <div className="flex border-b border-stone-200/90 dark:border-midnight-700/80 gap-2 overflow-x-auto">
         <button
           onClick={() => setActiveTab('stories')}
-          className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all flex items-center gap-2 ${
+          className={`pb-3 px-4 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'stories'
-              ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+              ? 'border-amber-500 text-amber-700 dark:border-amber-400 dark:text-amber-300 font-bold'
+              : 'border-transparent text-stone-500 hover:text-stone-800 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
           <span>🎬</span> Stories ({episodes.length})
@@ -236,32 +240,32 @@ export default function Library() {
 
         <button
           onClick={() => setActiveTab('characters')}
-          className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all flex items-center gap-2 ${
+          className={`pb-3 px-4 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'characters'
-              ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+              ? 'border-amber-500 text-amber-700 dark:border-amber-400 dark:text-amber-300 font-bold'
+              : 'border-transparent text-stone-500 hover:text-stone-800 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
-          <span>✨</span> Characters & Cast ({assets.characters.length})
+          <span>🦊</span> Characters ({assets.characters.length})
         </button>
 
         <button
           onClick={() => setActiveTab('backgrounds')}
-          className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all flex items-center gap-2 ${
+          className={`pb-3 px-4 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'backgrounds'
-              ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+              ? 'border-amber-500 text-amber-700 dark:border-amber-400 dark:text-amber-300 font-bold'
+              : 'border-transparent text-stone-500 hover:text-stone-800 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
-          <span>🎨</span> Backgrounds ({assets.backgrounds.length})
+          <span>🌳</span> Backgrounds ({assets.backgrounds.length})
         </button>
 
         <button
           onClick={() => setActiveTab('props')}
-          className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all flex items-center gap-2 ${
+          className={`pb-3 px-4 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'props'
-              ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+              ? 'border-amber-500 text-amber-700 dark:border-amber-400 dark:text-amber-300 font-bold'
+              : 'border-transparent text-stone-500 hover:text-stone-800 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
           <span>🪄</span> Props & Audio ({assets.props.length + assets.music.length + assets.sfx.length})
@@ -296,6 +300,7 @@ export default function Library() {
                 Newest First
               </span>
             </div>
+          </div>
           </div>
 
           {episodes.length === 0 ? (
@@ -396,12 +401,12 @@ export default function Library() {
       {activeTab === 'characters' && (
         <div className="space-y-6">
           {/* Creator Trigger Card */}
-          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/40 dark:to-purple-950/40 p-6 rounded-2xl border border-indigo-100 dark:border-indigo-900/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="bg-amber-500/10 dark:bg-midnight-850 p-6 rounded-3xl border border-amber-500/20 dark:border-midnight-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-storybook-sm">
             <div>
-              <h2 className="text-lg font-black text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <h2 className="text-lg font-bold font-display text-stone-900 dark:text-slate-100 flex items-center gap-2">
                 <span>🎨</span> Create & Generate New Character Designs
               </h2>
-              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+              <p className="text-xs text-stone-600 dark:text-slate-300 mt-1">
                 Invent new story characters with custom species, personality, colors, and voices that automatically join the studio cast!
               </p>
             </div>
@@ -410,21 +415,21 @@ export default function Library() {
               size="md"
               onClick={() => setShowCreator(!showCreator)}
             >
-              {showCreator ? 'Close Form' : '✨ Generate Character'}
+              {showCreator ? 'Close Form' : '+ Generate Character'}
             </Button>
           </div>
 
           {/* Inline Character Creator Form */}
           {showCreator && (
-            <Card className="border-indigo-200 dark:border-indigo-800/60 shadow-lg p-6 animate-fadeIn">
+            <Card className="border-amber-500/30 dark:border-midnight-600 shadow-storybook p-6 bg-white dark:bg-midnight-800">
               <form onSubmit={handleCreateCharacter} className="space-y-5">
-                <h3 className="font-black text-base text-slate-900 dark:text-slate-100">
+                <h3 className="font-bold font-display text-base text-stone-900 dark:text-slate-100">
                   New Character Design Studio
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-stone-600 dark:text-slate-300 mb-1.5">
                       Character Name
                     </label>
                     <input
@@ -433,18 +438,18 @@ export default function Library() {
                       placeholder="e.g. Leo the Brave, Penny"
                       value={newName}
                       onChange={(e) => setNewName(e.target.value)}
-                      className="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-stone-300 dark:border-midnight-700 bg-white dark:bg-midnight-900 text-stone-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-stone-600 dark:text-slate-300 mb-1.5">
                       Species Base
                     </label>
                     <select
                       value={newSpecies}
                       onChange={(e: any) => setNewSpecies(e.target.value)}
-                      className="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-stone-300 dark:border-midnight-700 bg-white dark:bg-midnight-900 text-stone-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500/30 cursor-pointer"
                     >
                       <option value="rabbit">🐰 Rabbit (Bouncy, curious)</option>
                       <option value="turtle">🐢 Turtle (Patient, steady)</option>
@@ -456,7 +461,7 @@ export default function Library() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-stone-600 dark:text-slate-300 mb-1.5">
                     Personality & Visual Style Note
                   </label>
                   <input
@@ -464,7 +469,7 @@ export default function Library() {
                     placeholder="e.g. Lavender sweater, loves stargazing, very cheerful"
                     value={newPersonality}
                     onChange={(e) => setNewPersonality(e.target.value)}
-                    className="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-stone-300 dark:border-midnight-700 bg-white dark:bg-midnight-900 text-stone-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
                   />
                 </div>
 
@@ -483,7 +488,7 @@ export default function Library() {
                     size="sm"
                     disabled={isCreating || !newName.trim()}
                   >
-                    {isCreating ? 'Generating Design...' : '✨ Save to Library'}
+                    {isCreating ? 'Generating Design...' : 'Save to Library'}
                   </Button>
                 </div>
               </form>

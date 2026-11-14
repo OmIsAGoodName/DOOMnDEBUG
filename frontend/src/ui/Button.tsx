@@ -26,15 +26,15 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variantClasses = {
     primary:
-      'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm hover:shadow active:scale-[0.98] focus:ring-indigo-500',
+      'bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-slate-950 font-bold shadow-storybook-sm hover:shadow-lantern-glow-sm active:scale-[0.98] border-t border-amber-300/50 focus:ring-amber-400',
     secondary:
-      'bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100 active:scale-[0.98] focus:ring-slate-400',
+      'bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-200/90 dark:bg-midnight-800 dark:hover:bg-midnight-750 dark:text-slate-100 dark:border-midnight-700/80 shadow-storybook-sm active:scale-[0.98] focus:ring-stone-400',
     ghost:
-      'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white focus:ring-slate-400',
+      'bg-transparent hover:bg-stone-200/60 dark:hover:bg-midnight-750/70 text-stone-600 dark:text-slate-300 hover:text-stone-900 dark:hover:text-white active:scale-[0.98] focus:ring-slate-400',
     danger:
-      'bg-rose-600 hover:bg-rose-700 text-white shadow-sm active:scale-[0.98] focus:ring-rose-500',
+      'bg-rose-600 hover:bg-rose-500 text-white shadow-storybook-sm active:scale-[0.98] focus:ring-rose-500',
     'big-kid':
-      'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-extrabold text-lg px-8 py-4 rounded-3xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] border-b-4 border-orange-700 focus:ring-amber-400 min-h-[64px]'
+      'bg-gradient-to-b from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-extrabold text-lg px-8 py-4 rounded-2xl shadow-storybook hover:shadow-lantern-glow active:scale-[0.98] border-t border-white/40 border-b-2 border-amber-600 focus:ring-amber-400 min-h-[58px]'
   }[variant];
 
   return (
