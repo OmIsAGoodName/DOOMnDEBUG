@@ -190,6 +190,7 @@ def build_writer_user_prompt(
     user_prompt = f"""
 STORY REQUEST:
 - User Premise: "{prompt}"
+- Fresh Creative Seed: {uuid.uuid4().hex[:6]} (Ensure a fresh, dynamic, original story progression)
 - Target Age Band: {age_band}
 - Language: {language}
 - Target Duration Requirement:
@@ -244,7 +245,7 @@ async def write_story(
         force_interactive_tree=force_interactive_tree
     )
 
-    call_kwargs = {}
+    call_kwargs = {"bypass_cache": True}
     if interactive and (num_choices > 1 or force_interactive_tree):
         # Strict requirement: deep multi-choice trees must be written by high-level Gemini model
         try:

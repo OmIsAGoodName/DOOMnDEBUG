@@ -444,6 +444,28 @@ async def get_episode(
         "video_url": ep.get("video_path")
     }
 
+@app.delete("/api/episodes/{episode_id}")
+async def delete_episode(
+    episode_id: str,
+    user: Dict[str, Any] = Depends(get_current_user),
+    repo: Repository = Depends(get_repository)
+):
+    success = await repo.delete_episode(user["user_id"], episode_id)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"code": "NOT_FOUND", "message": f"Episode {episode_id} not found"}
+        )
+    return {"ok": True, "deleted_id": episode_id}
+
+@app.post("/api/episodes/clear")
+async def clear_all_episodes(
+    user: Dict[str, Any] = Depends(get_current_user),
+    repo: Repository = Depends(get_repository)
+):
+    deleted_count = await repo.clear_episodes(user["user_id"])
+    return {"ok": True, "cleared_count": deleted_count}
+
 # --- Live Mode Matching ---
 @app.post("/api/live/match")
 async def live_match(

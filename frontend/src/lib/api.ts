@@ -178,8 +178,8 @@ export const api = {
   },
 
   getEpisode: async (episodeId: string): Promise<EpisodeRecord> => {
-    // Check if offline/demo bundled episode exists first
-    if (config.isDemoMode() || episodeId.startsWith('demo_')) {
+    // Only pre-baked bundled demo episodes (demo_*) load from static assets
+    if (episodeId.startsWith('demo_')) {
       try {
         const planRes = await fetch(`/demo/episodes/${episodeId}/plan.json`);
         if (planRes.ok) {
@@ -204,6 +204,14 @@ export const api = {
       } catch {}
     }
     return request<EpisodeRecord>(`/api/episodes/${episodeId}`);
+  },
+
+  deleteEpisode: async (episodeId: string): Promise<any> => {
+    return request<any>(`/api/episodes/${episodeId}`, { method: 'DELETE' });
+  },
+
+  clearEpisodes: async (): Promise<any> => {
+    return request<any>('/api/episodes/clear', { method: 'POST' });
   },
 
   listDemoEpisodes: async (): Promise<Array<{ id: string; title: string; interactive: boolean; has_video: boolean; video_url: string }>> => {

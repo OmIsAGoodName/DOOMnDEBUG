@@ -24,6 +24,14 @@ class Repository(ABC):
         pass
 
     @abstractmethod
+    async def delete_episode(self, owner_id: str, episode_id: str) -> bool:
+        pass
+
+    @abstractmethod
+    async def clear_episodes(self, owner_id: str) -> int:
+        pass
+
+    @abstractmethod
     async def create_generation(self, owner_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         pass
 
@@ -93,6 +101,20 @@ class LocalFileRepository(Repository):
         self._write_data(self.episodes_file, records)
         return record
 
+    async def delete_episode(self, owner_id: str, episode_id: str) -> bool:
+        records = self._read_data(self.episodes_file)
+        if episode_id in records:
+            del records[episode_id]
+            self._write_data(self.episodes_file, records)
+            return True
+        return False
+
+    async def clear_episodes(self, owner_id: str) -> int:
+        records = self._read_data(self.episodes_file)
+        count = len(records)
+        self._write_data(self.episodes_file, {})
+        return count
+
     async def create_generation(self, owner_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         records = self._read_data(self.generations_file)
         gen_id = data.get("id") or str(uuid.uuid4())
@@ -140,6 +162,14 @@ class SupabaseRepository(Repository):
     async def update_episode(self, owner_id: str, episode_id: str, data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         res = self.client.table("episodes").update(data).eq("id", episode_id).eq("owner_id", owner_id).execute()
         return res.data[0] if res.data else None
+
+    async def delete_episode(self, owner_id: str, episode_id: str) -> bool:
+        self.client.table("episodes").delete().eq("id", episode_id).eq("owner_id", owner_id).execute()
+        return True
+
+    async def clear_episodes(self, owner_id: str) -> int:
+        res = self.client.table("episodes").delete().eq("owner_id", owner_id).execute()
+        return len(res.data) if res.data else 0
 
     async def create_generation(self, owner_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         payload = {**data, "owner_id": owner_id}

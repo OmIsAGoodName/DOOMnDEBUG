@@ -380,6 +380,31 @@ export default function Library() {
     }
   };
 
+  const handleClearAllEpisodes = async () => {
+    if (!window.confirm('Clear all old story records? Fresh prompts will generate brand-new videos!')) return;
+    try {
+      await api.clearEpisodes();
+      setEpisodes([]);
+      setCreateSuccess('✨ Library cleared! Ready for fresh new generations.');
+      setTimeout(() => setCreateSuccess(null), 4000);
+    } catch (err: any) {
+      setError(`Failed to clear stories: ${err.message}`);
+    }
+  };
+
+  const handleDeleteEpisode = async (e: React.MouseEvent, episodeId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await api.deleteEpisode(episodeId);
+      setEpisodes((prev) => prev.filter((ep) => ep.id !== episodeId));
+      setCreateSuccess('Story removed.');
+      setTimeout(() => setCreateSuccess(null), 3000);
+    } catch (err: any) {
+      setError(`Failed to delete: ${err.message}`);
+    }
+  };
+
   const getSpeciesEmoji = (species?: string) => {
     switch (species?.toLowerCase()) {
       case 'rabbit': return '🐰';
@@ -512,7 +537,7 @@ export default function Library() {
               <span className="absolute left-3 top-2.5 text-slate-400 text-xs">🔍</span>
             </div>
 
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400">
+            <div className="flex items-center gap-3 text-xs font-bold text-slate-500 dark:text-slate-400">
               <span>Showing {episodes.filter((ep) => {
                 if (!searchQuery.trim()) return true;
                 const q = searchQuery.toLowerCase();
@@ -523,6 +548,18 @@ export default function Library() {
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 Newest First
               </span>
+              {episodes.length > 0 && (
+                <>
+                  <span className="text-slate-300 dark:text-slate-700">&bull;</span>
+                  <button
+                    type="button"
+                    onClick={handleClearAllEpisodes}
+                    className="text-rose-500 hover:text-rose-600 dark:text-rose-400 font-bold hover:underline cursor-pointer"
+                  >
+                    🗑️ Clear Old Stories
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
@@ -606,9 +643,21 @@ export default function Library() {
 
                           <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
                             <SafetyBadge status={ep.safety?.verdict || 'pass'} />
-                            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                              Play &rarr;
-                            </span>
+                            <div className="flex items-center gap-3">
+                              {!isDemo && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => handleDeleteEpisode(e, ep.id)}
+                                  className="text-slate-400 hover:text-rose-500 text-xs p-1 rounded transition-colors"
+                                  title="Delete story"
+                                >
+                                  🗑️
+                                </button>
+                              )}
+                              <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                                Play &rarr;
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </Card>
