@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     SUPABASE_SECRET_KEY: Optional[str] = None
 
     # App Mode
-    DEMO_MODE: bool = False
+    DEMO_MODE: bool = True
 
     # LLM Providers
     GEMINI_API_KEY: Optional[str] = None

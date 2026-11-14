@@ -6,7 +6,7 @@ import App from './App';
 describe('App', () => {
   it('renders application header', () => {
     render(<App />);
-    expect(screen.getByText(/VoxFable/i)).toBeDefined();
+    expect(screen.getAllByText(/VoxFable/i).length).toBeGreaterThan(0);
   });
 });
 

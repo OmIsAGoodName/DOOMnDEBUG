@@ -39,3 +39,14 @@ async def get_current_user(authorization: Optional[str] = Header(None)) -> Dict[
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={"code": "UNAUTHORIZED", "message": f"Authentication failed: {str(e)}"}
         )
+
+    try:
+        user_res = client.auth.get_user(token)
+        if not user_res or not user_res.user:
+            raise ValueError("No user returned")
+        return {"user_id": str(user_res.user.id), "email": user_res.user.email}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"code": "UNAUTHORIZED", "message": f"Authentication failed: {str(e)}"}
+        )

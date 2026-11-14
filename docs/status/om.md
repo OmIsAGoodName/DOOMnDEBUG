@@ -1,9 +1,41 @@
 # Om's Status & Milestone Log
 
-**Current Milestone**: Tailwind Dark Mode & Brand Token Resolution  
+**Current Milestone**: Asset Library Creators, Branch Cycle Elimination & Fallback Resilience  
 **Date**: 2026-11-14  
 **Active Branch**: `main` (synced with `origin/main`)  
 **Repository**: `https://github.com/OmIsAGoodName/DOOMnDEBUG.git`  
+
+---
+
+## ⚡ Recent Updates (Library Scenery/Prop/Audio Generators, Branch Loop Fix, Auth & Groq Resilience)
+
+1. **Custom Scenery, Prop & Audio Generation with Instant "Quick Spam" Creators**:
+   - **User Request**: Add buttons on Scenery (Backgrounds), Props, and Audio tabs under `/library` to generate new items individually or in bulk spam batches so judges and creators have dozens of vibrant backgrounds and props.
+   - **Backend Additions** ([`backend/app/main.py`](file:///d:/VoxFable/backend/app/main.py), [`backend/app/stations/writer.py`](file:///d:/VoxFable/backend/app/stations/writer.py)):
+     - Added endpoints `POST /api/backgrounds`, `POST /api/props`, `POST /api/audio`.
+     - Added dynamic storage persistence in `media/data/custom_backgrounds.json`, `custom_props.json`, and `custom_audio.json`.
+     - `load_metadata()` automatically merges these custom files into the studio catalog.
+     - `AssetResolver` and Story Writer (`avail_bgs`) immediately treat all custom scenery IDs and props as valid, making them selectable for all future episode drafts.
+   - **Frontend UI in Library** ([`frontend/src/pages/Library.tsx`](file:///d:/VoxFable/frontend/src/pages/Library.tsx)):
+     - **Backgrounds Tab**: Added "+ New Scenery" form and **"⚡ Quick Spam 3 Sceneries"** button. Generates rich scenes (Crystal Cavern, Starlit Mountain Peak, Sunlit Willow Glen, etc.) with custom "Original" badges and mood tags.
+     - **Props & Audio Tab**: Added "+ New Prop", "+ New Audio Cue", and **"⚡ Quick Spam Props & Audio"** button. Generates custom accessories (Star Wand, Golden Compass, Acorn Crown) and custom audio cues with tags and emoji.
+
+2. **Resolved Screenshot 1: "Missing or invalid Authorization header"**:
+   - **Root Cause**: When running locally or during initial onboarding without Supabase configured, `get_current_user` in `backend/app/auth.py` threw 401 when `authorization` header was missing, triggering the offline demo warning banner.
+   - **Fix**: Configured `DEMO_MODE: bool = True` as the local default in [`backend/app/config.py`](file:///d:/VoxFable/backend/app/config.py) and added safe fallback to demo user in `frontend/src/config.ts` whenever Supabase is not explicitly configured.
+
+3. **Resolved Screenshot 3: "'GroqProvider' object has no attribute 'model'"**:
+   - **Root Cause**: The uvicorn background process was running an earlier in-memory module before `@property def model` was added to `GroqProvider`. When Gemini experienced a network hiccup, the fallback to Groq crashed with `AttributeError`.
+   - **Fix**: Restarted uvicorn with hot-reload enabled (`--reload`), verified `GroqProvider.model` property and instance attributes across providers.
+
+4. **Resolved Screenshot 4: Branching Choice Tree Infinite Loop**:
+   - **Root Cause**:
+     1. In `frontend/src/engine/EpisodePlayer.tsx`, `resolveChoice` called `play()`. However, `play` closed over stale `timeline` state where `timeRef.current >= timeline.totalDuration`, which triggered `play`'s rewind logic (`timeRef.current = 0; resolvedChoiceBeatIdsRef.current.clear()`), resetting the video to 0s and causing choices 1 and 2 to re-fire indefinitely.
+     2. In `frontend/src/engine/resolveTimeline.ts`, there was no cycle detection for branching graphs—a cyclical transition would loop up to `maxScenes = 20`.
+   - **Fix**:
+     - In `EpisodePlayer.tsx`, `resolveChoice` directly resumes playback on `reResolved` without calling the stale rewind logic, preserving resolved choice state.
+     - In `resolveTimeline.ts`, added `visitedSceneIds = new Set<string>()` to detect and break any cycles in the scene transition graph.
+     - In `EpisodeView.tsx`, enhanced `handleResolveChoice` to handle option IDs and default fallbacks cleanly.
 
 ---
 

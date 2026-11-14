@@ -28,14 +28,53 @@ def load_metadata() -> Dict[str, List[Dict[str, Any]]]:
             except Exception:
                 pass
 
-    # Merge custom user-created characters from media/data
-    custom_chars_path = BASE_DIR / "media" / "data" / "custom_characters.json"
+    # Merge custom user-created assets from media/data
+    data_dir = BASE_DIR / "media" / "data"
+
+    custom_chars_path = data_dir / "custom_characters.json"
     if custom_chars_path.exists():
         try:
             with open(custom_chars_path, "r", encoding="utf-8") as f:
                 custom_list = json.load(f)
                 if isinstance(custom_list, list):
                     result["characters"].extend(custom_list)
+        except Exception:
+            pass
+
+    custom_bgs_path = data_dir / "custom_backgrounds.json"
+    if custom_bgs_path.exists():
+        try:
+            with open(custom_bgs_path, "r", encoding="utf-8") as f:
+                custom_bgs = json.load(f)
+                if isinstance(custom_bgs, list):
+                    result["backgrounds"].extend(custom_bgs)
+        except Exception:
+            pass
+
+    custom_props_path = data_dir / "custom_props.json"
+    if custom_props_path.exists():
+        try:
+            with open(custom_props_path, "r", encoding="utf-8") as f:
+                custom_props = json.load(f)
+                if isinstance(custom_props, list):
+                    result["props"].extend(custom_props)
+        except Exception:
+            pass
+
+    custom_audio_path = data_dir / "custom_audio.json"
+    if custom_audio_path.exists():
+        try:
+            with open(custom_audio_path, "r", encoding="utf-8") as f:
+                custom_audio = json.load(f)
+                if isinstance(custom_audio, dict):
+                    result["music"].extend(custom_audio.get("music", []))
+                    result["sfx"].extend(custom_audio.get("sfx", []))
+                elif isinstance(custom_audio, list):
+                    for a in custom_audio:
+                        if a.get("type") == "sfx":
+                            result["sfx"].append(a)
+                        else:
+                            result["music"].append(a)
         except Exception:
             pass
 

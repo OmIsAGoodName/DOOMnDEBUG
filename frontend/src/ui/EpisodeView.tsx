@@ -69,9 +69,10 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
 
   const handleResolveChoice = useCallback((optionId: string) => {
-    const chosen = activeChoiceInfo?.choice.options.find((o) => o.id === optionId);
+    const actualId = optionId === 'default' ? activeChoiceInfo?.choice.default : optionId;
+    const chosen = activeChoiceInfo?.choice.options.find((o) => o.id === actualId || o.id === optionId);
     if (chosen) {
-      setChoiceHistory((prev) => [...prev, { id: optionId, label: chosen.label }]);
+      setChoiceHistory((prev) => [...prev, { id: chosen.id, label: chosen.label }]);
     }
     setActiveChoiceInfo(null);
     playerRef.current?.resolveChoice(optionId);

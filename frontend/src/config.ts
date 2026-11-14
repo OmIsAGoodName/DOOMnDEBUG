@@ -3,7 +3,11 @@ export const config = {
   supabaseKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '',
   apiBase: import.meta.env.VITE_API_BASE || 'http://localhost:8000',
   isDemoMode: (): boolean => {
-    return localStorage.getItem('voxfable_demo_mode') === 'true';
+    const stored = localStorage.getItem('voxfable_demo_mode');
+    if (stored !== null) return stored === 'true';
+    // If Supabase is not configured, default to demo mode for seamless zero-config play
+    const sbUrl = import.meta.env.VITE_SUPABASE_URL || '';
+    return !sbUrl || sbUrl.includes('your-project');
   },
   setDemoMode: (enabled: boolean) => {
     localStorage.setItem('voxfable_demo_mode', enabled ? 'true' : 'false');

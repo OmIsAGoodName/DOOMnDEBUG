@@ -65,7 +65,10 @@ export function resolveTimeline(
   let sceneCount = 0;
   const maxScenes = 20; // Guard against infinite branch cycles
 
-  while (currentSceneId && sceneCount < maxScenes) {
+  const visitedSceneIds = new Set<string>();
+
+  while (currentSceneId && !visitedSceneIds.has(currentSceneId) && sceneCount < maxScenes) {
+    visitedSceneIds.add(currentSceneId);
     sceneCount++;
     const scene = scenesMap.get(currentSceneId);
     if (!scene) {
@@ -199,7 +202,7 @@ export function resolveTimeline(
 
           const opt = beat.choice.options.find((o) => o.id === chosenId) || beat.choice.options[0];
           if (opt) {
-            nextSceneId = opt.next_scene;
+            nextSceneId = opt.next_scene && !visitedSceneIds.has(opt.next_scene) ? opt.next_scene : null;
           }
 
           choicePoints.push({

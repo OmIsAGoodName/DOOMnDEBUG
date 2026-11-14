@@ -63,6 +63,28 @@ export default function Library() {
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const [createSuccess, setCreateSuccess] = useState<string | null>(null);
 
+  // Scenery creator state
+  const [showBgCreator, setShowBgCreator] = useState<boolean>(false);
+  const [newBgName, setNewBgName] = useState<string>('');
+  const [newBgMood, setNewBgMood] = useState<'day' | 'night' | 'sunset' | 'cozy' | 'magical'>('day');
+  const [newBgDesc, setNewBgDesc] = useState<string>('');
+  const [isCreatingBg, setIsCreatingBg] = useState<boolean>(false);
+  const [isSpammingBgs, setIsSpammingBgs] = useState<boolean>(false);
+
+  // Prop & Audio creator state
+  const [showPropCreator, setShowPropCreator] = useState<boolean>(false);
+  const [newPropName, setNewPropName] = useState<string>('');
+  const [newPropSlot, setNewPropSlot] = useState<'hand' | 'head' | 'ground'>('hand');
+  const [newPropEmoji, setNewPropEmoji] = useState<string>('✨');
+  const [isCreatingProp, setIsCreatingProp] = useState<boolean>(false);
+
+  const [showAudioCreator, setShowAudioCreator] = useState<boolean>(false);
+  const [newAudioName, setNewAudioName] = useState<string>('');
+  const [newAudioType, setNewAudioType] = useState<'music' | 'sfx'>('music');
+  const [newAudioMood, setNewAudioMood] = useState<string>('cheerful');
+  const [isCreatingAudio, setIsCreatingAudio] = useState<boolean>(false);
+  const [isSpammingPropsAudio, setIsSpammingPropsAudio] = useState<boolean>(false);
+
   useEffect(() => {
     async function loadData() {
       try {
@@ -165,6 +187,196 @@ export default function Library() {
       setError(`Failed to create character: ${err.message}`);
     } finally {
       setIsCreating(false);
+    }
+  };
+
+  const handleCreateBackground = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newBgName.trim()) return;
+    try {
+      setIsCreatingBg(true);
+      setCreateSuccess(null);
+      const created = await api.createBackground({
+        name: newBgName.trim(),
+        mood_hint: newBgMood,
+        description: newBgDesc.trim() || `Custom scenery: ${newBgName.trim()}`,
+        base_variant: newBgMood === 'night' ? 'forest_night' : 'forest_day',
+      });
+      setAssets((prev) => ({
+        ...prev,
+        backgrounds: [created, ...prev.backgrounds],
+      }));
+      setCreateSuccess(`🌳 Created scenery "${created.name}"! Available in all stories.`);
+      setNewBgName('');
+      setNewBgDesc('');
+      setShowBgCreator(false);
+      setTimeout(() => setCreateSuccess(null), 5000);
+    } catch (err: any) {
+      setError(`Failed to create scenery: ${err.message}`);
+    } finally {
+      setIsCreatingBg(false);
+    }
+  };
+
+  const handleSpamBackgrounds = async () => {
+    try {
+      setIsSpammingBgs(true);
+      setCreateSuccess(null);
+      const SCENERY_PRESETS = [
+        { name: 'Crystal Cavern', mood_hint: 'magical', description: 'Gleaming jewel-lit caverns with glowing crystals', base_variant: 'forest_night' },
+        { name: 'Starlit Mountain Peak', mood_hint: 'night', description: 'A majestic high snowy ledge under a starry galaxy', base_variant: 'forest_night' },
+        { name: 'Sunlit Willow Glen', mood_hint: 'day', description: 'Golden weeping willows and sparkling babbling stream', base_variant: 'forest_day' },
+        { name: 'Sunset Blossom Orchard', mood_hint: 'sunset', description: 'Pink cherry blossom trees illuminated by warm sunset', base_variant: 'forest_day' },
+        { name: 'Cozy Treehouse Hearth', mood_hint: 'cozy', description: 'Warm wooden treehouse parlor with fireplace glow', base_variant: 'forest_night' },
+        { name: 'Enchanted Mushroom Grove', mood_hint: 'magical', description: 'Giant glowing violet mushrooms and drifting pollen', base_variant: 'forest_night' },
+      ];
+      const shuffled = [...SCENERY_PRESETS].sort(() => 0.5 - Math.random()).slice(0, 3);
+      const results = await Promise.all(
+        shuffled.map((item) =>
+          api.createBackground({
+            name: `${item.name} ${Math.floor(Math.random() * 90 + 10)}`,
+            mood_hint: item.mood_hint,
+            description: item.description,
+            base_variant: item.base_variant,
+          })
+        )
+      );
+      setAssets((prev) => ({
+        ...prev,
+        backgrounds: [...results, ...prev.backgrounds],
+      }));
+      setCreateSuccess(`⚡ Quick-generated 3 diverse sceneries! Ready for stories and direction.`);
+      setTimeout(() => setCreateSuccess(null), 5000);
+    } catch (err: any) {
+      setError(`Failed to batch create sceneries: ${err.message}`);
+    } finally {
+      setIsSpammingBgs(false);
+    }
+  };
+
+  const handleCreateProp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPropName.trim()) return;
+    try {
+      setIsCreatingProp(true);
+      setCreateSuccess(null);
+      const created = await api.createProp({
+        name: newPropName.trim(),
+        default_slot: newPropSlot,
+        emoji: newPropEmoji,
+        description: `Custom stage prop: ${newPropName.trim()}`,
+      });
+      setAssets((prev) => ({
+        ...prev,
+        props: [created, ...prev.props],
+      }));
+      setCreateSuccess(`🪄 Created prop "${created.name}"!`);
+      setNewPropName('');
+      setShowPropCreator(false);
+      setTimeout(() => setCreateSuccess(null), 5000);
+    } catch (err: any) {
+      setError(`Failed to create prop: ${err.message}`);
+    } finally {
+      setIsCreatingProp(false);
+    }
+  };
+
+  const handleCreateAudio = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAudioName.trim()) return;
+    try {
+      setIsCreatingAudio(true);
+      setCreateSuccess(null);
+      const created = await api.createAudio({
+        name: newAudioName.trim(),
+        type: newAudioType,
+        mood: newAudioMood,
+        description: `Custom ${newAudioType}: ${newAudioName.trim()}`,
+      });
+      setAssets((prev) => ({
+        ...prev,
+        music: created.type === 'music' ? [created, ...prev.music] : prev.music,
+        sfx: created.type === 'sfx' ? [created, ...prev.sfx] : prev.sfx,
+      }));
+      setCreateSuccess(`🎵 Created audio "${created.name}"!`);
+      setNewAudioName('');
+      setShowAudioCreator(false);
+      setTimeout(() => setCreateSuccess(null), 5000);
+    } catch (err: any) {
+      setError(`Failed to create audio: ${err.message}`);
+    } finally {
+      setIsCreatingAudio(false);
+    }
+  };
+
+  const handleSpamPropsAndAudio = async () => {
+    try {
+      setIsSpammingPropsAudio(true);
+      setCreateSuccess(null);
+      const PROP_PRESETS = [
+        { name: 'Star Wand', default_slot: 'hand', emoji: '🪄', description: 'Sparkling wand topped with a miniature star' },
+        { name: 'Golden Compass', default_slot: 'hand', emoji: '🧭', description: 'Ornate explorer compass guiding true hearts' },
+        { name: 'Acorn Crown', default_slot: 'head', emoji: '👑', description: 'Rustic woodland crown braided with oak leaves' },
+        { name: 'Crystal Prism', default_slot: 'hand', emoji: '💎', description: 'Rainbow-casting prism of ancient lore' },
+        { name: 'Feather Quill', default_slot: 'hand', emoji: '🪶', description: 'Legendary quill used to chronicle great deeds' },
+        { name: 'Bedtime Lantern', default_slot: 'hand', emoji: '🏮', description: 'Warm glowing paper lantern for twilight paths' },
+      ];
+      const AUDIO_PRESETS = [
+        { name: 'Sparkle Shimmer SFX', type: 'sfx' as const, mood: 'magical', description: 'Delicate glitter chime for wonder' },
+        { name: 'Gentle Lullaby Melody', type: 'music' as const, mood: 'cozy', description: 'Soothing bedtime acoustic harp melody' },
+        { name: 'Triumph Chime Fanfare', type: 'sfx' as const, mood: 'cheerful', description: 'Crisp orchestral celebration bell' },
+        { name: 'Forest Breeze Ambient', type: 'music' as const, mood: 'peaceful', description: 'Rustling leaves with twilight crickets' },
+      ];
+      const randomProps = [...PROP_PRESETS].sort(() => 0.5 - Math.random()).slice(0, 2);
+      const randomAudios = [...AUDIO_PRESETS].sort(() => 0.5 - Math.random()).slice(0, 2);
+
+      const [p1, p2, a1, a2] = await Promise.all([
+        api.createProp({
+          name: `${randomProps[0].name} ${Math.floor(Math.random() * 90 + 10)}`,
+          default_slot: randomProps[0].default_slot,
+          emoji: randomProps[0].emoji,
+          description: randomProps[0].description,
+        }),
+        api.createProp({
+          name: `${randomProps[1].name} ${Math.floor(Math.random() * 90 + 10)}`,
+          default_slot: randomProps[1].default_slot,
+          emoji: randomProps[1].emoji,
+          description: randomProps[1].description,
+        }),
+        api.createAudio({
+          name: `${randomAudios[0].name} ${Math.floor(Math.random() * 90 + 10)}`,
+          type: randomAudios[0].type,
+          mood: randomAudios[0].mood,
+          description: randomAudios[0].description,
+        }),
+        api.createAudio({
+          name: `${randomAudios[1].name} ${Math.floor(Math.random() * 90 + 10)}`,
+          type: randomAudios[1].type,
+          mood: randomAudios[1].mood,
+          description: randomAudios[1].description,
+        }),
+      ]);
+
+      setAssets((prev) => ({
+        ...prev,
+        props: [p1, p2, ...prev.props],
+        music: [
+          ...(a1.type === 'music' ? [a1] : []),
+          ...(a2.type === 'music' ? [a2] : []),
+          ...prev.music,
+        ],
+        sfx: [
+          ...(a1.type === 'sfx' ? [a1] : []),
+          ...(a2.type === 'sfx' ? [a2] : []),
+          ...prev.sfx,
+        ],
+      }));
+      setCreateSuccess(`⚡ Quick-generated 2 Props and 2 Audio Cues! Ready for stories.`);
+      setTimeout(() => setCreateSuccess(null), 5000);
+    } catch (err: any) {
+      setError(`Failed to batch create props/audio: ${err.message}`);
+    } finally {
+      setIsSpammingPropsAudio(false);
     }
   };
 
@@ -596,71 +808,344 @@ export default function Library() {
 
       {/* TAB 3: Backgrounds */}
       {activeTab === 'backgrounds' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {assets.backgrounds.map((bg) => (
-            <Card key={bg.id} className="p-5 space-y-3 border-slate-200 dark:border-slate-800">
-              <div className="h-32 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center text-4xl shadow-inner">
-                {bg.mood_hint === 'night' ? '🌙' : bg.mood_hint === 'cozy' ? '🏡' : '🌳'}
-              </div>
+        <div className="space-y-6">
+          {/* Scenery Generator & Quick Spam Actions */}
+          <div className="bg-gradient-to-r from-amber-500/10 via-amber-400/5 to-transparent dark:from-amber-950/40 dark:via-amber-900/20 border border-amber-300 dark:border-amber-800 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+            <div>
+              <h2 className="text-lg font-bold font-display text-stone-900 dark:text-slate-100 flex items-center gap-2">
+                <span>🌳</span> Scenery & Background Environments
+              </h2>
+              <p className="text-xs text-stone-600 dark:text-slate-300 mt-1 max-w-xl">
+                Create custom locations or generate a batch of unique storybook backgrounds for your story scenes.
+              </p>
+            </div>
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowBgCreator(!showBgCreator)}
+                className="whitespace-nowrap"
+              >
+                {showBgCreator ? '✕ Cancel' : '+ New Scenery'}
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleSpamBackgrounds}
+                disabled={isSpammingBgs}
+                className="bg-amber-600 hover:bg-amber-700 text-white font-bold whitespace-nowrap shadow-sm"
+              >
+                {isSpammingBgs ? '⚡ Generating 3...' : '⚡ Quick Spam 3 Sceneries'}
+              </Button>
+            </div>
+          </div>
 
-              <div>
-                <h3 className="font-bold text-base text-slate-900 dark:text-slate-100">
-                  {bg.name || bg.id}
-                </h3>
-                <p className="text-xs text-slate-400 font-mono mt-0.5">
-                  ID: {bg.id}
-                </p>
-              </div>
+          {/* Inline Scenery Creation Form */}
+          {showBgCreator && (
+            <Card className="p-6 border-amber-300 dark:border-amber-700 shadow-md animate-fadeIn bg-white/90 dark:bg-midnight-800/90">
+              <form onSubmit={handleCreateBackground} className="space-y-4">
+                <div className="flex items-center justify-between border-b border-stone-200 dark:border-midnight-700 pb-3">
+                  <h3 className="font-bold text-base text-stone-900 dark:text-slate-100 flex items-center gap-2">
+                    <span>🎨</span> Add Custom Scenery
+                  </h3>
+                  <span className="text-xs text-stone-500 dark:text-slate-400">Available across all episodes</span>
+                </div>
 
-              <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-                <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300">
-                  Mood: {bg.mood_hint || 'day'}
-                </span>
-                <span className="text-[10px] font-semibold text-slate-400">
-                  Ground: 62% - 92%
-                </span>
-              </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-1.5 md:col-span-2">
+                    <label className="text-xs font-bold text-stone-700 dark:text-slate-300">
+                      Scenery / Location Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Whispering Willows, Starlit Observatory, Dragon's Peak"
+                      value={newBgName}
+                      onChange={(e) => setNewBgName(e.target.value)}
+                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-stone-300 dark:border-midnight-600 bg-white dark:bg-midnight-900 text-stone-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-stone-700 dark:text-slate-300">
+                      Atmospheric Mood
+                    </label>
+                    <select
+                      value={newBgMood}
+                      onChange={(e) => setNewBgMood(e.target.value as any)}
+                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-stone-300 dark:border-midnight-600 bg-white dark:bg-midnight-900 text-stone-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+                    >
+                      <option value="day">☀️ Sunny Day</option>
+                      <option value="night">🌙 Starlit Night</option>
+                      <option value="sunset">🌅 Golden Sunset</option>
+                      <option value="cozy">🏡 Cozy Hearth</option>
+                      <option value="magical">✨ Magical Glow</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-stone-700 dark:text-slate-300">
+                    Visual Description (for Story Writer)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. A serene clearing with gentle fireflies and blooming bluebells"
+                    value={newBgDesc}
+                    onChange={(e) => setNewBgDesc(e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-stone-300 dark:border-midnight-600 bg-white dark:bg-midnight-900 text-stone-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-2.5 pt-2">
+                  <Button variant="ghost" size="sm" type="button" onClick={() => setShowBgCreator(false)}>
+                    Cancel
+                  </Button>
+                  <Button variant="primary" size="sm" type="submit" disabled={isCreatingBg || !newBgName.trim()}>
+                    {isCreatingBg ? 'Saving Scenery...' : 'Save Scenery'}
+                  </Button>
+                </div>
+              </form>
             </Card>
-          ))}
+          )}
+
+          {/* Backgrounds Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {assets.backgrounds.map((bg) => (
+              <Card key={bg.id} className="p-5 space-y-3 border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow">
+                <div className="h-32 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center text-4xl shadow-inner relative overflow-hidden">
+                  <span>
+                    {bg.mood_hint === 'night' ? '🌙' : bg.mood_hint === 'cozy' ? '🏡' : bg.mood_hint === 'sunset' ? '🌅' : bg.mood_hint === 'magical' ? '✨' : '🌳'}
+                  </span>
+                  {bg.id.startsWith('custom_') && (
+                    <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/90 text-white shadow-sm">
+                      Original
+                    </span>
+                  )}
+                </div>
+
+                <div>
+                  <h3 className="font-bold text-base text-slate-900 dark:text-slate-100">
+                    {bg.name || bg.id}
+                  </h3>
+                  <p className="text-xs text-slate-400 font-mono mt-0.5 truncate">
+                    ID: {bg.id}
+                  </p>
+                  {bg.description && (
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                      {bg.description}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300">
+                    Mood: {bg.mood_hint || 'day'}
+                  </span>
+                  <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                    <span>✓</span> Ready
+                  </span>
+                </div>
+              </Card>
+            ))}
+          </div>
         </div>
       )}
 
       {/* TAB 4: Props & Sound Cues */}
       {activeTab === 'props' && (
         <div className="space-y-8">
+          {/* Generator & Quick Spam Actions */}
+          <div className="bg-gradient-to-r from-amber-500/10 via-amber-400/5 to-transparent dark:from-amber-950/40 dark:via-amber-900/20 border border-amber-300 dark:border-amber-800 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+            <div>
+              <h2 className="text-lg font-bold font-display text-stone-900 dark:text-slate-100 flex items-center gap-2">
+                <span>🪄</span> Stage Props & Audio Atmosphere
+              </h2>
+              <p className="text-xs text-stone-600 dark:text-slate-300 mt-1 max-w-xl">
+                Add hand/head items for characters to carry, or create ambient music and sound effects cues.
+              </p>
+            </div>
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  setShowPropCreator(!showPropCreator);
+                  setShowAudioCreator(false);
+                }}
+                className="whitespace-nowrap"
+              >
+                {showPropCreator ? '✕ Cancel' : '+ New Prop'}
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  setShowAudioCreator(!showAudioCreator);
+                  setShowPropCreator(false);
+                }}
+                className="whitespace-nowrap"
+              >
+                {showAudioCreator ? '✕ Cancel' : '+ New Audio Cue'}
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleSpamPropsAndAudio}
+                disabled={isSpammingPropsAudio}
+                className="bg-amber-600 hover:bg-amber-700 text-white font-bold whitespace-nowrap shadow-sm"
+              >
+                {isSpammingPropsAudio ? '⚡ Generating...' : '⚡ Quick Spam Props & Audio'}
+              </Button>
+            </div>
+          </div>
+
+          {/* Inline Prop Creator */}
+          {showPropCreator && (
+            <Card className="p-6 border-amber-300 dark:border-amber-700 shadow-md animate-fadeIn bg-white/90 dark:bg-midnight-800/90">
+              <form onSubmit={handleCreateProp} className="space-y-4">
+                <div className="flex items-center justify-between border-b border-stone-200 dark:border-midnight-700 pb-3">
+                  <h3 className="font-bold text-base text-stone-900 dark:text-slate-100 flex items-center gap-2">
+                    <span>🪄</span> Create Stage Prop
+                  </h3>
+                  <span className="text-xs text-stone-500 dark:text-slate-400">Available in character attachments</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <label className="text-xs font-bold text-stone-700 dark:text-slate-300">
+                      Prop Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Star Wand, Golden Key, Bedtime Book"
+                      value={newPropName}
+                      onChange={(e) => setNewPropName(e.target.value)}
+                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-stone-300 dark:border-midnight-600 bg-white dark:bg-midnight-900 text-stone-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-stone-700 dark:text-slate-300">
+                      Attachment Slot
+                    </label>
+                    <select
+                      value={newPropSlot}
+                      onChange={(e) => setNewPropSlot(e.target.value as any)}
+                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-stone-300 dark:border-midnight-600 bg-white dark:bg-midnight-900 text-stone-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+                    >
+                      <option value="hand">Hand / Carried</option>
+                      <option value="head">Head / Hat</option>
+                      <option value="ground">Ground / Stage</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-2.5 pt-2">
+                  <Button variant="ghost" size="sm" type="button" onClick={() => setShowPropCreator(false)}>
+                    Cancel
+                  </Button>
+                  <Button variant="primary" size="sm" type="submit" disabled={isCreatingProp || !newPropName.trim()}>
+                    {isCreatingProp ? 'Saving Prop...' : 'Save Prop'}
+                  </Button>
+                </div>
+              </form>
+            </Card>
+          )}
+
+          {/* Inline Audio Creator */}
+          {showAudioCreator && (
+            <Card className="p-6 border-amber-300 dark:border-amber-700 shadow-md animate-fadeIn bg-white/90 dark:bg-midnight-800/90">
+              <form onSubmit={handleCreateAudio} className="space-y-4">
+                <div className="flex items-center justify-between border-b border-stone-200 dark:border-midnight-700 pb-3">
+                  <h3 className="font-bold text-base text-stone-900 dark:text-slate-100 flex items-center gap-2">
+                    <span>🎵</span> Create Audio Cue
+                  </h3>
+                  <span className="text-xs text-stone-500 dark:text-slate-400">Atmospheric score or sound effect</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-stone-700 dark:text-slate-300">
+                      Audio Type
+                    </label>
+                    <select
+                      value={newAudioType}
+                      onChange={(e) => setNewAudioType(e.target.value as any)}
+                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-stone-300 dark:border-midnight-600 bg-white dark:bg-midnight-900 text-stone-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+                    >
+                      <option value="music">🎵 Music Track (Looping)</option>
+                      <option value="sfx">✨ Sound Effect (SFX)</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <label className="text-xs font-bold text-stone-700 dark:text-slate-300">
+                      Cue Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Whispering Breeze, Magic Chime Fanfare"
+                      value={newAudioName}
+                      onChange={(e) => setNewAudioName(e.target.value)}
+                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-stone-300 dark:border-midnight-600 bg-white dark:bg-midnight-900 text-stone-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-2.5 pt-2">
+                  <Button variant="ghost" size="sm" type="button" onClick={() => setShowAudioCreator(false)}>
+                    Cancel
+                  </Button>
+                  <Button variant="primary" size="sm" type="submit" disabled={isCreatingAudio || !newAudioName.trim()}>
+                    {isCreatingAudio ? 'Saving Audio...' : 'Save Audio Cue'}
+                  </Button>
+                </div>
+              </form>
+            </Card>
+          )}
+
+          {/* Props Grid */}
           <div>
             <h3 className="text-base font-black text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
-              <span>🪄</span> Stage Props & Accessories
+              <span>🪄</span> Stage Props & Accessories ({assets.props.length})
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {assets.props.map((p) => (
                 <div key={p.id} className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 flex items-center gap-3">
                   <span className="text-2xl">
-                    {p.id.includes('map') ? '🗺️' : p.id.includes('flower') ? '🌸' : p.id.includes('balloon') ? '🎈' : p.id.includes('lantern') ? '🏮' : '🎒'}
+                    {p.emoji || (p.id.includes('map') ? '🗺️' : p.id.includes('flower') ? '🌸' : p.id.includes('balloon') ? '🎈' : p.id.includes('lantern') ? '🏮' : '🎒')}
                   </span>
-                  <div>
-                    <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 capitalize">
-                      {p.id.replace('_', ' ')}
+                  <div className="truncate">
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 capitalize truncate">
+                      {p.name || p.id.replace('custom_prop_', '').replace('_', ' ')}
                     </h4>
-                    <span className="text-[10px] text-slate-400">Slot: Hand / Head</span>
+                    <span className="text-[10px] text-slate-400 capitalize">
+                      Slot: {p.default_slot || 'hand'}
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
+          {/* Music Grid */}
           <div>
             <h3 className="text-base font-black text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
-              <span>🎵</span> Music & Ambient Scores
+              <span>🎵</span> Music & Ambient Scores ({assets.music.length})
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {assets.music.map((m) => (
                 <div key={m.id} className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                  <div>
-                    <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 capitalize">
-                      {m.id.replace('music_', '')}
+                  <div className="truncate pr-2">
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 capitalize truncate">
+                      {m.name || m.id.replace('music_', '').replace('custom_music_', '')}
                     </h4>
-                    <span className="text-xs text-slate-400">Atmospheric background track</span>
+                    <span className="text-xs text-slate-400">
+                      {m.mood ? `Mood: ${m.mood}` : 'Atmospheric score'}
+                    </span>
                   </div>
                   <span className="text-xl">🎶</span>
                 </div>
@@ -668,15 +1153,16 @@ export default function Library() {
             </div>
           </div>
 
+          {/* SFX Grid */}
           <div>
             <h3 className="text-base font-black text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
-              <span>✨</span> Sound Effects (SFX)
+              <span>✨</span> Sound Effects ({assets.sfx.length})
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {assets.sfx.map((s) => (
                 <div key={s.id} className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                  <span className="font-semibold text-xs text-slate-800 dark:text-slate-200 capitalize">
-                    {s.id.replace('sfx_', '')}
+                  <span className="font-semibold text-xs text-slate-800 dark:text-slate-200 capitalize truncate pr-2">
+                    {s.name || s.id.replace('sfx_', '').replace('custom_sfx_', '')}
                   </span>
                   <span className="text-base">🔔</span>
                 </div>

@@ -2,6 +2,7 @@ import os
 import shutil
 import asyncio
 import uuid
+import json
 import httpx
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Literal
@@ -517,6 +518,26 @@ class CharacterCreateRequest(BaseModel):
     palette: Optional[Dict[str, str]] = None
     voice: Optional[Dict[str, str]] = None
 
+class BackgroundCreateRequest(BaseModel):
+    name: str
+    mood_hint: Optional[str] = "day" # day | night | sunset | cozy | magical
+    tags: Optional[List[str]] = None
+    description: Optional[str] = None
+    base_variant: Optional[str] = None
+
+class PropCreateRequest(BaseModel):
+    name: str
+    default_slot: Optional[str] = "hand" # hand | head | ground
+    tags: Optional[List[str]] = None
+    emoji: Optional[str] = None
+    description: Optional[str] = None
+
+class AudioCreateRequest(BaseModel):
+    name: str
+    type: str = "music" # music | sfx
+    mood: Optional[str] = "cheerful"
+    description: Optional[str] = None
+
 def get_custom_characters_file() -> Path:
     p = Path(settings.MEDIA_DIR) / "data" / "custom_characters.json"
     p.parent.mkdir(parents=True, exist_ok=True)
@@ -540,14 +561,82 @@ def save_custom_character(char_data: Dict[str, Any]):
     with open(p, "w", encoding="utf-8") as f:
         json.dump(chars, f, indent=2)
 
+def get_custom_backgrounds_file() -> Path:
+    p = Path(settings.MEDIA_DIR) / "data" / "custom_backgrounds.json"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    if not p.exists():
+        with open(p, "w", encoding="utf-8") as f:
+            json.dump([], f)
+    return p
+
+def load_custom_backgrounds() -> List[Dict[str, Any]]:
+    p = get_custom_backgrounds_file()
+    try:
+        with open(p, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+def save_custom_background(bg_data: Dict[str, Any]):
+    p = get_custom_backgrounds_file()
+    bgs = load_custom_backgrounds()
+    bgs.append(bg_data)
+    with open(p, "w", encoding="utf-8") as f:
+        json.dump(bgs, f, indent=2)
+
+def get_custom_props_file() -> Path:
+    p = Path(settings.MEDIA_DIR) / "data" / "custom_props.json"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    if not p.exists():
+        with open(p, "w", encoding="utf-8") as f:
+            json.dump([], f)
+    return p
+
+def load_custom_props() -> List[Dict[str, Any]]:
+    p = get_custom_props_file()
+    try:
+        with open(p, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+def save_custom_prop(prop_data: Dict[str, Any]):
+    p = get_custom_props_file()
+    props = load_custom_props()
+    props.append(prop_data)
+    with open(p, "w", encoding="utf-8") as f:
+        json.dump(props, f, indent=2)
+
+def get_custom_audio_file() -> Path:
+    p = Path(settings.MEDIA_DIR) / "data" / "custom_audio.json"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    if not p.exists():
+        with open(p, "w", encoding="utf-8") as f:
+            json.dump([], f)
+    return p
+
+def load_custom_audio() -> List[Dict[str, Any]]:
+    p = get_custom_audio_file()
+    try:
+        with open(p, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return data if isinstance(data, list) else []
+    except Exception:
+        return []
+
+def save_custom_audio(audio_data: Dict[str, Any]):
+    p = get_custom_audio_file()
+    audios = load_custom_audio()
+    audios.append(audio_data)
+    with open(p, "w", encoding="utf-8") as f:
+        json.dump(audios, f, indent=2)
+
 @app.get("/api/assets")
 async def get_assets():
     from .stations.writer import load_metadata
     meta = load_metadata()
-    customs = load_custom_characters()
-    all_chars = meta.get("characters", []) + customs
     return {
-        "characters": all_chars,
+        "characters": meta.get("characters", []),
         "backgrounds": meta.get("backgrounds", []),
         "props": meta.get("props", []),
         "music": meta.get("music", []),
@@ -608,3 +697,87 @@ async def create_character(
 
     save_custom_character(new_char)
     return new_char
+
+@app.post("/api/backgrounds")
+async def create_background(
+    req: BackgroundCreateRequest,
+    user: Dict[str, Any] = Depends(get_current_user)
+):
+    clean_name = req.name.strip() or "Enchanted Valley"
+    clean_slug = clean_name.lower().replace(" ", "_").replace("-", "_")
+    bg_id = f"custom_bg_{clean_slug}_{uuid.uuid4().hex[:4]}"
+    mood = (req.mood_hint or "day").lower()
+    if mood not in ("day", "night", "sunset", "cozy", "magical"):
+        mood = "day"
+
+    tags = ["custom", mood]
+    if req.tags:
+        tags.extend(req.tags)
+
+    new_bg = {
+        "id": bg_id,
+        "name": clean_name,
+        "status": "implemented",
+        "tags": tags,
+        "mood_hint": mood,
+        "ground_band": [0.62, 0.92],
+        "description": req.description or f"Custom storybook scenery: {clean_name}",
+        "base_variant": req.base_variant or ("forest_night" if mood == "night" else "forest_day"),
+        "licence": "original"
+    }
+
+    save_custom_background(new_bg)
+    return new_bg
+
+@app.post("/api/props")
+async def create_prop(
+    req: PropCreateRequest,
+    user: Dict[str, Any] = Depends(get_current_user)
+):
+    clean_name = req.name.strip() or "Magic Trinket"
+    clean_slug = clean_name.lower().replace(" ", "_").replace("-", "_")
+    prop_id = f"custom_prop_{clean_slug}_{uuid.uuid4().hex[:4]}"
+    slot = (req.default_slot or "hand").lower()
+    if slot not in ("hand", "head", "ground"):
+        slot = "hand"
+
+    tags = ["custom", slot]
+    if req.tags:
+        tags.extend(req.tags)
+
+    new_prop = {
+        "id": prop_id,
+        "name": clean_name,
+        "default_slot": slot,
+        "tags": tags,
+        "emoji": req.emoji or "✨",
+        "description": req.description or f"Custom story prop: {clean_name}",
+        "licence": "original"
+    }
+
+    save_custom_prop(new_prop)
+    return new_prop
+
+@app.post("/api/audio")
+async def create_audio(
+    req: AudioCreateRequest,
+    user: Dict[str, Any] = Depends(get_current_user)
+):
+    clean_name = req.name.strip() or "Story Sound"
+    clean_slug = clean_name.lower().replace(" ", "_").replace("-", "_")
+    audio_type = "sfx" if req.type.lower() == "sfx" else "music"
+    audio_id = f"custom_{audio_type}_{clean_slug}_{uuid.uuid4().hex[:4]}"
+
+    new_audio = {
+        "id": audio_id,
+        "name": clean_name,
+        "type": audio_type,
+        "duration_s": 1.5 if audio_type == "sfx" else 32.0,
+        "loop": audio_type == "music",
+        "mood": req.mood or "cheerful",
+        "description": req.description or f"Atmospheric {audio_type}: {clean_name}",
+        "licence": "original"
+    }
+
+    save_custom_audio(new_audio)
+    return new_audio

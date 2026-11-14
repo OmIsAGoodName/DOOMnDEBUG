@@ -228,7 +228,8 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
 
     // Play
     const play = useCallback(async () => {
-      if (timeRef.current >= timeline.totalDuration) {
+      // Only rewind to beginning if playback truly finished and not at an active choice point
+      if (timeRef.current >= timeline.totalDuration && !activeChoicePointRef.current) {
         timeRef.current = 0;
         resolvedChoiceBeatIdsRef.current.clear();
         activeChoicePointRef.current = null;
@@ -311,7 +312,11 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
         const currentChoicePoint = timeline.choicePoints.find(
           (cp) => cp.choiceBeatId === choiceBeatId
         );
-        const chosenOption = currentChoicePoint?.options.find((o) => o.id === optionId);
+        const resolvedOptId =
+          optionId === 'default'
+            ? currentChoicePoint?.defaultOptionId || optionId
+            : optionId;
+        const chosenOption = currentChoicePoint?.options.find((o) => o.id === resolvedOptId);
         if (chosenOption?.next_scene) {
           const targetScene = reResolved.scenes.find(
             (s) => s.sceneId === chosenOption.next_scene
@@ -321,9 +326,18 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
           }
         }
 
-        play();
+        // Directly resume playback on reResolved without stale timeline closure rewinding to 0
+        isPlayingRef.current = true;
+        lastTimestampRef.current = null;
+        const engine = audioEngineRef.current;
+        if (engine) {
+          engine.ensureContextResumed().catch(() => {});
+          engine.syncPlayback(reResolved, timeRef.current, true);
+        }
+        if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+        animFrameRef.current = requestAnimationFrame(tick);
       },
-      [timeline, play]
+      [timeline, tick]
     );
 
     // Recording: startRecording

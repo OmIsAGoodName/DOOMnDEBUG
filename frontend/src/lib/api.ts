@@ -282,6 +282,44 @@ export const api = {
     });
   },
 
+  createBackground: async (params: {
+    name: string;
+    mood_hint?: string;
+    tags?: string[];
+    description?: string;
+    base_variant?: string;
+  }): Promise<any> => {
+    return request<any>('/api/backgrounds', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+  },
+
+  createProp: async (params: {
+    name: string;
+    default_slot?: string;
+    tags?: string[];
+    emoji?: string;
+    description?: string;
+  }): Promise<any> => {
+    return request<any>('/api/props', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+  },
+
+  createAudio: async (params: {
+    name: string;
+    type: 'music' | 'sfx';
+    mood?: string;
+    description?: string;
+  }): Promise<any> => {
+    return request<any>('/api/audio', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+  },
+
   getSystemStats: async (): Promise<SystemStatsResponse> => {
     return request<SystemStatsResponse>('/api/system/stats');
   },
