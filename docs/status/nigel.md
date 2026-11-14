@@ -1,12 +1,47 @@
 # Status: Nigel
 
-**Current Milestone**: Design Taste Refactor Pass Complete & Verified  
+**Current Milestone**: Homepage Streaming UI Layout Transformation Complete  
 **Date**: 2026-11-14  
 **Active Branch**: `nigel/art-setup` (Synced with `main`, local commits ahead of origin; NO push without explicit consent)
 
 ---
 
 ## Done
+- [x] **N8.5 Quick Story 75% Page Width (`frontend/src/pages/Quick.tsx`)**:
+  - Adjusted container width to explicitly occupy 75% of the viewport width (`w-[94%] md:w-[75%] mx-auto`).
+  - Maintained complete preservation of form state, event handlers, and generation pipeline logic.
+  - Synchronized across both workspaces (`frontend/src/pages/Quick.tsx` and `DOOMnDEBUG/frontend/src/pages/Quick.tsx`).
+- [x] **N8.4 Quick Story Layout Proportions & Width Expansion (`frontend/src/pages/Quick.tsx`)**:
+  - Widened the Quick Story card container from `max-w-xl` to `max-w-3xl lg:max-w-4xl` for a spacious, comfortable composition.
+  - Zero changes to business logic, API requests, contract fields, or pipeline state machines.
+  - Increased prompt textarea comfortable height (`rows={4}`) and padded glass input wells.
+  - Synchronized across both workspaces (`frontend/src/pages/Quick.tsx` and `DOOMnDEBUG/frontend/src/pages/Quick.tsx`).
+- [x] **N8.3 Quick Story Glassmorphism Redesign (`frontend/src/pages/Quick.tsx`)**:
+  - Re-skinned Quick Story form taking design inspiration from the frosted glass card aesthetic in Image 1 without copying its login contents, strictly preserving VoxFable's midnight/slate/cream/lantern gold palette.
+  - Implemented translucent smoked glass container with `backdrop-blur-2xl`, specular top/left bevel highlights (`border-t border-white/30 border-l border-white/20`), and deep multi-layered shadows.
+  - Added atmospheric ambient corner glow (warm amber lantern radial bleed behind the top-left edge).
+  - Sunken glass input wells with soft inner depth for prompt textarea and select menus.
+  - Tactile glass duration chips with gold glow illumination on active state.
+  - Radiant gold action button inspired by Image 1's luminous accent CTA.
+  - Synchronized across both workspaces (`frontend/src/pages/Quick.tsx` and `DOOMnDEBUG/frontend/src/pages/Quick.tsx`).
+- [x] **N8.2 Homepage UI Declutter & Polish**:
+  - Removed all unwanted/unused buttons and dummy UI elements from the homepage:
+    - Removed redundant left vertical navigation rail and its duplicate/dummy icon buttons.
+    - Removed placeholder search bar, fake "Live Mic Ready" badge, fake "Child-Safe" badge, and dummy user profile avatar.
+    - Removed non-functional category filter chips row (8 filter buttons + chevron button).
+    - Removed cluttered developer harness links footer from the public homepage.
+  - Retained the clean, cinematic Hero Showcase Banner (nocturnal vector scenery + bold typography) with a single, clear Quick Story CTA button.
+  - Kept the 3 clean, media-rich cards for Quick Story, Studio Mode, and Episode Library.
+  - Synchronized across both workspaces (`frontend/src/pages/Home.tsx` and `DOOMnDEBUG/frontend/src/pages/Home.tsx`).
+- [x] **N8.1 Homepage UI Streaming Layout Transformation (`frontend/src/pages/Home.tsx`)**:
+  - Replaced legacy centered text stack with media-streaming layout inspired by modern dashboard UX while strictly retaining VoxFable's brand color scheme (`midnight`, `slate`, `cream`, `lantern gold`, `mint`).
+  - **Left Navigation Rail**: Slim icon strip with Home (with left pill active indicator), Quick Story, Studio, Library, Live Mic, and Art Gallery icons.
+  - **Top Search & Prompt Bar**: Pill input with search icon, bedtime prompt placeholder, and radiant gold "Create" button linked to `/quick?prompt=...`. Included Live Mic Ready and Child-Safe status indicators.
+  - **Panoramic Hero Showcase**: Full-bleed nocturnal storybook landscape (crescent moon, twinkling stars, rolling hills, pine trees, lantern glow) with bold display headline, pitch description, trust tags, and a featured teaser card with a circular gold Play button.
+  - **Category Filter Chips Row**: Horizontal scrollable chips (`All Stories`, `Quick Stories`, `Live Interactive`, `Bedtime Fables`, `Animal Friends`, `Studio Series`, etc.) with active state toggles.
+  - **3-Column Episode / Feature Grid**: 16:9 thumbnail previews with duration pills (`2:45`, `LIVE`, `4 EPISODES`), story titles, creator avatars, and interactive metadata.
+  - Connected prompt pre-filling in `Quick.tsx` via `useSearchParams`.
+  - Verified with `npm run typecheck` (0 errors) and `npm test` (all 11 test suites, 38 unit tests passing).
 - [x] **N8.0 Frontend Design Taste Refactor Pass**:
   - Implemented cohesive Storybook Atelier art direction: deep velvety midnight palette (`#070a13`, `#0b101e`, `#151f38`), warm parchment light mode, and radiant lantern gold primary accents.
   - Eliminated generic AI-slop anti-patterns: removed harsh purple/neon gradients, floating clapperboard emoji thumbnails, blinding un-themed white empty-state containers, and muddy disabled-looking buttons.
