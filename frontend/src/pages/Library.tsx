@@ -301,7 +301,6 @@ export default function Library() {
               </span>
             </div>
           </div>
-          </div>
 
           {episodes.length === 0 ? (
             <EmptyState
