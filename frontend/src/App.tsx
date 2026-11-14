@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useState, useEffect } from 'react';
+import React, { Suspense, lazy, useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider, AuthGuard } from './auth';
 
@@ -24,6 +24,7 @@ function NavBar({ isDark, onToggleTheme }: NavBarProps) {
   const navigate = useNavigate();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [navSearchQuery, setNavSearchQuery] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const currentPath = location.pathname;
 
@@ -34,6 +35,17 @@ function NavBar({ isDark, onToggleTheme }: NavBarProps) {
     { path: '/library', label: 'Library', icon: '📚' },
     { path: '/debug', label: 'Diagnostics', icon: '⚙️' },
   ];
+
+  const handleOpenSearch = () => {
+    setIsSearchOpen(true);
+    setTimeout(() => {
+      searchInputRef.current?.focus();
+    }, 100);
+  };
+
+  const handleCloseSearch = () => {
+    setIsSearchOpen(false);
+  };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,22 +58,22 @@ function NavBar({ isDark, onToggleTheme }: NavBarProps) {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full px-4 sm:px-8 py-3.5 flex items-center justify-between gap-3 select-none backdrop-blur-md bg-white/40 dark:bg-[#070a13]/40 border-b border-stone-200/50 dark:border-white/5 transition-colors">
-      {/* 1. Left Brand Pod */}
+    <header className="sticky top-0 z-50 w-full px-4 sm:px-8 py-3 flex items-center justify-between gap-3 select-none backdrop-blur-md bg-white/40 dark:bg-[#070a13]/40 border-b border-stone-200/50 dark:border-white/5 transition-colors duration-300">
+      {/* 1. Left Brand Pod with Tactile Spring Hover */}
       <Link
         to="/"
-        className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/80 dark:bg-[#131d2e]/80 backdrop-blur-2xl border border-stone-200/80 dark:border-white/10 shadow-storybook-sm hover:scale-[1.02] transition-transform shrink-0"
+        className="group flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/80 dark:bg-[#131d2e]/80 backdrop-blur-2xl border-t border-white/40 dark:border-white/15 border-l border-white/30 dark:border-white/10 border-r border-stone-200/80 dark:border-black/30 border-b border-stone-200/80 dark:border-black/40 shadow-storybook-sm hover:shadow-storybook hover:scale-[1.03] active:scale-[0.96] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] shrink-0"
       >
-        <span className="w-7 h-7 rounded-full bg-vox-gold/20 border border-vox-gold/40 flex items-center justify-center text-vox-gold text-xs shadow-storybook-sm font-bold">
+        <span className="w-7 h-7 rounded-full bg-vox-gold/20 border border-vox-gold/40 flex items-center justify-center text-vox-gold text-xs shadow-gold-sm font-bold group-hover:rotate-45 group-hover:scale-110 transition-transform duration-300 ease-out">
           ✨
         </span>
-        <span className="font-extrabold font-display tracking-tight text-stone-900 dark:text-slate-100 text-sm hidden sm:inline">
+        <span className="font-extrabold font-display tracking-tight text-stone-900 dark:text-slate-100 text-sm hidden sm:inline group-hover:text-vox-gold transition-colors duration-200">
           VoxFable
         </span>
       </Link>
 
-      {/* 2. Floating Center Pill Navigation Dock (Inspired by Image 1) */}
-      <nav className="flex items-center gap-1 sm:gap-1.5 p-1.5 rounded-full bg-white/85 dark:bg-[#131d2e]/90 backdrop-blur-2xl border border-stone-200/90 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-x-auto scrollbar-none">
+      {/* 2. Floating Center Pill Navigation Dock (Apple Spring Physics) */}
+      <nav className="flex items-center gap-1 sm:gap-1.5 p-1.5 rounded-full bg-white/85 dark:bg-[#131d2e]/90 backdrop-blur-2xl border-t border-white/40 dark:border-white/15 border-l border-white/30 dark:border-white/10 border-r border-stone-200/90 dark:border-black/40 border-b border-stone-200/90 dark:border-black/50 shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-x-auto scrollbar-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]">
         {navItems.map((item) => {
           const isActive =
             item.path === '/'
@@ -72,68 +84,79 @@ function NavBar({ isDark, onToggleTheme }: NavBarProps) {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 whitespace-nowrap active:scale-95 ${
+              className={`group relative flex items-center gap-1.5 sm:gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] whitespace-nowrap active:scale-[0.94] ${
                 isActive
-                  ? 'bg-gradient-to-r from-vox-gold via-lantern-500 to-vox-gold text-vox-midnight shadow-gold-sm ring-1 ring-vox-gold/40'
-                  : 'text-stone-600 dark:text-slate-300 hover:text-vox-midnight dark:hover:text-vox-gold hover:bg-black/5 dark:hover:bg-white/5'
+                  ? 'bg-gradient-to-r from-vox-gold via-lantern-500 to-vox-gold text-vox-midnight shadow-gold-sm ring-1 ring-vox-gold/50 scale-[1.02]'
+                  : 'text-stone-600 dark:text-slate-300 hover:text-vox-midnight dark:hover:text-vox-gold hover:bg-black/5 dark:hover:bg-white/5 hover:-translate-y-0.5'
               }`}
             >
-              <span className="text-sm">{item.icon}</span>
-              <span className="tracking-tight">{item.label}</span>
+              <span className="text-sm transition-transform duration-200 ease-out group-hover:scale-115 group-hover:-translate-y-0.5 inline-block">
+                {item.icon}
+              </span>
+              <span className="tracking-tight transition-colors duration-200">
+                {item.label}
+              </span>
             </Link>
           );
         })}
       </nav>
 
-      {/* 3. Right Companion Pods: Interactive Search & Dark Mode (Inspired by Image 1) */}
+      {/* 3. Right Companion Pods: Morphing Search Pod & Dark Mode */}
       <div className="flex items-center gap-2 shrink-0">
-        {/* Companion Search Pod (Exact Image 1 Companion Feature) */}
-        {isSearchOpen ? (
-          <form
-            onSubmit={handleSearchSubmit}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 dark:bg-[#131d2e]/95 backdrop-blur-2xl border border-vox-gold/70 shadow-gold-sm animate-fadeIn"
-          >
-            <span className="text-xs text-vox-gold">🔍</span>
-            <input
-              type="text"
-              autoFocus
-              value={navSearchQuery}
-              onChange={(e) => setNavSearchQuery(e.target.value)}
-              placeholder="Search videos in Library..."
-              className="bg-transparent text-xs text-stone-900 dark:text-slate-100 placeholder:text-stone-400 dark:placeholder:text-slate-500 focus:outline-none w-36 sm:w-52"
-            />
-            <button
-              type="button"
-              onClick={() => setIsSearchOpen(false)}
-              className="w-4 h-4 rounded-full flex items-center justify-center text-[10px] text-stone-400 hover:text-stone-600 dark:text-slate-500 dark:hover:text-slate-300"
-            >
-              ✕
-            </button>
-          </form>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setIsSearchOpen(true)}
-            title="Search videos in Asset Library"
-            className="w-10 h-10 rounded-full flex items-center justify-center bg-white/80 dark:bg-[#131d2e]/85 backdrop-blur-2xl border border-stone-200/90 dark:border-white/10 shadow-storybook-sm hover:border-vox-gold/60 text-stone-700 dark:text-slate-200 hover:text-vox-gold hover:scale-105 active:scale-95 transition-all cursor-pointer"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-          </button>
-        )}
+        {/* Smooth Expanding Companion Search Pod (Apple Morphing Spring Animation) */}
+        <div
+          className={`relative h-10 rounded-full flex items-center bg-white/85 dark:bg-[#131d2e]/90 backdrop-blur-2xl border-t border-white/40 dark:border-white/15 border-l border-white/30 dark:border-white/10 border-r border-stone-200/90 dark:border-black/40 border-b border-stone-200/90 dark:border-black/50 shadow-storybook-sm transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden ${
+            isSearchOpen
+              ? 'w-60 sm:w-72 ring-2 ring-vox-gold/40 border-vox-gold/60 shadow-gold-sm px-3.5'
+              : 'w-10 hover:w-10 hover:border-vox-gold/60 hover:scale-105 active:scale-95 cursor-pointer justify-center'
+          }`}
+          onClick={!isSearchOpen ? handleOpenSearch : undefined}
+          title={!isSearchOpen ? 'Search videos in Asset Library' : undefined}
+        >
+          {isSearchOpen ? (
+            <form onSubmit={handleSearchSubmit} className="flex items-center w-full gap-2">
+              <span className="text-xs text-vox-gold animate-fadeIn">🔍</span>
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={navSearchQuery}
+                onChange={(e) => setNavSearchQuery(e.target.value)}
+                placeholder="Search videos in Library..."
+                className="bg-transparent text-xs text-stone-900 dark:text-slate-100 placeholder:text-stone-400 dark:placeholder:text-slate-500 focus:outline-none flex-1 min-w-0"
+              />
+              <button
+                type="button"
+                onClick={handleCloseSearch}
+                className="w-5 h-5 rounded-full flex items-center justify-center text-xs text-stone-400 hover:text-stone-700 dark:text-slate-500 dark:hover:text-slate-200 hover:scale-110 active:scale-90 transition-all"
+                title="Close search"
+              >
+                ✕
+              </button>
+            </form>
+          ) : (
+            <div className="flex items-center justify-center w-full h-full text-stone-700 dark:text-slate-200 hover:text-vox-gold transition-colors duration-200">
+              <svg className="w-4 h-4 transition-transform duration-200 hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </div>
+          )}
+        </div>
 
-        {/* Companion Dark Mode Pod */}
+        {/* Companion Dark Mode Pod with Fluid Physics */}
         <button
           type="button"
           onClick={onToggleTheme}
           aria-label="Toggle dark mode"
           title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          className="h-10 px-3.5 rounded-full flex items-center gap-1.5 text-xs font-bold border border-stone-200/90 dark:border-white/10 bg-white/80 dark:bg-[#131d2e]/85 backdrop-blur-2xl text-stone-800 dark:text-slate-200 hover:border-vox-gold/50 shadow-storybook-sm active:scale-95 transition-all"
+          className="group h-10 px-3.5 rounded-full flex items-center gap-1.5 text-xs font-bold border-t border-white/40 dark:border-white/15 border-l border-white/30 dark:border-white/10 border-r border-stone-200/90 dark:border-black/40 border-b border-stone-200/90 dark:border-black/50 bg-white/85 dark:bg-[#131d2e]/90 backdrop-blur-2xl text-stone-800 dark:text-slate-200 hover:border-vox-gold/50 hover:text-vox-gold shadow-storybook-sm hover:shadow-storybook hover:scale-105 active:scale-95 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
         >
-          <span>{isDark ? '🌙' : '☀️'}</span>
-          <span className="hidden md:inline">{isDark ? 'Dark' : 'Light'}</span>
+          <span className="text-xs transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:rotate-180 group-hover:scale-120 inline-block">
+            {isDark ? '🌙' : '☀️'}
+          </span>
+          <span className="hidden md:inline transition-colors duration-200">
+            {isDark ? 'Dark' : 'Light'}
+          </span>
         </button>
       </div>
     </header>
