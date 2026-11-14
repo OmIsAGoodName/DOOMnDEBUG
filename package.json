@@ -1,0 +1,12 @@
+{
+  "name": "voxfable-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "backend": "python -m uvicorn backend.app.main:app --reload --port 8000",
+    "build": "npm --prefix frontend run build",
+    "test": "npm --prefix frontend test",
+    "typecheck": "npm --prefix frontend run typecheck"
+  }
+}
