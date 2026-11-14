@@ -9,6 +9,7 @@ export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElemen
   label?: string;
   options?: SelectOption[];
   error?: string;
+  children?: React.ReactNode;
 }
 
 export const Select: React.FC<SelectProps> = ({
