@@ -228,6 +228,7 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
 
     // Play
     const play = useCallback(async () => {
+      setHasInteracted(true);
       // Only rewind to beginning if playback truly finished and not at an active choice point
       if (timeRef.current >= timeline.totalDuration && !activeChoicePointRef.current) {
         timeRef.current = 0;
@@ -239,10 +240,14 @@ export const EpisodePlayer = forwardRef<EpisodePlayerHandle, EpisodePlayerProps>
       setIsChoiceActive(false);
       lastTimestampRef.current = null;
 
-      const engine = audioEngineRef.current;
-      if (engine) {
-        await engine.ensureContextResumed();
-        engine.syncPlayback(timeline, timeRef.current, true);
+      try {
+        const engine = audioEngineRef.current;
+        if (engine) {
+          await engine.ensureContextResumed();
+          engine.syncPlayback(timeline, timeRef.current, true);
+        }
+      } catch (err) {
+        console.warn('[EpisodePlayer] Audio sync error on play:', err);
       }
 
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
