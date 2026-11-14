@@ -1,4 +1,5 @@
 import json
+import uuid
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from ..models.story_draft import StoryDraft
