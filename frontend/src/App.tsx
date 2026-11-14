@@ -1,5 +1,15 @@
 import React, { Suspense, lazy, useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
+import { 
+  Home as HomeIcon, 
+  Sparkles as QuickIcon, 
+  Clapperboard as StudioIcon, 
+  Library as LibraryIcon, 
+  Sliders as DiagnosticsIcon,
+  Search as SearchIcon,
+  Sun as SunIcon,
+  Moon as MoonIcon
+} from 'lucide-react';
 import { AuthProvider, AuthGuard } from './auth';
 
 const Home = lazy(() => import('./pages/Home'));
@@ -29,11 +39,11 @@ function NavBar({ isDark, onToggleTheme }: NavBarProps) {
   const currentPath = location.pathname;
 
   const navItems = [
-    { path: '/', label: 'Home', icon: '🏠' },
-    { path: '/quick', label: 'Quick Story', icon: '🌙' },
-    { path: '/studio', label: 'Studio', icon: '🎬' },
-    { path: '/library', label: 'Library', icon: '📚' },
-    { path: '/debug', label: 'Diagnostics', icon: '⚙️' },
+    { path: '/', label: 'Home', icon: HomeIcon },
+    { path: '/quick', label: 'Quick Story', icon: QuickIcon },
+    { path: '/studio', label: 'Studio', icon: StudioIcon },
+    { path: '/library', label: 'Library', icon: LibraryIcon },
+    { path: '/debug', label: 'Diagnostics', icon: DiagnosticsIcon },
   ];
 
   // Sliding pill position state & element refs
@@ -105,11 +115,11 @@ function NavBar({ isDark, onToggleTheme }: NavBarProps) {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full px-4 sm:px-8 py-3 flex items-center justify-between gap-3 select-none backdrop-blur-md bg-white/40 dark:bg-[#070a13]/40 border-b border-stone-200/50 dark:border-white/5 transition-colors duration-300">
+    <header className="sticky top-0 z-50 w-full px-4 sm:px-8 py-3 flex items-center justify-between gap-3 select-none backdrop-blur-xl bg-white/80 dark:bg-[#070a13]/70 border-b border-stone-200/90 dark:border-white/10 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-none transition-colors duration-300">
       {/* 1. Left Brand Pod with Logo Emblem + Custom Typography */}
       <Link
         to="/"
-        className="group flex items-center gap-2.5 px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full bg-white/80 dark:bg-[#131d2e]/80 backdrop-blur-2xl border-t border-white/40 dark:border-white/15 border-l border-white/30 dark:border-white/10 border-r border-stone-200/80 dark:border-black/30 border-b border-stone-200/80 dark:border-black/40 shadow-storybook-sm hover:shadow-storybook hover:scale-[1.03] active:scale-[0.96] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] shrink-0"
+        className="group flex items-center gap-2.5 px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full bg-white dark:bg-[#131d2e]/90 backdrop-blur-2xl border border-stone-300/90 dark:border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.1),0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.14),0_2px_6px_rgba(0,0,0,0.08)] dark:shadow-storybook-sm hover:scale-[1.03] active:scale-[0.96] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] shrink-0"
         title="VoxFable Home"
       >
         <img
@@ -125,11 +135,11 @@ function NavBar({ isDark, onToggleTheme }: NavBarProps) {
       {/* 2. Floating Center Pill Navigation Dock with Sliding Spring Indicator */}
       <nav
         ref={navRef}
-        className="relative flex items-center gap-1 sm:gap-1.5 p-1.5 rounded-full bg-white/85 dark:bg-[#131d2e]/90 backdrop-blur-2xl border-t border-white/40 dark:border-white/15 border-l border-white/30 dark:border-white/10 border-r border-stone-200/90 dark:border-black/40 border-b border-stone-200/90 dark:border-black/50 shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-x-auto scrollbar-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+        className="relative flex items-center gap-1 sm:gap-1.5 p-1.5 rounded-full bg-white dark:bg-[#131d2e]/90 backdrop-blur-2xl border border-stone-300/90 dark:border-white/15 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.12),0_4px_12px_-2px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-x-auto scrollbar-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
       >
         {/* The Smooth Sliding Spring Pill Indicator (Glides between sections) */}
         <div
-          className="absolute rounded-full bg-gradient-to-r from-vox-gold via-lantern-500 to-vox-gold shadow-gold-sm pointer-events-none transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)]"
+          className="absolute rounded-full bg-gradient-to-r from-vox-gold via-lantern-500 to-vox-gold shadow-[0_2px_10px_rgba(245,158,11,0.4)] pointer-events-none transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)]"
           style={{
             transform: `translate3d(${indicatorStyle.left}px, ${indicatorStyle.top}px, 0)`,
             width: `${indicatorStyle.width}px`,
@@ -145,6 +155,7 @@ function NavBar({ isDark, onToggleTheme }: NavBarProps) {
             item.path === '/'
               ? currentPath === '/'
               : currentPath.startsWith(item.path);
+          const Icon = item.icon;
 
           return (
             <Link
@@ -156,13 +167,11 @@ function NavBar({ isDark, onToggleTheme }: NavBarProps) {
               }}
               className={`group relative z-10 flex items-center gap-1.5 sm:gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-colors duration-250 whitespace-nowrap active:scale-[0.94] ${
                 isActive
-                  ? 'text-vox-midnight'
-                  : 'text-stone-600 dark:text-slate-300 hover:text-vox-midnight dark:hover:text-vox-gold'
+                  ? 'text-stone-950 font-extrabold'
+                  : 'text-stone-700 dark:text-slate-300 hover:text-stone-950 dark:hover:text-vox-gold'
               }`}
             >
-              <span className="text-sm transition-transform duration-200 ease-out group-hover:scale-115 group-hover:-translate-y-0.5 inline-block">
-                {item.icon}
-              </span>
+              <Icon className="w-4 h-4 transition-transform duration-200 ease-out group-hover:scale-110 shrink-0" />
               <span className="tracking-tight transition-colors duration-200">
                 {item.label}
               </span>
@@ -175,17 +184,17 @@ function NavBar({ isDark, onToggleTheme }: NavBarProps) {
       <div className="flex items-center gap-2 shrink-0">
         {/* Smooth Expanding Companion Search Pod (Apple Morphing Spring Animation) */}
         <div
-          className={`relative h-10 rounded-full flex items-center bg-white/85 dark:bg-[#131d2e]/90 backdrop-blur-2xl border-t border-white/40 dark:border-white/15 border-l border-white/30 dark:border-white/10 border-r border-stone-200/90 dark:border-black/40 border-b border-stone-200/90 dark:border-black/50 shadow-storybook-sm transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden ${
+          className={`relative h-10 rounded-full flex items-center bg-white dark:bg-[#131d2e]/90 backdrop-blur-2xl border border-stone-300/90 dark:border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.1),0_1px_3px_rgba(0,0,0,0.06)] transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden ${
             isSearchOpen
-              ? 'w-60 sm:w-72 ring-2 ring-vox-gold/40 border-vox-gold/60 shadow-gold-sm px-3.5'
-              : 'w-10 hover:w-10 hover:border-vox-gold/60 hover:scale-105 active:scale-95 cursor-pointer justify-center'
+              ? 'w-60 sm:w-72 ring-2 ring-vox-gold/50 border-vox-gold shadow-gold-sm px-3.5'
+              : 'w-10 hover:w-10 hover:border-vox-gold/60 hover:shadow-[0_6px_20px_rgba(0,0,0,0.14)] hover:scale-105 active:scale-95 cursor-pointer justify-center'
           }`}
           onClick={!isSearchOpen ? handleOpenSearch : undefined}
           title={!isSearchOpen ? 'Search videos in Asset Library' : undefined}
         >
           {isSearchOpen ? (
             <form onSubmit={handleSearchSubmit} className="flex items-center w-full gap-2">
-              <span className="text-xs text-vox-gold animate-fadeIn">🔍</span>
+              <SearchIcon className="w-3.5 h-3.5 text-vox-gold animate-fadeIn shrink-0" />
               <input
                 ref={searchInputRef}
                 type="text"
@@ -205,10 +214,7 @@ function NavBar({ isDark, onToggleTheme }: NavBarProps) {
             </form>
           ) : (
             <div className="flex items-center justify-center w-full h-full text-stone-700 dark:text-slate-200 hover:text-vox-gold transition-colors duration-200">
-              <svg className="w-4 h-4 transition-transform duration-200 hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
+              <SearchIcon className="w-4 h-4 transition-transform duration-200 hover:scale-110" />
             </div>
           )}
         </div>
@@ -219,11 +225,13 @@ function NavBar({ isDark, onToggleTheme }: NavBarProps) {
           onClick={onToggleTheme}
           aria-label="Toggle dark mode"
           title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          className="group h-10 px-3.5 rounded-full flex items-center gap-1.5 text-xs font-bold border-t border-white/40 dark:border-white/15 border-l border-white/30 dark:border-white/10 border-r border-stone-200/90 dark:border-black/40 border-b border-stone-200/90 dark:border-black/50 bg-white/85 dark:bg-[#131d2e]/90 backdrop-blur-2xl text-stone-800 dark:text-slate-200 hover:border-vox-gold/50 hover:text-vox-gold shadow-storybook-sm hover:shadow-storybook hover:scale-105 active:scale-95 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+          className="group h-10 px-3.5 rounded-full flex items-center gap-1.5 text-xs font-bold border border-stone-300/90 dark:border-white/15 bg-white dark:bg-[#131d2e]/90 backdrop-blur-2xl text-stone-800 dark:text-slate-200 hover:border-vox-gold/50 hover:text-vox-gold shadow-[0_4px_16px_rgba(0,0,0,0.1),0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.14)] hover:scale-105 active:scale-95 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
         >
-          <span className="text-xs transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:rotate-180 group-hover:scale-120 inline-block">
-            {isDark ? '🌙' : '☀️'}
-          </span>
+          {isDark ? (
+            <MoonIcon className="w-4 h-4 text-vox-gold transition-transform duration-300 ease-out group-hover:-rotate-12 group-hover:scale-110" />
+          ) : (
+            <SunIcon className="w-4 h-4 text-amber-500 transition-transform duration-300 ease-out group-hover:rotate-45 group-hover:scale-110" />
+          )}
           <span className="hidden md:inline transition-colors duration-200">
             {isDark ? 'Dark' : 'Light'}
           </span>
