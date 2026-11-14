@@ -1,12 +1,18 @@
 # Status: Nigel
 
-**Current Milestone**: Homepage Streaming UI Layout Transformation Complete  
+**Current Milestone**: Brand Identity Asset Integration (Logo Navbar & Favicon)  
 **Date**: 2026-11-14  
 **Active Branch**: `nigel/art-setup` (Synced with `main`, local commits ahead of origin; NO push without explicit consent)
 
 ---
 
 ## Done
+- [x] **N8.9 Brand Identity Asset Integration (`frontend/public/`, `frontend/src/App.tsx`, `frontend/index.html`)**:
+  - Integrated official high-resolution brand assets from `Logos/`:
+    - `Logo_Navbar.png` placed in `public/logo_navbar.png` and embedded in `NavBar` with responsive height, rounded-full geometry, tactile hover scale, and screen-reader accessible label.
+    - `Logo.png` placed in `public/logo.png` and wired into `index.html` as the official site favicon (`<link rel="icon">`) and Apple touch icon.
+  - Synchronized across both workspaces (`frontend` and `DOOMnDEBUG/frontend`).
+  - Verified with 39 passing tests and clean TypeScript compilation.
 - [x] **N8.8 Continuous Gliding Spring Pill Indicator (`frontend/src/App.tsx`)**:
   - Replaced isolated static pill backgrounds with a single continuous sliding pill indicator that physically glides and morphs width between sections.
   - Calculated exact layout geometry (`offsetLeft`, `offsetTop`, `offsetWidth`, `offsetHeight`) via item element refs and `ResizeObserver`/font-load events.

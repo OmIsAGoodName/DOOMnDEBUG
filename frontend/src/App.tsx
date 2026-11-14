@@ -106,17 +106,18 @@ function NavBar({ isDark, onToggleTheme }: NavBarProps) {
 
   return (
     <header className="sticky top-0 z-50 w-full px-4 sm:px-8 py-3 flex items-center justify-between gap-3 select-none backdrop-blur-md bg-white/40 dark:bg-[#070a13]/40 border-b border-stone-200/50 dark:border-white/5 transition-colors duration-300">
-      {/* 1. Left Brand Pod with Tactile Spring Hover */}
+      {/* 1. Left Brand Pod with Logo_Navbar */}
       <Link
         to="/"
-        className="group flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/80 dark:bg-[#131d2e]/80 backdrop-blur-2xl border-t border-white/40 dark:border-white/15 border-l border-white/30 dark:border-white/10 border-r border-stone-200/80 dark:border-black/30 border-b border-stone-200/80 dark:border-black/40 shadow-storybook-sm hover:shadow-storybook hover:scale-[1.03] active:scale-[0.96] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] shrink-0"
+        className="group flex items-center px-2 py-1 sm:px-2.5 sm:py-1 rounded-full bg-white/80 dark:bg-[#131d2e]/80 backdrop-blur-2xl border-t border-white/40 dark:border-white/15 border-l border-white/30 dark:border-white/10 border-r border-stone-200/80 dark:border-black/30 border-b border-stone-200/80 dark:border-black/40 shadow-storybook-sm hover:shadow-storybook hover:scale-[1.03] active:scale-[0.96] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] shrink-0"
+        title="VoxFable Home"
       >
-        <span className="w-7 h-7 rounded-full bg-vox-gold/20 border border-vox-gold/40 flex items-center justify-center text-vox-gold text-xs shadow-gold-sm font-bold group-hover:rotate-45 group-hover:scale-110 transition-transform duration-300 ease-out">
-          ✨
-        </span>
-        <span className="font-extrabold font-display tracking-tight text-stone-900 dark:text-slate-100 text-sm hidden sm:inline group-hover:text-vox-gold transition-colors duration-200">
-          VoxFable
-        </span>
+        <img
+          src="/logo_navbar.png"
+          alt="VoxFable"
+          className="h-8 sm:h-9 w-auto object-contain rounded-full group-hover:scale-105 transition-transform duration-300"
+        />
+        <span className="sr-only">VoxFable</span>
       </Link>
 
       {/* 2. Floating Center Pill Navigation Dock with Sliding Spring Indicator */}
