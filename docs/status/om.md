@@ -1,15 +1,24 @@
 # Om's Status & Milestone Log
 
-**Current Milestone**: Episode Library Auto-Save, Reverse Chronological Ordering & Real-Time Sync  
+**Current Milestone**: Tailwind Dark Mode & Brand Token Resolution  
 **Date**: 2026-11-14  
 **Active Branch**: `main` (synced with `origin/main`)  
 **Repository**: `https://github.com/OmIsAGoodName/DOOMnDEBUG.git`  
 
 ---
 
-## ⚡ Recent Updates (Library Auto-Save, Real-Time Sync & Reverse Chronological Ordering)
+## ⚡ Recent Updates (Tailwind Dark Mode Brand Tokens & UI Color Resolution)
 
-1. **Episode Library Auto-Save & Chronological Sorting**:
+1. **Resolved Dark Mode Breakdown (Missing `vox` Tokens in Tailwind Config)**:
+   - Diagnosed root cause:
+     - The git pull was completely clean and up to date with `origin/main` (commit `8070744`).
+     - However, the recent UI commits introduced custom brand color classes across `Home.tsx`, `Quick.tsx`, `App.tsx`, and `index.html` (`text-vox-midnight`, `dark:text-vox-cream`, `bg-vox-gold`, `dark:bg-vox-slate`, `border-vox-warmBorder`, `border-vox-border`, `shadow-gold-glow`, etc.).
+     - These `vox` color tokens were never defined inside `frontend/tailwind.config.js`. As a result, Tailwind generated zero CSS classes for dark mode surfaces, text colors, or borders, rendering dark mode unstyled or broken on fresh builds.
+   - **Fix**:
+     - Added the complete `vox` theme tokens (`midnight`, `slate`, `cream`, `gold`, `border`, `warmBorder`, `muted`, `lightMuted`, `coral`, `mint`, `sidebar`) and `gold-*` box shadows into [`frontend/tailwind.config.js`](file:///d:/VoxFable/frontend/tailwind.config.js).
+     - Rebuilt frontend production assets (`tsc && vite build`) and restarted the Vite dev server. Verified all 39 frontend unit tests pass.
+
+2. **Episode Library Auto-Save & Chronological Sorting**:
    - Diagnosed why recent generations seemed missing from `/library`:
      - Episodes were previously saved without an ISO `created_at` timestamp in `backend/app/pipeline.py` and `backend/app/repositories.py`.
      - `LocalFileRepository.list_episodes` returned records in insertion order (oldest first), placing newly generated episodes 30+ cards down at the very bottom of the page.

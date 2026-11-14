@@ -37,6 +37,19 @@ export default {
           400: '#34d399',
           500: '#10b981',
           600: '#059669',
+        },
+        vox: {
+          midnight: '#070a13',
+          slate: '#131d2e',
+          cream: '#faf8f5',
+          gold: '#FFCE0B',
+          border: 'rgba(255, 255, 255, 0.1)',
+          warmBorder: 'rgba(231, 224, 212, 0.9)',
+          muted: '#94a3b8',
+          lightMuted: '#78716c',
+          coral: '#f43f5e',
+          mint: '#10b981',
+          sidebar: '#090e1a',
         }
       },
       boxShadow: {
@@ -45,6 +58,8 @@ export default {
         'storybook-hover': '0 20px 40px -10px rgba(7, 10, 19, 0.35), 0 4px 12px -2px rgba(7, 10, 19, 0.15)',
         'lantern-glow': '0 0 24px -2px rgba(245, 158, 11, 0.35)',
         'lantern-glow-sm': '0 0 14px -2px rgba(245, 158, 11, 0.25)',
+        'gold-glow': '0 0 28px rgba(245, 158, 11, 0.45)',
+        'gold-sm': '0 2px 10px rgba(245, 158, 11, 0.35)',
         'cel-border': 'inset 0 1px 0 rgba(255, 255, 255, 0.08)',
       },
       backgroundImage: {
