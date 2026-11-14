@@ -77,7 +77,7 @@
           "beat_id": "b1",
           "speech": {
             "type": "NARRATE",
-            "text": "Deep in the forest, Pip loved spending quiet days all alone."
+            "text": "Deep in the whispering forest, little Pip loved gliding from branch to branch."
           },
           "actions": [
             {
@@ -102,7 +102,7 @@
           "speech": {
             "type": "SPEAK",
             "character_id": "pip_owl",
-            "text": "I found a pretty flower! It is mine.",
+            "text": "Look at these glowing berries! They make a sweet bedtime treat for everyone.",
             "expression": "happy"
           },
           "actions": [

@@ -1,7 +1,9 @@
 export const config = {
   supabaseUrl: import.meta.env.VITE_SUPABASE_URL || '',
   supabaseKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '',
-  apiBase: import.meta.env.VITE_API_BASE || 'http://localhost:8000',
+  apiBase:
+    import.meta.env.VITE_API_BASE ||
+    (import.meta.env.PROD ? 'https://voxfable-backend.onrender.com' : 'http://localhost:8000'),
   isDemoMode: (): boolean => {
     const stored = localStorage.getItem('voxfable_demo_mode');
     if (stored !== null) return stored === 'true';
