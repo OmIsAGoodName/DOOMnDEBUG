@@ -109,13 +109,13 @@ function NavBar({ isDark, onToggleTheme }: NavBarProps) {
       {/* 1. Left Brand Pod with Logo_Navbar */}
       <Link
         to="/"
-        className="group flex items-center px-2 py-1 sm:px-2.5 sm:py-1 rounded-full bg-white/80 dark:bg-[#131d2e]/80 backdrop-blur-2xl border-t border-white/40 dark:border-white/15 border-l border-white/30 dark:border-white/10 border-r border-stone-200/80 dark:border-black/30 border-b border-stone-200/80 dark:border-black/40 shadow-storybook-sm hover:shadow-storybook hover:scale-[1.03] active:scale-[0.96] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] shrink-0"
+        className="group flex items-center px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full bg-white/80 dark:bg-[#131d2e]/80 backdrop-blur-2xl border-t border-white/40 dark:border-white/15 border-l border-white/30 dark:border-white/10 border-r border-stone-200/80 dark:border-black/30 border-b border-stone-200/80 dark:border-black/40 shadow-storybook-sm hover:shadow-storybook hover:scale-[1.03] active:scale-[0.96] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] shrink-0"
         title="VoxFable Home"
       >
         <img
           src="/logo_navbar.png"
           alt="VoxFable"
-          className="h-8 sm:h-9 w-auto object-contain rounded-full group-hover:scale-105 transition-transform duration-300"
+          className="h-7 sm:h-8 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
         />
         <span className="sr-only">VoxFable</span>
       </Link>
