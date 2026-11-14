@@ -7,6 +7,13 @@
 ---
 
 ## Done
+- [x] **N8.11 Quick Story Form Spacing & Vertical Rhythm Polish (`frontend/src/pages/Quick.tsx`)**:
+  - Expanded major form section gaps to `space-y-7 sm:space-y-8` and internal card padding to `p-6 sm:p-10 lg:p-12` to create proportional vertical breathing room across 75% wide desktop screens.
+  - Symmetrized "Age Level" dropdown and "Live Mode" checkbox wells to matching `h-[52px]` heights with comfortable padding.
+  - Relieved density inside the "Branching Choice Points" quest card: expanded container padding (`p-5 sm:p-7`), increased choice chips gap and padding (`p-4`), provided dedicated margin for the multi-path toggle, and added generous separation (`mt-4`) above the Gemini notice.
+  - Aligned the "Try generating new character designs" card with `items-center gap-3.5`.
+  - Added dedicated top breathing room (`pt-2 sm:pt-4`) and comfortable button padding (`py-4 sm:py-4.5 px-6`) above the action button with improved disabled/active contrast.
+  - Synchronized across both workspaces and verified with all 39 passing tests and clean TypeScript compilation.
 - [x] **N8.10 Logo Emblem & Crisp Brand Typography Pairing (`frontend/src/App.tsx`)**:
   - Embedded high-res square emblem (`logo.png`) in the navbar brand pod (`h-7 w-7 sm:h-8 sm:w-8`).
   - Added "VoxFable" brand typography manually using matching geometric typeface (`font-sans font-extrabold`) and the exact logo gold hex color `#FFCE0B` extracted from the brand mark, with subtle depth drop-shadow.
