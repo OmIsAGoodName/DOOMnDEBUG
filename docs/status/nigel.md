@@ -7,6 +7,16 @@
 ---
 
 ## Done
+- [x] **N8.12 Light-Mode Elevation Shadows & Professional Vector Icons (`frontend/src/App.tsx`)**:
+  - Replaced all raw emoji characters in the navbar with vector icons from `lucide-react`:
+    - `Home` (`HomeIcon`), `Quick Story` (`SparklesIcon`), `Studio` (`ClapperboardIcon`), `Library` (`LibraryIcon`), and `Diagnostics` (`SlidersIcon`).
+    - Companion search icon (`SearchIcon`) and dynamic theme toggle icons (`SunIcon` in amber and `MoonIcon` in gold).
+  - Enhanced light-mode visibility and physical depth:
+    - Added backdrop shadow to `<header>` (`shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)]`) with crisp boundary border (`border-stone-200/90`).
+    - Elevated brand pod, search pod, and theme toggle pod with tactile shadows (`shadow-[0_4px_16px_rgba(0,0,0,0.1),0_1px_3px_rgba(0,0,0,0.06)]`) and hover elevation.
+    - Added deep ambient shadow (`shadow-[0_10px_30px_-5px_rgba(0,0,0,0.12),0_4px_12px_-2px_rgba(0,0,0,0.08)]`) to the floating center navigation dock.
+    - Improved active state contrast (`text-stone-950 font-extrabold`) and inactive nav label contrast in light mode.
+  - Synchronized across both workspaces and verified with all 39 passing tests and clean TypeScript compilation.
 - [x] **N8.11 Quick Story Form Spacing & Vertical Rhythm Polish (`frontend/src/pages/Quick.tsx`)**:
   - Expanded major form section gaps to `space-y-7 sm:space-y-8` and internal card padding to `p-6 sm:p-10 lg:p-12` to create proportional vertical breathing room across 75% wide desktop screens.
   - Symmetrized "Age Level" dropdown and "Live Mode" checkbox wells to matching `h-[52px]` heights with comfortable padding.
