@@ -1,9 +1,36 @@
 # Om's Status & Milestone Log
 
-**Current Milestone**: Pipeline Generation Speedup, TTS Timeout Elimination & Fresh Story Dynamics  
+**Current Milestone**: Interactive Story Voice Mic Fix, Continuous Speech & Real-Time Audio Level Visualizer  
 **Date**: 2026-11-14  
 **Active Branch**: `main` (synced with `origin/main`)  
 **Repository**: `https://github.com/OmIsAGoodName/DOOMnDEBUG.git`  
+
+---
+
+## ⚡ Recent Updates (Live Microphone Voice Input & Real-Time Audio Visualizer)
+
+1. **Fixed Microphone Inactivity & Chrome/Chromium Early Silence Abort**:
+   - **Root Cause**:
+     1. Web Speech API was initialized with `continuous = false`. In Chromium browsers, when `continuous` is false, even 1 second of initial pause while the user reads the choice prompts fired `onerror: 'no-speech'`, followed immediately by `onend()`, which shut down the microphone permanently before the user could speak.
+     2. `navigator.mediaDevices.getUserMedia` was never called, meaning the browser often blocked audio capture permissions silently.
+   - **Fix**:
+     - In [`frontend/src/live/useLiveChoices.ts`](file:///d:/VoxFable/frontend/src/live/useLiveChoices.ts):
+       - Explicitly requested `navigator.mediaDevices.getUserMedia({ audio: true })` to reliably trigger browser microphone access permission.
+       - Set `recognition.continuous = true` and `interimResults = true`.
+       - Filtered out `no-speech` errors so the engine does not abort when the child pauses to think.
+       - Added auto-restart loop in `onend()` to keep speech recognition active until the choice is answered or timed out.
+       - Added fallback support for natural ordinals ("the first one", "option two", "left", "right") in [`frontend/src/live/matchChoice.ts`](file:///d:/VoxFable/frontend/src/live/matchChoice.ts).
+
+2. **Added Real-Time Audio Heard & Processing Visualizer**:
+   - In [`frontend/src/ui/EpisodeView.tsx`](file:///d:/VoxFable/frontend/src/ui/EpisodeView.tsx) and [`frontend/src/live/LiveController.tsx`](file:///d:/VoxFable/frontend/src/live/LiveController.tsx):
+     - Integrated Web Audio API (`AudioContext` + `AnalyserNode`) to calculate real-time volume levels (`audioLevel` and `isHearingAudio`).
+     - Added an animated 7-bar dynamic audio equalizer waveform directly in the choice dialog that bounces and lights up in emerald/amber when the user speaks into the microphone.
+     - Added distinct dynamic indicators:
+       - 🟢 Silent & ready: *"Listening for your voice... (Speak or tap above)"*
+       - 🎙️ Sound detected: *"Hearing you! Speak clearly..."* + dynamic animated sound waves.
+       - 💬 Speech transcribed: Live interim words shown immediately: `Heard: "..."`.
+       - ✨ Processing: Glowing badge *"Processing your spoken choice..."* with spinner.
+       - 🎉 Matched: *"Selected: [Choice Name]"* confirmation.
 
 ---
 

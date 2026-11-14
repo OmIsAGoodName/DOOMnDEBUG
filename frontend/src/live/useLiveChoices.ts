@@ -34,20 +34,50 @@ export function useLiveChoices({
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isThinking, setIsThinking] = useState(false);
   const [hasMicSupport, setHasMicSupport] = useState(true);
+  const [audioLevel, setAudioLevel] = useState<number>(0);
+  const [isHearingAudio, setIsHearingAudio] = useState<boolean>(false);
+  const [micPermissionState, setMicPermissionState] = useState<'prompt' | 'granted' | 'denied' | 'unsupported'>('prompt');
+  const [matchedOptionLabel, setMatchedOptionLabel] = useState<string | null>(null);
 
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const timeoutTimerRef = useRef<NodeJS.Timeout | null>(null);
   const retryCountRef = useRef(0);
   const isResolvedRef = useRef(false);
 
+  // Audio analyzer refs
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const animFrameRef = useRef<number | null>(null);
+
   // Check Web Speech API availability
   useEffect(() => {
     const SpeechRec =
       (window as any).SpeechRecognition ||
       (window as any).webkitSpeechRecognition;
-    if (!SpeechRec) {
+    if (!SpeechRec && !navigator.mediaDevices?.getUserMedia) {
       setHasMicSupport(false);
+      setMicPermissionState('unsupported');
     }
+  }, []);
+
+  const cleanupAudio = useCallback(() => {
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = null;
+    }
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+      mediaStreamRef.current = null;
+    }
+    if (audioContextRef.current) {
+      try {
+        audioContextRef.current.close();
+      } catch {}
+      audioContextRef.current = null;
+    }
+    setAudioLevel(0);
+    setIsHearingAudio(false);
   }, []);
 
   const handleResolveOption = useCallback(
@@ -55,10 +85,12 @@ export function useLiveChoices({
       if (isResolvedRef.current) return;
       isResolvedRef.current = true;
 
-      // Stop speech recognition
+      // Stop speech recognition and audio analysis
       try {
         recognitionRef.current?.stop();
       } catch {}
+
+      cleanupAudio();
 
       if (timeoutTimerRef.current) {
         clearTimeout(timeoutTimerRef.current);
@@ -69,7 +101,7 @@ export function useLiveChoices({
       setIsThinking(false);
       onResolve(optionId);
     },
-    [onResolve]
+    [onResolve, cleanupAudio]
   );
 
   // Process heard transcript
@@ -77,17 +109,22 @@ export function useLiveChoices({
     async (spokenText: string, options: ChoiceOption[]) => {
       setTranscript(spokenText);
 
-      // 1. Client keyword match first
+      // 1. Client keyword / ordinal match first
       const clientMatch = matchChoice(spokenText, options);
       if (clientMatch.matchedId) {
-        setStatusMessage(`I heard "${spokenText}"!`);
-        handleResolveOption(clientMatch.matchedId, 'keyword');
+        const chosen = options.find((o) => o.id === clientMatch.matchedId);
+        const label = chosen?.label || spokenText;
+        setMatchedOptionLabel(label);
+        setStatusMessage(`I heard "${label}"!`);
+        setTimeout(() => {
+          handleResolveOption(clientMatch.matchedId!, 'keyword');
+        }, 500);
         return;
       }
 
       // 2. Fallback to api.matchLive with 2.5s timeout
       setIsThinking(true);
-      setStatusMessage('Thinking...');
+      setStatusMessage('Understanding your choice...');
 
       try {
         const timeoutPromise = new Promise<{ option_id: string; confidence: number }>((_, reject) =>
@@ -102,7 +139,13 @@ export function useLiveChoices({
 
         const res = await Promise.race([matchPromise, timeoutPromise]);
         if (res && res.option_id && res.confidence >= 0.5) {
-          handleResolveOption(res.option_id, 'api');
+          const chosen = options.find((o) => o.id === res.option_id);
+          const label = chosen?.label || spokenText;
+          setMatchedOptionLabel(label);
+          setStatusMessage(`I heard "${label}"!`);
+          setTimeout(() => {
+            handleResolveOption(res.option_id, 'api');
+          }, 500);
           return;
         }
       } catch (err) {
@@ -114,7 +157,7 @@ export function useLiveChoices({
       // If still unclear, prompt to try again or tap
       retryCountRef.current++;
       if (retryCountRef.current === 1) {
-        setStatusMessage('Say it again or tap a choice!');
+        setStatusMessage(`Heard: "${spokenText}" - say it again or tap below!`);
       } else {
         const defaultOpt = choiceInfo?.choice.default || options[0].id;
         const defaultLabel = options.find((o) => o.id === defaultOpt)?.label || 'Continue';
@@ -125,24 +168,27 @@ export function useLiveChoices({
     [promptText, choiceInfo, handleResolveOption]
   );
 
-  // Start listening when choice point is active
+  // Start listening and audio level analysis when choice point is active
   useEffect(() => {
     if (!choiceInfo) {
       setIsListening(false);
       setTranscript('');
       setInterimTranscript('');
       setStatusMessage(null);
+      setMatchedOptionLabel(null);
       isResolvedRef.current = false;
       retryCountRef.current = 0;
+      cleanupAudio();
       if (timeoutTimerRef.current) clearTimeout(timeoutTimerRef.current);
       return;
     }
 
     isResolvedRef.current = false;
     retryCountRef.current = 0;
+    let shouldBeListening = true;
     const options = choiceInfo.choice.options;
 
-    // Set 12s overall choice timeout -> falls back to choice.default
+    // Set 14s overall choice timeout -> falls back to choice.default
     timeoutTimerRef.current = setTimeout(() => {
       if (!isResolvedRef.current) {
         const defaultOpt = choiceInfo.choice.default || options[0].id;
@@ -150,8 +196,59 @@ export function useLiveChoices({
         setStatusMessage(`Time's up! Let's go with ${defaultLabel}.`);
         handleResolveOption(defaultOpt, 'timeout');
       }
-    }, 12000);
+    }, 14000);
 
+    // 1. Explicitly request microphone stream for volume level & permissions
+    if (typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then((stream) => {
+          if (!shouldBeListening || isResolvedRef.current) {
+            stream.getTracks().forEach((t) => t.stop());
+            return;
+          }
+          mediaStreamRef.current = stream;
+          setMicPermissionState('granted');
+
+          // Initialize Web Audio Analyzer
+          try {
+            const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+            if (AudioCtx) {
+              const ctx = new AudioCtx();
+              audioContextRef.current = ctx;
+              const source = ctx.createMediaStreamSource(stream);
+              const analyser = ctx.createAnalyser();
+              analyser.fftSize = 64;
+              analyser.smoothingTimeConstant = 0.4;
+              source.connect(analyser);
+              analyserRef.current = analyser;
+
+              const dataArray = new Uint8Array(analyser.frequencyBinCount);
+              const sampleLoop = () => {
+                if (!shouldBeListening || isResolvedRef.current || !analyserRef.current) return;
+                analyserRef.current.getByteFrequencyData(dataArray);
+                let sum = 0;
+                for (let i = 0; i < dataArray.length; i++) {
+                  sum += dataArray[i];
+                }
+                const avg = sum / (dataArray.length * 255);
+                setAudioLevel(avg);
+                setIsHearingAudio(avg > 0.04);
+                animFrameRef.current = requestAnimationFrame(sampleLoop);
+              };
+              animFrameRef.current = requestAnimationFrame(sampleLoop);
+            }
+          } catch (e) {
+            console.warn('[useLiveChoices] AudioContext analysis error:', e);
+          }
+        })
+        .catch((err) => {
+          console.warn('[useLiveChoices] Microphone access denied or unavailable:', err);
+          setMicPermissionState('denied');
+        });
+    }
+
+    // 2. Initialize Speech Recognition
     const SpeechRec =
       (window as any).SpeechRecognition ||
       (window as any).webkitSpeechRecognition;
@@ -159,7 +256,7 @@ export function useLiveChoices({
     if (SpeechRec) {
       try {
         const recognition: SpeechRecognitionInstance = new SpeechRec();
-        recognition.continuous = false;
+        recognition.continuous = true;
         recognition.interimResults = true;
         recognition.lang = language;
 
@@ -168,15 +265,17 @@ export function useLiveChoices({
           let final = '';
 
           for (let i = event.resultIndex; i < event.results.length; ++i) {
-            const transcriptChunk = event.results[i][0].transcript;
+            const chunk = event.results[i][0].transcript;
             if (event.results[i].isFinal) {
-              final += transcriptChunk;
+              final += chunk;
             } else {
-              interim += transcriptChunk;
+              interim += chunk;
             }
           }
 
-          if (interim) setInterimTranscript(interim);
+          if (interim) {
+            setInterimTranscript(interim);
+          }
           if (final) {
             setInterimTranscript('');
             processTranscript(final, options);
@@ -184,30 +283,51 @@ export function useLiveChoices({
         };
 
         recognition.onerror = (e: any) => {
+          if (e.error === 'no-speech') {
+            // Keep listening even if user pauses
+            return;
+          }
+          if (e.error === 'not-allowed') {
+            setMicPermissionState('denied');
+            setIsListening(false);
+            return;
+          }
           console.warn('[useLiveChoices] Speech recognition error:', e.error);
-          setIsListening(false);
-          setStatusMessage('Tap a choice button below!');
         };
 
         recognition.onend = () => {
-          setIsListening(false);
+          // Keep continuous recognition running while choice is active
+          if (shouldBeListening && !isResolvedRef.current) {
+            try {
+              recognition.start();
+            } catch {}
+          } else {
+            setIsListening(false);
+          }
         };
 
         recognitionRef.current = recognition;
-        recognition.start();
-        setIsListening(true);
+        try {
+          recognition.start();
+          setIsListening(true);
+        } catch (err) {
+          console.warn('[useLiveChoices] Could not start speech recognition:', err);
+        }
       } catch (err) {
-        console.warn('[useLiveChoices] Could not start speech recognition:', err);
+        console.warn('[useLiveChoices] Could not initialize speech recognition:', err);
       }
     }
 
     return () => {
+      shouldBeListening = false;
       try {
+        recognitionRef.current?.stop();
         recognitionRef.current?.abort();
       } catch {}
+      cleanupAudio();
       if (timeoutTimerRef.current) clearTimeout(timeoutTimerRef.current);
     };
-  }, [choiceInfo, language, processTranscript, handleResolveOption]);
+  }, [choiceInfo, language, processTranscript, handleResolveOption, cleanupAudio]);
 
   return {
     isListening,
@@ -215,7 +335,10 @@ export function useLiveChoices({
     statusMessage,
     isThinking,
     hasMicSupport,
+    audioLevel,
+    isHearingAudio,
+    micPermissionState,
+    matchedOptionLabel,
     handleResolveOption,
   };
 }
-

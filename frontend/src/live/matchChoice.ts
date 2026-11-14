@@ -88,6 +88,18 @@ export function matchChoice(
     };
   }
 
+  // Fallback: Check ordinal and directional cues (e.g. "first one", "option 2", "left", "right")
+  const rawLower = transcript.toLowerCase();
+  if (options.length >= 1 && (rawLower.includes('first') || rawLower.includes('option 1') || rawLower.includes('number 1') || rawLower.includes('left') || /\b(one|1st)\b/.test(rawLower))) {
+    return { matchedId: options[0].id, confidence: 0.85, method: 'keyword' };
+  }
+  if (options.length >= 2 && (rawLower.includes('second') || rawLower.includes('option 2') || rawLower.includes('number 2') || rawLower.includes('right') || /\b(two|2nd)\b/.test(rawLower))) {
+    return { matchedId: options[1].id, confidence: 0.85, method: 'keyword' };
+  }
+  if (options.length >= 3 && (rawLower.includes('third') || rawLower.includes('option 3') || rawLower.includes('number 3') || /\b(three|3rd)\b/.test(rawLower))) {
+    return { matchedId: options[2].id, confidence: 0.85, method: 'keyword' };
+  }
+
   return { matchedId: null, confidence: 0, method: 'none' };
 }
 

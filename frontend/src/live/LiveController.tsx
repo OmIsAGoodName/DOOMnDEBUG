@@ -41,6 +41,9 @@ export function LiveController({
     isThinking,
     hasMicSupport,
     handleResolveOption,
+    audioLevel,
+    isHearingAudio,
+    matchedOptionLabel,
   } = useLiveChoices({
     choiceInfo: activeChoiceInfo,
     promptText: activeChoiceInfo?.choice.options.map((o) => o.label).join(' or ') || '',
@@ -69,12 +72,18 @@ export function LiveController({
         <div className="w-full bg-midnight-850/95 backdrop-blur-md border border-amber-500/40 rounded-3xl p-6 shadow-storybook-hover space-y-4 animate-in fade-in duration-200">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-midnight-700/80 pb-3">
             <div className="flex items-center gap-3">
-              {/* Mic Status Ring */}
-              <div className="relative flex items-center justify-center">
+              {/* Mic Status Ring & Sound Wave */}
+              <div className="relative flex items-center gap-2">
                 <div
                   className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
-                    isListening
-                      ? 'bg-rose-500 text-white shadow-storybook-sm ring-4 ring-rose-500/30 animate-pulse'
+                    matchedOptionLabel
+                      ? 'bg-emerald-500 text-white ring-4 ring-emerald-500/40 shadow-lg'
+                      : isThinking
+                      ? 'bg-amber-500 text-slate-950 ring-4 ring-amber-500/40 animate-pulse'
+                      : isHearingAudio
+                      ? 'bg-rose-500 text-white ring-4 ring-rose-500/50 shadow-md scale-105'
+                      : isListening
+                      ? 'bg-slate-800 text-rose-400 border border-rose-500/40 ring-2 ring-rose-500/20'
                       : 'bg-midnight-750 text-slate-400 border border-midnight-700'
                   }`}
                 >
@@ -82,6 +91,27 @@ export function LiveController({
                     <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
                     <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
                   </svg>
+                  {isHearingAudio && (
+                    <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-400 ring-2 ring-slate-900 animate-ping" />
+                  )}
+                </div>
+
+                {/* Equalizer Waveform Bars */}
+                <div className="flex items-center gap-1 h-7 px-2 py-1 bg-midnight-900/90 rounded-lg border border-midnight-700/60" title="Audio Input Level">
+                  {[0.3, 0.65, 1.0, 0.75, 0.45, 0.9, 0.55].map((multiplier, idx) => {
+                    const level = Math.max(3, Math.min(22, Math.round(audioLevel * 30 * multiplier)));
+                    return (
+                      <div
+                        key={idx}
+                        style={{ height: `${level}px` }}
+                        className={`w-1 rounded-full transition-all duration-75 ${
+                          isHearingAudio
+                            ? 'bg-gradient-to-t from-emerald-400 to-amber-300 shadow-sm'
+                            : 'bg-slate-700'
+                        }`}
+                      />
+                    );
+                  })}
                 </div>
               </div>
 

@@ -85,6 +85,11 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
     statusMessage,
     hasMicSupport,
     handleResolveOption,
+    audioLevel,
+    isHearingAudio,
+    isThinking,
+    micPermissionState,
+    matchedOptionLabel,
   } = useLiveChoices({
     choiceInfo: activeChoiceInfo,
     promptText: activeChoiceInfo?.choice.options.map((o) => o.label).join(' or ') || '',
@@ -333,23 +338,90 @@ export function EpisodeView({ episode, onReset, className = '' }: EpisodeViewPro
                 ))}
               </div>
 
-              {/* Microphone Voice Recognition Status */}
-              <div className="flex items-center justify-center gap-2 text-xs font-semibold text-slate-400 pt-1">
-                {hasMicSupport && isListening && (
-                  <span className="flex items-center gap-1.5 text-rose-400 animate-pulse">
-                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                      <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
-                      <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
-                    </svg>
-                    <span>Say your choice out loud or tap an option above!</span>
-                  </span>
-                )}
-                {transcript && (
-                  <span className="text-amber-300 italic font-medium">Heard: "{transcript}"</span>
-                )}
-                {statusMessage && !transcript && (
-                  <span className="text-slate-400">{statusMessage}</span>
-                )}
+              {/* Microphone Voice Recognition & Live Audio Processing Visualizer */}
+              <div className="bg-slate-950/70 border border-slate-700/80 rounded-2xl p-3 sm:p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-inner">
+                {/* Left: Animated Mic + Dynamic Sound Waveform Bars */}
+                <div className="flex items-center gap-2.5">
+                  <div
+                    className={`relative w-9 h-9 rounded-full flex items-center justify-center transition-all ${
+                      matchedOptionLabel
+                        ? 'bg-emerald-500 text-white ring-4 ring-emerald-500/40 shadow-lg'
+                        : isThinking
+                        ? 'bg-amber-500 text-slate-950 ring-4 ring-amber-500/40 animate-pulse'
+                        : isHearingAudio
+                        ? 'bg-rose-500 text-white ring-4 ring-rose-500/50 shadow-md scale-105'
+                        : isListening
+                        ? 'bg-slate-800 text-rose-400 border border-rose-500/40'
+                        : 'bg-slate-800 text-slate-500'
+                    }`}
+                  >
+                    {isThinking ? (
+                      <span className="animate-spin text-base">✨</span>
+                    ) : (
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
+                        <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+                      </svg>
+                    )}
+                    {isHearingAudio && (
+                      <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-slate-900 animate-ping" />
+                    )}
+                  </div>
+
+                  {/* Dynamic Equalizer Sound Bars (Visible Audio Waveform) */}
+                  <div className="flex items-center gap-1 h-6 px-2 py-1 bg-slate-900/90 rounded-lg border border-slate-700/60" title="Microphone Audio Volume">
+                    {[0.3, 0.65, 1.0, 0.75, 0.45, 0.9, 0.55].map((multiplier, idx) => {
+                      const level = Math.max(3, Math.min(20, Math.round(audioLevel * 28 * multiplier)));
+                      return (
+                        <div
+                          key={idx}
+                          style={{ height: `${level}px` }}
+                          className={`w-1 rounded-full transition-all duration-75 ${
+                            isHearingAudio
+                              ? 'bg-gradient-to-t from-emerald-400 to-amber-300 shadow-sm'
+                              : 'bg-slate-700'
+                          }`}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Right: Dynamic Audio Heard & Processing State Message */}
+                <div className="flex-1 text-center sm:text-left min-w-0">
+                  {matchedOptionLabel ? (
+                    <div className="text-emerald-400 font-bold text-xs flex items-center justify-center sm:justify-start gap-1.5 animate-fadeIn">
+                      <span>🎉</span>
+                      <span>Selected: <strong>{matchedOptionLabel}</strong></span>
+                    </div>
+                  ) : isThinking ? (
+                    <div className="text-amber-300 font-bold text-xs flex items-center justify-center sm:justify-start gap-1.5 animate-pulse">
+                      <span>✨</span>
+                      <span>Processing your spoken choice...</span>
+                    </div>
+                  ) : transcript ? (
+                    <div className="text-amber-200 text-xs truncate">
+                      <span className="font-bold text-amber-400">Heard: </span>
+                      <span className="italic">"{transcript}"</span>
+                    </div>
+                  ) : isHearingAudio ? (
+                    <div className="text-emerald-300 font-semibold text-xs flex items-center justify-center sm:justify-start gap-1 animate-pulse">
+                      <span>🎙️</span>
+                      <span>Hearing you! Speak clearly...</span>
+                    </div>
+                  ) : micPermissionState === 'denied' ? (
+                    <div className="text-amber-400 text-xs">
+                      Mic access blocked in browser. Tap a choice button above!
+                    </div>
+                  ) : (
+                    <div className="text-slate-400 text-xs">
+                      <span>Listening for your voice... (Speak or tap above)</span>
+                    </div>
+                  )}
+                  {statusMessage && !matchedOptionLabel && !isThinking && transcript && (
+                    <p className="text-[10px] text-slate-400 mt-0.5 truncate">{statusMessage}</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>

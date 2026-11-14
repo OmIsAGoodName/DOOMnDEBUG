@@ -48,5 +48,15 @@ describe('matchChoice', () => {
     const res = matchChoice('banana ice cream', options);
     expect(res.matchedId).toBeNull();
   });
+
+  it('matches ordinal speech: "the first one"', () => {
+    const res = matchChoice('the first one please', options);
+    expect(res.matchedId).toBe('a');
+  });
+
+  it('matches ordinal speech: "option two"', () => {
+    const res = matchChoice('option two', options);
+    expect(res.matchedId).toBe('b');
+  });
 });
 
