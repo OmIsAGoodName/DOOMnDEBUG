@@ -8,5 +8,7 @@ httpx>=0.28.0
 python-multipart>=0.0.20
 edge-tts>=6.1.12
 mutagen>=1.47.0
+jsonschema>=4.20.0
 pytest>=8.3.0
 pytest-asyncio>=0.25.0
+
