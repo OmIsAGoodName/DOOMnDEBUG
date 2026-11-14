@@ -7,6 +7,15 @@
 ---
 
 ## Done
+- [x] **N8.6 Floating Capsule Dock Navbar & Live Asset Library Search (`frontend/src/App.tsx`, `pages/Library.tsx`)**:
+  - Redesigned the top navigation header into a floating capsule dock inspired by the pill aesthetic in Image 1 while incorporating both icons and section names:
+    - `🏠 Home`, `🌙 Quick Story`, `🎬 Studio`, `📚 Library`, and `⚙️ Diagnostics`.
+    - Active route detection via `useLocation` with a glowing warm lantern gold capsule highlight.
+  - Implemented standalone companion search pod (matching the circular companion search button from Image 1):
+    - Clicking/typing expands the search input and routes to `/library?q=...`.
+    - Enhanced `Library.tsx` with `useSearchParams` to instantly filter stories/episodes by title or character name in real-time.
+  - Paired companion dark mode toggle pill with frosted acrylic blur effects.
+  - Synchronized and verified across both workspaces with all 39 unit tests passing.
 - [x] **N8.5 Quick Story 75% Page Width (`frontend/src/pages/Quick.tsx`)**:
   - Adjusted container width to explicitly occupy 75% of the viewport width (`w-[94%] md:w-[75%] mx-auto`).
   - Maintained complete preservation of form state, event handlers, and generation pipeline logic.
