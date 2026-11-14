@@ -79,7 +79,7 @@ export default function Quick() {
         generate_characters: generateCharacters,
         num_choices: isInteractive ? numChoices : 1,
         force_interactive_tree: isInteractive ? forceInteractiveTree : false
-      });
+      } as any);
 
       setGenerationId(res.generation_id);
     } catch (err: any) {
