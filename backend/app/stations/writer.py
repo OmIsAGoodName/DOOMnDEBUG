@@ -158,7 +158,7 @@ def build_writer_user_prompt(
       * Ending A2 ("sc3a2"): Warm resolution for choice Path A2. next_scene: null.
       * Ending B1 ("sc3b1"): Warm resolution for choice Path B1. next_scene: null.
       * Ending B2 ("sc3b2"): Warm resolution for choice Path B2. next_scene: null.
-  * Every scene must contain 2 to 3 beats. Total 7 scenes so any pathway can be explored!"""
+  * Each scene MUST contain 2 beats (never more than 2) to maintain fast generation and punchy pacing. Provide all scenes so any pathway can be explored!"""
         elif effective_choices >= 3:
             interactive_section = """- Interactive: YES (BRANCHING CHOICE TREE WITH MULTIPLE ENDINGS - 3 CHOICE SCREENS / EPIC QUEST)
   * Construct an expansive multi-stage interactive journey with 3 distinct decision screens across the adventure!
@@ -246,14 +246,14 @@ async def write_story(
         force_interactive_tree=force_interactive_tree
     )
 
-    call_kwargs = {"bypass_cache": True}
+    call_kwargs = {}
+    varnames = getattr(getattr(llm_fn, "__code__", None), "co_varnames", ())
+    if "bypass_cache" in varnames or hasattr(llm_fn, "__code__") is False:
+        call_kwargs["bypass_cache"] = True
     if interactive and (num_choices > 1 or force_interactive_tree):
         # Strict requirement: deep multi-choice trees must be written by high-level Gemini model
-        try:
-            if "strict_provider" in getattr(llm_fn, "__code__", object()).co_varnames:
-                call_kwargs["strict_provider"] = "gemini"
-        except Exception:
-            pass
+        if "strict_provider" in varnames:
+            call_kwargs["strict_provider"] = "gemini"
 
     data = await llm_fn(
         system=system_prompt,

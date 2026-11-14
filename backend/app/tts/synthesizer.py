@@ -39,24 +39,32 @@ async def synthesize_line(
         except Exception:
             pass # Re-synthesize if corrupted
 
-    communicate = edge_tts.Communicate(text, voice, rate=rate, pitch=pitch)
-    submaker = edge_tts.SubMaker()
+    async def _stream_tts():
+        communicate = edge_tts.Communicate(text, voice, rate=rate, pitch=pitch)
+        submaker = edge_tts.SubMaker()
+        with open(dest, "wb") as f:
+            async for chunk in communicate.stream():
+                if chunk["type"] == "audio":
+                    f.write(chunk["data"])
+                elif chunk["type"] == "WordBoundary":
+                    submaker.create_sub((chunk["offset"], chunk["duration"]), chunk["text"])
+                    start_ms = int(chunk["offset"] / 10000) # 100ns units to ms
+                    duration_chunk_ms = int(chunk["duration"] / 10000)
+                    words.append(WordTiming(
+                        text=chunk["text"],
+                        start_ms=start_ms,
+                        end_ms=start_ms + duration_chunk_ms
+                    ))
 
-    with open(dest, "wb") as f:
-        async for chunk in communicate.stream():
-            if chunk["type"] == "audio":
-                f.write(chunk["data"])
-            elif chunk["type"] == "WordBoundary":
-                submaker.create_sub((chunk["offset"], chunk["duration"]), chunk["text"])
-                start_ms = int(chunk["offset"] / 10000) # 100ns units to ms
-                duration_chunk_ms = int(chunk["duration"] / 10000)
-                words.append(WordTiming(
-                    text=chunk["text"],
-                    start_ms=start_ms,
-                    end_ms=start_ms + duration_chunk_ms
-                ))
+    try:
+        await asyncio.wait_for(_stream_tts(), timeout=12.0)
+    except Exception as tts_err:
+        print(f"[Synthesizer] TTS stream timed out or failed for line, using fallback estimate: {tts_err}")
 
     # Read duration
+    if not dest.exists() or dest.stat().st_size == 0:
+        dest.touch(exist_ok=True)
+
     try:
         audio_info = MP3(dest)
         duration_ms = int(audio_info.info.length * 1000)

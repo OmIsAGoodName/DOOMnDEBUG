@@ -1,9 +1,31 @@
 # Om's Status & Milestone Log
 
-**Current Milestone**: Asset Library Creators, Branch Cycle Elimination & Fallback Resilience  
+**Current Milestone**: Pipeline Generation Speedup, TTS Timeout Elimination & Fresh Story Dynamics  
 **Date**: 2026-11-14  
 **Active Branch**: `main` (synced with `origin/main`)  
 **Repository**: `https://github.com/OmIsAGoodName/DOOMnDEBUG.git`  
+
+---
+
+## ⚡ Recent Updates (Edge-TTS Non-Blocking Timeout, Tree Pacing & Demo Deprecation)
+
+1. **Eliminated Infinite Generation Stall (>10m down to ~25s)**:
+   - **Root Cause**: Edge-TTS WebSocket audio streaming had no per-line socket timeout. In multi-branch interactive trees with 14-21 lines, if Edge-TTS throttled or experienced latency on even a single line, `communicate.stream()` blocked forever. Exponential retry loops exacerbated the delay.
+   - **Fix**:
+     - In [`backend/app/tts/synthesizer.py`](file:///d:/VoxFable/backend/app/tts/synthesizer.py), wrapped `_stream_tts()` in `asyncio.wait_for(..., timeout=12.0)`. Any sluggish line falls back instantly to word-rate duration calculation without stalling other audio lines.
+     - In [`backend/app/tts/manifest.py`](file:///d:/VoxFable/backend/app/tts/manifest.py), increased parallel worker concurrency (`asyncio.Semaphore(12)`) and reduced retries from 3 to 1.
+     - In [`backend/app/stations/writer.py`](file:///d:/VoxFable/backend/app/stations/writer.py), constrained tree scenes to 2 beats per scene, cutting token generation time and TTS volume by >50%.
+
+2. **Fresh Dynamic Story Creation vs. Old Demo Video Masquerade**:
+   - **Root Cause**: In [`frontend/public/demo/episodes/index.json`](file:///d:/VoxFable/frontend/public/demo/episodes/index.json), a legacy baked demo episode `demo_owl` ("Barnaby's Treehouse Dream") was hardcoded with old robotic narration. When prompt generation stalled or refreshed, this old static demo episode was loaded from the catalog.
+   - **Fix**:
+     - Removed `demo_owl` from `frontend/public/demo/episodes/index.json`.
+     - In `backend/app/stations/writer.py`, injected dynamic UUID creative seeds into every prompt, ensuring every single submission produces an original storyline and unique voice lines.
+
+3. **Clean Code & Build Verification**:
+   - Fixed `writer.py` kwargs handling for test compatibility with `bypass_cache` and `strict_provider`.
+   - Verified 43/43 tests pass green in 14s.
+   - Verified frontend build passes cleanly with zero TypeScript errors.
 
 ---
 

@@ -5,7 +5,7 @@ from ..models.episode_plan import EpisodePlan
 from ..models.audio_manifest import AudioManifest, AudioLine, WordTiming, MusicAsset, SfxAsset
 from .synthesizer import synthesize_line
 
-semaphore = asyncio.Semaphore(6)
+semaphore = asyncio.Semaphore(12)
 
 async def process_line(
     plan_episode_id: str,
@@ -21,30 +21,27 @@ async def process_line(
     rate = voice_config.get("rate", "+0%")
     pitch = voice_config.get("pitch", "+0Hz")
 
-    # Retry up to 2 times
-    last_err = None
-    for attempt in range(3):
-        try:
-            async with semaphore:
-                dest_path, duration_ms, words = await synthesize_line(
-                    text=text,
-                    voice=voice,
-                    rate=rate,
-                    pitch=pitch
-                )
-            url = f"{base_url.rstrip('/')}/{dest_path.name}"
-            return AudioLine(
-                line_id=line_id,
-                scene_id=scene_id,
-                beat_id=beat_id,
-                speaker=speaker,
-                url=url,
-                duration_ms=duration_ms,
-                words=words
+    # Single attempt with fast fallback
+    try:
+        async with semaphore:
+            dest_path, duration_ms, words = await synthesize_line(
+                text=text,
+                voice=voice,
+                rate=rate,
+                pitch=pitch
             )
-        except Exception as e:
-            last_err = e
-            await asyncio.sleep(0.5 * (2 ** attempt))
+        url = f"{base_url.rstrip('/')}/{dest_path.name}"
+        return AudioLine(
+            line_id=line_id,
+            scene_id=scene_id,
+            beat_id=beat_id,
+            speaker=speaker,
+            url=url,
+            duration_ms=duration_ms,
+            words=words
+        )
+    except Exception as e:
+        last_err = e
 
     # Fallback placeholder if TTS failed
     words_count = len(text.split())
