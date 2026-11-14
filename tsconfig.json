@@ -1,6 +1,10 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./frontend/tsconfig.json" }
+  "extends": "./frontend/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./frontend"
+  },
+  "include": [
+    "frontend/src/**/*",
+    "contracts/**/*"
   ]
 }
