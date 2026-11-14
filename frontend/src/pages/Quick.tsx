@@ -244,11 +244,11 @@ export default function Quick() {
       </div>
 
       {/* Glassmorphic Card Container (Inspired by Image 1) */}
-      <div className="relative z-10 rounded-[32px] p-6 sm:p-10 border-t border-white/30 border-l border-white/20 border-r border-white/10 border-b border-black/40 bg-white/70 dark:bg-[#131d2e]/80 backdrop-blur-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.45)] dark:shadow-[0_25px_65px_-15px_rgba(0,0,0,0.85)]">
+      <div className="relative z-10 rounded-[32px] p-6 sm:p-10 lg:p-12 border-t border-white/30 border-l border-white/20 border-r border-white/10 border-b border-black/40 bg-white/70 dark:bg-[#131d2e]/80 backdrop-blur-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.45)] dark:shadow-[0_25px_65px_-15px_rgba(0,0,0,0.85)]">
         {/* Specular Edge Highlight Overlay */}
         <div className="absolute inset-0 rounded-[32px] pointer-events-none border border-white/10 dark:border-white/5" />
 
-        <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+        <form onSubmit={handleSubmit} className="space-y-7 sm:space-y-8 relative z-10">
           {/* Prompt Sunken Glass Input Well */}
           <div className="space-y-2.5">
             <label className="block text-[11px] font-bold uppercase tracking-wider text-vox-lightMuted dark:text-vox-muted">
@@ -266,11 +266,11 @@ export default function Quick() {
             </div>
 
             {/* Example Prompt Chips */}
-            <div className="space-y-1.5 pt-1">
+            <div className="space-y-2 pt-1.5">
               <span className="text-[10px] font-bold uppercase tracking-wider text-vox-lightMuted dark:text-vox-muted/80">
                 Or try an idea:
               </span>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 sm:gap-2.5">
                 {EXAMPLE_PROMPTS.map((ex) => (
                   <button
                     key={ex}
@@ -290,11 +290,11 @@ export default function Quick() {
           </div>
 
           {/* Duration Selector Glass Chips (Inspired by Image 1) */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <label className="block text-[11px] font-bold uppercase tracking-wider text-vox-lightMuted dark:text-vox-muted">
               Story Duration
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               {[
                 { id: '<1min', label: '< 1 min', desc: 'Snack Story (2 scenes)' },
                 { id: '1-2mins', label: '1 - 2 mins', desc: 'Bedtime Tale (3-4 scenes)' },
@@ -306,7 +306,7 @@ export default function Quick() {
                     key={opt.id}
                     type="button"
                     onClick={() => setDuration(opt.id as any)}
-                    className={`p-3.5 sm:p-4 rounded-2xl border text-center transition-all duration-150 backdrop-blur-md active:scale-[0.98] ${
+                    className={`p-4 sm:p-4.5 rounded-2xl border text-center transition-all duration-150 backdrop-blur-md active:scale-[0.98] ${
                       selected
                         ? 'border-vox-gold bg-vox-gold/20 dark:bg-vox-gold/15 shadow-gold-sm ring-1 ring-vox-gold/50'
                         : 'border-vox-warmBorder/80 dark:border-white/10 bg-black/[0.03] dark:bg-[#0c1524]/50 hover:bg-black/[0.06] dark:hover:bg-white/[0.05]'
@@ -315,7 +315,7 @@ export default function Quick() {
                     <div className={`text-sm sm:text-base font-bold ${selected ? 'text-vox-midnight dark:text-vox-gold' : 'text-vox-midnight dark:text-vox-cream'}`}>
                       {opt.label}
                     </div>
-                    <div className="text-[11px] text-vox-lightMuted dark:text-vox-muted mt-0.5">
+                    <div className="text-[11px] text-vox-lightMuted dark:text-vox-muted mt-1">
                       {opt.desc}
                     </div>
                   </button>
@@ -325,34 +325,34 @@ export default function Quick() {
           </div>
 
           {/* Settings Grid (Age Band & Live Mic) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 pt-1">
             {/* Age Level Select */}
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <label className="block text-[11px] font-bold uppercase tracking-wider text-vox-lightMuted dark:text-vox-muted">
                 Age Level
               </label>
-              <div className="relative">
+              <div className="relative h-[52px]">
                 <select
                   value={ageBand}
                   onChange={(e) => setAgeBand(e.target.value as any)}
-                  className="w-full appearance-none px-4 py-3 rounded-xl border border-vox-warmBorder/80 dark:border-white/10 bg-white/70 dark:bg-[#0c1524]/60 backdrop-blur-md text-xs sm:text-sm font-semibold text-vox-midnight dark:text-vox-cream focus:outline-none focus:border-vox-gold/80 focus:ring-2 focus:ring-vox-gold/25 transition-all shadow-[inset_0_1px_3px_rgba(0,0,0,0.05)] cursor-pointer pr-8"
+                  className="w-full h-full appearance-none px-4 rounded-xl border border-vox-warmBorder/80 dark:border-white/10 bg-white/70 dark:bg-[#0c1524]/60 backdrop-blur-md text-xs sm:text-sm font-semibold text-vox-midnight dark:text-vox-cream focus:outline-none focus:border-vox-gold/80 focus:ring-2 focus:ring-vox-gold/25 transition-all shadow-[inset_0_1px_3px_rgba(0,0,0,0.05)] cursor-pointer pr-10"
                 >
                   <option value="3-5" className="bg-white dark:bg-vox-sidebar">Ages 3 - 5 (Simple rhymes & repetition)</option>
                   <option value="4-6" className="bg-white dark:bg-vox-sidebar">Ages 4 - 6 (Storybook adventure & dialogue)</option>
                   <option value="6-8" className="bg-white dark:bg-vox-sidebar">Ages 6 - 8 (Riddles & gentle choices)</option>
                 </select>
-                <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-vox-lightMuted dark:text-vox-muted text-xs">
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-vox-lightMuted dark:text-vox-muted text-xs">
                   ▼
                 </div>
               </div>
             </div>
 
             {/* Live Interactive Voice Toggle */}
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <label className="block text-[11px] font-bold uppercase tracking-wider text-vox-lightMuted dark:text-vox-muted">
                 Interactive Voice Choices
               </label>
-              <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-vox-warmBorder/80 dark:border-white/10 bg-white/70 dark:bg-[#0c1524]/60 backdrop-blur-md cursor-pointer hover:border-vox-gold/50 transition-all select-none">
+              <label className="flex items-center gap-3 h-[52px] px-4 rounded-xl border border-vox-warmBorder/80 dark:border-white/10 bg-white/70 dark:bg-[#0c1524]/60 backdrop-blur-md cursor-pointer hover:border-vox-gold/50 transition-all select-none">
                 <input
                   type="checkbox"
                   checked={isInteractive}
@@ -369,23 +369,23 @@ export default function Quick() {
 
           {/* Interactive Branching Choice Screens Config (Om's Multi-Tier Tree Options) */}
           {isInteractive && (
-            <div className="p-4 sm:p-5 rounded-2xl border border-vox-gold/30 bg-vox-gold/5 dark:bg-vox-gold/[0.06] backdrop-blur-md space-y-4 animate-fadeIn">
+            <div className="p-5 sm:p-7 rounded-2xl border border-vox-gold/30 bg-vox-gold/5 dark:bg-vox-gold/[0.06] backdrop-blur-md space-y-5 animate-fadeIn">
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-vox-gold">
+                <div className="flex items-center justify-between gap-3">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-vox-gold">
                     Branching Choice Points (Quest Complexity)
                   </label>
-                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-vox-gold/20 text-vox-gold border border-vox-gold/40">
+                  <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-vox-gold/20 text-vox-gold border border-vox-gold/40 shrink-0">
                     Live Audio Enabled
                   </span>
                 </div>
-                <p className="text-xs text-vox-lightMuted dark:text-vox-muted">
+                <p className="text-xs text-vox-lightMuted dark:text-vox-muted leading-relaxed">
                   How many times will characters pause and listen to the child's voice to branch the storyline?
                 </p>
               </div>
 
               {/* Number of Choices Selector */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                 {[
                   {
                     val: 1,
@@ -410,23 +410,23 @@ export default function Quick() {
                       type="button"
                       key={opt.val}
                       onClick={() => setNumChoices(opt.val)}
-                      className={`p-3.5 rounded-2xl border text-left transition-all backdrop-blur-sm ${
+                      className={`p-4 rounded-2xl border text-left transition-all backdrop-blur-sm ${
                         selected
                           ? 'border-vox-gold bg-vox-gold/20 dark:bg-vox-gold/15 ring-1 ring-vox-gold/50 shadow-gold-sm'
                           : 'border-vox-warmBorder/80 dark:border-white/10 bg-white/70 dark:bg-[#0c1524]/60 hover:border-vox-gold/40'
                       }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <span className={`text-xs font-bold ${selected ? 'text-vox-midnight dark:text-vox-gold' : 'text-vox-midnight dark:text-vox-cream'}`}>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className={`text-xs sm:text-sm font-bold ${selected ? 'text-vox-midnight dark:text-vox-gold' : 'text-vox-midnight dark:text-vox-cream'}`}>
                           {opt.label}
                         </span>
                         {opt.highlight && (
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-vox-gold text-vox-midnight">
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-vox-gold text-vox-midnight shrink-0">
                             REC
                           </span>
                         )}
                       </div>
-                      <p className="text-[10px] text-vox-lightMuted dark:text-vox-muted mt-1 leading-tight">
+                      <p className="text-[11px] text-vox-lightMuted dark:text-vox-muted mt-1.5 leading-snug">
                         {opt.desc}
                       </p>
                     </button>
@@ -435,19 +435,19 @@ export default function Quick() {
               </div>
 
               {/* Force Large Tree Toggle */}
-              <div className="pt-2 border-t border-vox-gold/20">
-                <label className="flex items-center gap-2.5 cursor-pointer select-none">
+              <div className="pt-4 mt-2 border-t border-vox-gold/20">
+                <label className="flex items-start sm:items-center gap-3 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={forceInteractiveTree}
                     onChange={(e) => setForceInteractiveTree(e.target.checked)}
-                    className="rounded text-vox-gold focus:ring-vox-gold h-4 w-4 accent-vox-gold"
+                    className="mt-0.5 sm:mt-0 rounded text-vox-gold focus:ring-vox-gold h-4 w-4 accent-vox-gold shrink-0"
                   />
                   <div className="space-y-0.5">
-                    <span className="text-xs font-bold text-vox-midnight dark:text-vox-cream flex items-center gap-1.5">
+                    <span className="text-xs sm:text-sm font-bold text-vox-midnight dark:text-vox-cream flex items-center gap-1.5">
                       <span>⚡</span> Force Large Long Tree (Deep Multi-Path Expansion)
                     </span>
-                    <p className="text-[10px] text-vox-lightMuted dark:text-vox-muted">
+                    <p className="text-[11px] text-vox-lightMuted dark:text-vox-muted leading-snug">
                       Enforces completely separate backgrounds and distinct climax resolutions for all branches.
                     </p>
                   </div>
@@ -456,14 +456,14 @@ export default function Quick() {
 
               {/* Gemini Strict Requirement Notice */}
               {numChoices > 1 && (
-                <div className="bg-vox-gold/10 border border-vox-gold/30 rounded-xl p-2.5 flex items-center justify-between gap-2 text-[11px]">
-                  <div className="flex items-center gap-2 text-vox-midnight dark:text-vox-cream font-medium">
-                    <span>💎</span>
+                <div className="mt-4 bg-vox-gold/10 border border-vox-gold/30 rounded-xl p-3 sm:px-4 sm:py-3 flex items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2.5 text-vox-midnight dark:text-vox-cream font-medium">
+                    <span className="text-sm">💎</span>
                     <span>Multi-choice trees strictly require <strong>Google Gemini</strong> for fast deep-tree synthesis.</span>
                   </div>
                   <a
                     href="/debug"
-                    className="text-vox-gold font-bold hover:underline shrink-0 text-[10px]"
+                    className="text-vox-gold font-bold hover:underline shrink-0 text-[11px] ml-2"
                   >
                     Check Diagnostics ↗
                   </a>
@@ -473,13 +473,13 @@ export default function Quick() {
           )}
 
           {/* Custom Character Generation Glass Banner */}
-          <div className="p-4 rounded-2xl border border-vox-warmBorder/80 dark:border-white/10 bg-black/[0.02] dark:bg-[#0c1524]/40 backdrop-blur-sm">
-            <label className="flex items-start gap-3 cursor-pointer select-none">
+          <div className="p-4 sm:p-5 rounded-2xl border border-vox-warmBorder/80 dark:border-white/10 bg-black/[0.02] dark:bg-[#0c1524]/40 backdrop-blur-sm">
+            <label className="flex items-start sm:items-center gap-3.5 cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={generateCharacters}
                 onChange={(e) => setGenerateCharacters(e.target.checked)}
-                className="mt-0.5 rounded text-vox-gold focus:ring-vox-gold h-4 w-4 accent-vox-gold"
+                className="mt-0.5 sm:mt-0 rounded text-vox-gold focus:ring-vox-gold h-4 w-4 accent-vox-gold shrink-0"
               />
               <div className="space-y-0.5">
                 <span className="text-xs sm:text-sm font-semibold text-vox-midnight dark:text-vox-cream flex items-center gap-1.5">
@@ -493,30 +493,32 @@ export default function Quick() {
           </div>
 
           {/* Radiant Action Button (Inspired by Image 1's luminous accent button) */}
-          <button
-            type="submit"
-            disabled={!prompt.trim() || isSubmitting}
-            className={`w-full py-4 px-6 rounded-2xl font-extrabold text-base sm:text-lg flex items-center justify-center gap-3 transition-all duration-200 select-none ${
-              !prompt.trim() || isSubmitting
-                ? 'opacity-50 cursor-not-allowed bg-vox-gold/30 text-vox-midnight'
-                : 'bg-gradient-to-r from-vox-gold via-lantern-500 to-vox-gold hover:from-lantern-400 hover:to-lantern-500 text-vox-midnight shadow-gold-glow hover:shadow-[0_0_28px_rgba(233,173,97,0.45)] active:scale-[0.98]'
-            }`}
-          >
-            {isSubmitting ? (
-              <>
-                <Spinner size="sm" />
-                <span>Launching Story Forge...</span>
-              </>
-            ) : (
-              <>
-                <span>✨</span>
-                <span>Create Cartoon Story</span>
-                <span className="w-7 h-7 rounded-full bg-vox-midnight/15 flex items-center justify-center text-xs font-bold">
-                  &rarr;
-                </span>
-              </>
-            )}
-          </button>
+          <div className="pt-2 sm:pt-4">
+            <button
+              type="submit"
+              disabled={!prompt.trim() || isSubmitting}
+              className={`w-full py-4 sm:py-4.5 px-6 rounded-2xl font-extrabold text-base sm:text-lg flex items-center justify-center gap-3 transition-all duration-200 select-none ${
+                !prompt.trim() || isSubmitting
+                  ? 'opacity-50 cursor-not-allowed bg-vox-gold/20 dark:bg-vox-gold/15 text-vox-midnight/60 dark:text-vox-gold/60 border border-vox-gold/20'
+                  : 'bg-gradient-to-r from-vox-gold via-lantern-500 to-vox-gold hover:from-lantern-400 hover:to-lantern-500 text-vox-midnight shadow-gold-glow hover:shadow-[0_0_32px_rgba(233,173,97,0.5)] active:scale-[0.98]'
+              }`}
+            >
+              {isSubmitting ? (
+                <>
+                  <Spinner size="sm" />
+                  <span>Launching Story Forge...</span>
+                </>
+              ) : (
+                <>
+                  <span>✨</span>
+                  <span>Create Cartoon Story</span>
+                  <span className="w-7 h-7 rounded-full bg-vox-midnight/15 flex items-center justify-center text-xs font-bold">
+                    &rarr;
+                  </span>
+                </>
+              )}
+            </button>
+          </div>
         </form>
 
         {/* Offline Fallback Callout */}
