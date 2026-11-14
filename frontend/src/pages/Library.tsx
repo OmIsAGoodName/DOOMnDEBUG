@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import type { EpisodeRecord } from '@contracts';
 import { api } from '../lib/api';
 import { Card, Button, Spinner, EmptyState, SafetyBadge } from '../ui';
@@ -32,7 +32,19 @@ function formatEpisodeDate(dateStr?: string) {
 export default function Library() {
   const [activeTab, setActiveTab] = useState<'stories' | 'characters' | 'backgrounds' | 'props'>('stories');
   const [episodes, setEpisodes] = useState<EpisodeRecord[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState<string>(
+    () => searchParams.get('q') || searchParams.get('search') || ''
+  );
+
+  // Sync when search params change from navbar
+  useEffect(() => {
+    const q = searchParams.get('q') || searchParams.get('search');
+    if (q !== null) {
+      setSearchQuery(q);
+      setActiveTab('stories');
+    }
+  }, [searchParams]);
   const [assets, setAssets] = useState<AssetCatalog>({
     characters: [],
     backgrounds: [],
