@@ -7,6 +7,11 @@
 ---
 
 ## Done
+- [x] **N8.10 Logo Emblem & Crisp Brand Typography Pairing (`frontend/src/App.tsx`)**:
+  - Embedded high-res square emblem (`logo.png`) in the navbar brand pod (`h-7 w-7 sm:h-8 sm:w-8`).
+  - Added "VoxFable" brand typography manually using matching geometric typeface (`font-sans font-extrabold`) and the exact logo gold hex color `#FFCE0B` extracted from the brand mark, with subtle depth drop-shadow.
+  - Interactive tactile hover physics (`group-hover:rotate-6 group-hover:scale-105` on emblem and `group-hover:brightness-110` on typography).
+  - Synchronized across both workspaces and verified with all 39 passing unit tests and clean TypeScript check.
 - [x] **N8.9 Brand Identity Asset Integration (`frontend/public/`, `frontend/src/App.tsx`, `frontend/index.html`)**:
   - Integrated official high-resolution brand assets from `Logos/`:
     - `Logo_Navbar.png` placed in `public/logo_navbar.png` and embedded in `NavBar` with responsive height, rounded-full geometry, tactile hover scale, and screen-reader accessible label.
