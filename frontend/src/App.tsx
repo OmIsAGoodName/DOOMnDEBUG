@@ -36,6 +36,53 @@ function NavBar({ isDark, onToggleTheme }: NavBarProps) {
     { path: '/debug', label: 'Diagnostics', icon: '⚙️' },
   ];
 
+  // Sliding pill position state & element refs
+  const [indicatorStyle, setIndicatorStyle] = useState({
+    left: 0,
+    top: 6,
+    width: 0,
+    height: 0,
+    opacity: 0,
+  });
+  const navRef = useRef<HTMLElement>(null);
+  const itemRefs = useRef<Map<string, HTMLAnchorElement>>(new Map());
+
+  const updateIndicator = () => {
+    const matchedItem =
+      navItems.find((item) =>
+        item.path === '/'
+          ? currentPath === '/'
+          : currentPath.startsWith(item.path)
+      ) || navItems[0];
+
+    const el = itemRefs.current.get(matchedItem.path);
+    if (el && navRef.current) {
+      setIndicatorStyle({
+        left: el.offsetLeft,
+        top: el.offsetTop,
+        width: el.offsetWidth,
+        height: el.offsetHeight,
+        opacity: 1,
+      });
+    }
+  };
+
+  useEffect(() => {
+    updateIndicator();
+  }, [currentPath]);
+
+  useEffect(() => {
+    window.addEventListener('resize', updateIndicator);
+    if (document.fonts) {
+      document.fonts.ready.then(updateIndicator);
+    }
+    const timer = setTimeout(updateIndicator, 50);
+    return () => {
+      window.removeEventListener('resize', updateIndicator);
+      clearTimeout(timer);
+    };
+  }, []);
+
   const handleOpenSearch = () => {
     setIsSearchOpen(true);
     setTimeout(() => {
@@ -72,8 +119,24 @@ function NavBar({ isDark, onToggleTheme }: NavBarProps) {
         </span>
       </Link>
 
-      {/* 2. Floating Center Pill Navigation Dock (Apple Spring Physics) */}
-      <nav className="flex items-center gap-1 sm:gap-1.5 p-1.5 rounded-full bg-white/85 dark:bg-[#131d2e]/90 backdrop-blur-2xl border-t border-white/40 dark:border-white/15 border-l border-white/30 dark:border-white/10 border-r border-stone-200/90 dark:border-black/40 border-b border-stone-200/90 dark:border-black/50 shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-x-auto scrollbar-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]">
+      {/* 2. Floating Center Pill Navigation Dock with Sliding Spring Indicator */}
+      <nav
+        ref={navRef}
+        className="relative flex items-center gap-1 sm:gap-1.5 p-1.5 rounded-full bg-white/85 dark:bg-[#131d2e]/90 backdrop-blur-2xl border-t border-white/40 dark:border-white/15 border-l border-white/30 dark:border-white/10 border-r border-stone-200/90 dark:border-black/40 border-b border-stone-200/90 dark:border-black/50 shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-x-auto scrollbar-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+      >
+        {/* The Smooth Sliding Spring Pill Indicator (Glides between sections) */}
+        <div
+          className="absolute rounded-full bg-gradient-to-r from-vox-gold via-lantern-500 to-vox-gold shadow-gold-sm pointer-events-none transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)]"
+          style={{
+            transform: `translate3d(${indicatorStyle.left}px, ${indicatorStyle.top}px, 0)`,
+            width: `${indicatorStyle.width}px`,
+            height: `${indicatorStyle.height}px`,
+            opacity: indicatorStyle.opacity,
+            left: 0,
+            top: 0,
+          }}
+        />
+
         {navItems.map((item) => {
           const isActive =
             item.path === '/'
@@ -84,10 +147,14 @@ function NavBar({ isDark, onToggleTheme }: NavBarProps) {
             <Link
               key={item.path}
               to={item.path}
-              className={`group relative flex items-center gap-1.5 sm:gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] whitespace-nowrap active:scale-[0.94] ${
+              ref={(el) => {
+                if (el) itemRefs.current.set(item.path, el);
+                else itemRefs.current.delete(item.path);
+              }}
+              className={`group relative z-10 flex items-center gap-1.5 sm:gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-colors duration-250 whitespace-nowrap active:scale-[0.94] ${
                 isActive
-                  ? 'bg-gradient-to-r from-vox-gold via-lantern-500 to-vox-gold text-vox-midnight shadow-gold-sm ring-1 ring-vox-gold/50 scale-[1.02]'
-                  : 'text-stone-600 dark:text-slate-300 hover:text-vox-midnight dark:hover:text-vox-gold hover:bg-black/5 dark:hover:bg-white/5 hover:-translate-y-0.5'
+                  ? 'text-vox-midnight'
+                  : 'text-stone-600 dark:text-slate-300 hover:text-vox-midnight dark:hover:text-vox-gold'
               }`}
             >
               <span className="text-sm transition-transform duration-200 ease-out group-hover:scale-115 group-hover:-translate-y-0.5 inline-block">
