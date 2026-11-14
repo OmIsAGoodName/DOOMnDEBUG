@@ -7,6 +7,11 @@
 ---
 
 ## Done
+- [x] **N8.8 Continuous Gliding Spring Pill Indicator (`frontend/src/App.tsx`)**:
+  - Replaced isolated static pill backgrounds with a single continuous sliding pill indicator that physically glides and morphs width between sections.
+  - Calculated exact layout geometry (`offsetLeft`, `offsetTop`, `offsetWidth`, `offsetHeight`) via item element refs and `ResizeObserver`/font-load events.
+  - Powered by hardware-accelerated 3D transforms (`translate3d`) and Apple's critically damped fluid spring curve (`cubic-bezier(0.16, 1, 0.3, 1)` over 350ms).
+  - Synchronized and verified across both workspaces with all 39 unit tests passing.
 - [x] **N8.7 Fluid Apple-Style Motion & Transitions on Navbar (`frontend/src/App.tsx`)**:
   - Implemented Apple-grade fluid spring motion curve `cubic-bezier(0.16, 1, 0.3, 1)` across all navbar elements.
   - Replaced hard DOM unmount of the companion search pod with a smooth morphing capsule animation: smoothly expands from `w-10` circular pod to `w-72` search bar with fade-in and auto-focus.
