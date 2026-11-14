@@ -106,18 +106,20 @@ function NavBar({ isDark, onToggleTheme }: NavBarProps) {
 
   return (
     <header className="sticky top-0 z-50 w-full px-4 sm:px-8 py-3 flex items-center justify-between gap-3 select-none backdrop-blur-md bg-white/40 dark:bg-[#070a13]/40 border-b border-stone-200/50 dark:border-white/5 transition-colors duration-300">
-      {/* 1. Left Brand Pod with Logo_Navbar */}
+      {/* 1. Left Brand Pod with Logo Emblem + Custom Typography */}
       <Link
         to="/"
-        className="group flex items-center px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full bg-white/80 dark:bg-[#131d2e]/80 backdrop-blur-2xl border-t border-white/40 dark:border-white/15 border-l border-white/30 dark:border-white/10 border-r border-stone-200/80 dark:border-black/30 border-b border-stone-200/80 dark:border-black/40 shadow-storybook-sm hover:shadow-storybook hover:scale-[1.03] active:scale-[0.96] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] shrink-0"
+        className="group flex items-center gap-2.5 px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full bg-white/80 dark:bg-[#131d2e]/80 backdrop-blur-2xl border-t border-white/40 dark:border-white/15 border-l border-white/30 dark:border-white/10 border-r border-stone-200/80 dark:border-black/30 border-b border-stone-200/80 dark:border-black/40 shadow-storybook-sm hover:shadow-storybook hover:scale-[1.03] active:scale-[0.96] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] shrink-0"
         title="VoxFable Home"
       >
         <img
-          src="/logo_navbar.png"
-          alt="VoxFable"
-          className="h-7 sm:h-8 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+          src="/logo.png"
+          alt="VoxFable Emblem"
+          className="h-7 w-7 sm:h-8 sm:w-8 object-contain shrink-0 group-hover:rotate-6 group-hover:scale-105 transition-transform duration-300 ease-out"
         />
-        <span className="sr-only">VoxFable</span>
+        <span className="font-sans font-extrabold tracking-tight text-[#FFCE0B] text-base sm:text-lg select-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.15)] group-hover:brightness-110 transition-all duration-200">
+          VoxFable
+        </span>
       </Link>
 
       {/* 2. Floating Center Pill Navigation Dock with Sliding Spring Indicator */}
